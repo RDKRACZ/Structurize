@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import com.ldtteam.structurize.block.IAnchorBlock;
 import com.ldtteam.structurize.structure.StructureBB;
 import com.ldtteam.structurize.util.BlockInfo;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.HangingEntity;
@@ -18,6 +17,7 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.extensions.IForgeBlockState;
 import static com.ldtteam.structurize.util.constants.MathConstants.NINETY_DEGREES;
 
 /**
@@ -38,7 +38,7 @@ public class Blueprint
     /**
      * The palette of different blocks.
      */
-    private List<BlockState> palette;
+    private List<IForgeBlockState> palette;
 
     /**
      * The name of the blueprint.
@@ -79,7 +79,12 @@ public class Blueprint
      * @param tileEntities the tileEntities.
      * @param requiredMods the required mods.
      */
-    protected Blueprint(final StructureBB structBB, final List<BlockState> palette, final short[][][] structure, final CompoundNBT[] tileEntities, final List<String> requiredMods)
+    protected Blueprint(
+        final StructureBB structBB,
+        final List<IForgeBlockState> palette,
+        final short[][][] structure,
+        final CompoundNBT[] tileEntities,
+        final List<String> requiredMods)
     {
         this((short) structBB.getXSize(), (short) structBB.getYSize(), (short) structBB.getZSize(), palette, structure, tileEntities, requiredMods);
     }
@@ -99,7 +104,7 @@ public class Blueprint
         final short sizeX,
         final short sizeY,
         final short sizeZ,
-        final List<BlockState> palette,
+        final List<IForgeBlockState> palette,
         final short[][][] structure,
         final CompoundNBT[] tileEntities,
         final List<String> requiredMods)
@@ -148,6 +153,7 @@ public class Blueprint
 
         this.requiredMods = new ArrayList<>();
         this.palette = new ArrayList<>();
+        this.palette.add(Blocks.AIR.getDefaultState());
         // this.palette.add(0, ModBlocks.blockSubstitution.getDefaultState()); ??? why though
     }
 
@@ -186,9 +192,9 @@ public class Blueprint
     /**
      * @return the pallete (without rotation and/or mirroring)
      */
-    public BlockState[] getPalette()
+    public IForgeBlockState[] getPalette()
     {
-        return palette.toArray(new BlockState[0]);
+        return palette.toArray(new IForgeBlockState[0]);
     }
 
     /**
@@ -197,7 +203,7 @@ public class Blueprint
      * @param pos   the position to add it to.
      * @param state the state to add.
      */
-    public void addBlockState(final BlockPos pos, final BlockState state)
+    public void addBlockState(final BlockPos pos, final IForgeBlockState state)
     {
         int index = palette.indexOf(state);
 
@@ -337,7 +343,7 @@ public class Blueprint
                 {
                     final BlockPos tempPos = new BlockPos(x, y, z);
                     final short value = structure[y][z][x];
-                    final BlockState state = palette.get(value & 0xFFFF);
+                    final IForgeBlockState state = palette.get(value & 0xFFFF);
                     list.add(new BlockInfo(tempPos, state, tileEntities[y][z][x]));
                 }
             }
@@ -365,10 +371,10 @@ public class Blueprint
         final CompoundNBT[] newEntities = new CompoundNBT[entities.length];
         final CompoundNBT[][][] newTileEntities = new CompoundNBT[newSizeY][newSizeZ][newSizeX];
 
-        final List<BlockState> tempPalette = new ArrayList<>();
+        final List<IForgeBlockState> tempPalette = new ArrayList<>();
         for (int i = 0; i < palette.size(); i++)
         {
-            tempPalette.add(i, palette.get(i).with(null, null).mirror(mirror).rotate(rotation));
+            tempPalette.add(i, palette.get(i).getBlockState().mirror(mirror).rotate(rotation));
         }
 
         final BlockPos extremes = transformedBlockPos(sizeX, sizeY, sizeZ, mirror, rotation);
@@ -389,12 +395,12 @@ public class Blueprint
                 {
                     final BlockPos tempPos = transformedBlockPos(x, y, z, mirror, rotation).add(minX, minY, minZ);
                     final short value = structure[y][z][x];
-                    final BlockState state = palette.get(value & 0xFFFF);
-                    if (state.getBlock() == Blocks.STRUCTURE_VOID)
+                    final IForgeBlockState state = palette.get(value & 0xFFFF);
+                    if (state.getBlockState().getBlock() == Blocks.STRUCTURE_VOID)
                     {
                         continue;
                     }
-                    if (state.getBlock() instanceof IAnchorBlock)
+                    if (state.getBlockState().getBlock() instanceof IAnchorBlock)
                     {
                         offset = tempPos;
                         foundAnchor = true;

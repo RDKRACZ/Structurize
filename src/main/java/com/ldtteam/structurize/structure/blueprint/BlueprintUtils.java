@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import com.ldtteam.structurize.structure.StructureBB;
 import org.apache.logging.log4j.LogManager;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.HangingEntity;
@@ -23,6 +22,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.extensions.IForgeBlockState;
 import net.minecraftforge.fml.ModList;
 import static com.ldtteam.structurize.util.constants.MathConstants.CHUNK_BLOCK_SIZE;
 
@@ -68,7 +68,7 @@ public class BlueprintUtils
      */
     public static Blueprint createBlueprint(final World world, final BlockPos start, final BlockPos end, final String name, final String... architects)
     {
-        final List<BlockState> pallete = new ArrayList<>();
+        final List<IForgeBlockState> pallete = new ArrayList<>();
         // Always add AIR to Pallete
         pallete.add(Blocks.AIR.getDefaultState());
         final StructureBB structBB = new StructureBB(start, end);
@@ -80,8 +80,8 @@ public class BlueprintUtils
 
         for (final BlockPos pos : structBB.getPosIterator())
         {
-            final BlockState state = world.getBlockState(pos);
-            final String modName = state.getBlock().getRegistryName().getNamespace();
+            final IForgeBlockState state = world.getBlockState(pos);
+            final String modName = state.getBlockState().getBlock().getRegistryName().getNamespace();
 
             final BlockPos posInStruct = pos.subtract(structBB.getAnchor());
 
@@ -177,11 +177,11 @@ public class BlueprintUtils
         tag.putShort("size_z", schem.getSizeZ());
 
         // Create Pallete
-        final BlockState[] palette = schem.getPalette();
+        final IForgeBlockState[] palette = schem.getPalette();
         final ListNBT paletteTag = new ListNBT();
         for (short i = 0; i < schem.getPalleteSize(); i++)
         {
-            paletteTag.add(NBTUtil.writeBlockState(palette[i]));
+            paletteTag.add(NBTUtil.writeBlockState(palette[i].getBlockState()));
         }
         tag.put("palette", paletteTag);
 
@@ -269,7 +269,7 @@ public class BlueprintUtils
 
             // Reading Pallete
             final ListNBT paletteTag = (ListNBT) tag.get("palette");
-            final List<BlockState> palette = new ArrayList<>();
+            final List<IForgeBlockState> palette = new ArrayList<>();
             for (short i = 0; i < paletteTag.size(); i++)
             {
                 palette.add(i, NBTUtil.readBlockState(paletteTag.getCompound(i)));
