@@ -47,7 +47,7 @@ public class ScanTool extends AbstractItemWithPosSelector
         if (!worldIn.isRemote())
         {
             final Path loc = Minecraft.getInstance().gameDir.toPath().resolve("structurize").resolve("tempschem.blueprint").toAbsolutePath();
-            Instances.getModLogger().info("Saving bp to: " + loc.toString());
+            Instances.getLogger().info("Saving bp to: " + loc.toString());
             try
             {
                 Files.createDirectories(loc.getParent());
