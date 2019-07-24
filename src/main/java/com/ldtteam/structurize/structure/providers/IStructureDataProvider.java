@@ -18,12 +18,12 @@ public interface IStructureDataProvider
     void rotateCounterClockwise();
 
     /**
-     * Mirrors structure through X axis.
+     * Mirrors structure along X axis.
      */
     void mirrorX();
 
     /**
-     * Mirrors structure through Z axis.
+     * Mirrors structure along Z axis.
      */
     void mirrorZ();
 

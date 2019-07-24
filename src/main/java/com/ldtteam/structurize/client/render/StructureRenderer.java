@@ -51,9 +51,5 @@ public class StructureRenderer
 
     private static void renderStructureDataProvider(final IStructureDataProvider dataProvider, final WorldRenderer worldRenderer, final float partialTicks)
     {
-        GlStateManager.enableDepthTest();
-        GlStateManager.enableAlphaTest();
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.5F);
-        GlStateManager.enableCull();
     }
 }
