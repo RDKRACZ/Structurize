@@ -51,10 +51,7 @@ public class ScanTool extends AbstractItemWithPosSelector
             try
             {
                 Files.createDirectories(loc.getParent());
-                BlueprintUtils
-                    .writeToStream(
-                        Files.newOutputStream(loc, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING),
-                        BlueprintUtils.createBlueprint(worldIn, start, end, Long.toString(System.currentTimeMillis())));
+                BlueprintUtils.writeToStream(loc, BlueprintUtils.createBlueprint(worldIn, start, end, Long.toString(System.currentTimeMillis())));
             }
             catch (final IOException e)
             {

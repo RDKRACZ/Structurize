@@ -2,9 +2,13 @@ package com.ldtteam.structurize.command;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.ldtteam.structurize.util.LanguageHandler;
+import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.exceptions.CommandExceptionType;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandSource;
 
 /**
@@ -44,6 +48,43 @@ public abstract class AbstractCommand
     protected static <T> RequiredArgumentBuilder<CommandSource, T> newArgument(final String name, final ArgumentType<T> type)
     {
         return RequiredArgumentBuilder.argument(name, type);
+    }
+
+    /**
+     * Throws command syntax exception.
+     *
+     * @param key language key to translate
+     */
+    public static void throwSyntaxException(final String key) throws CommandSyntaxException
+    {
+        throw new CommandSyntaxException(new StructurizeCommandExceptionType(), new LiteralMessage(LanguageHandler.translateKey(key)));
+    }
+
+    /**
+     * Throws command syntax exception.
+     *
+     * @param key    language key to translate
+     * @param format String.format() attributes
+     */
+    public static void throwSyntaxException(final String key, final Object... format) throws CommandSyntaxException
+    {
+        throw new CommandSyntaxException(new StructurizeCommandExceptionType(), new LiteralMessage(LanguageHandler.translateKeyWithFormat(key, format)));
+    }
+
+    /**
+     * Our dummy exception type
+     */
+    public static class StructurizeCommandExceptionType implements CommandExceptionType
+    {
+        /**
+         * Creates a dummy exception type
+         */
+        public StructurizeCommandExceptionType()
+        {
+            /**
+             * Intentionally left empty
+             */
+        }
     }
 
     /**

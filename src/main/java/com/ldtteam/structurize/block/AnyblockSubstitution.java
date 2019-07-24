@@ -1,12 +1,14 @@
 package com.ldtteam.structurize.block;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import com.ldtteam.structurize.util.constants.MathConstants;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.material.PushReaction;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -18,6 +20,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
 /**
  * Anyblock substitution block class
@@ -36,8 +39,7 @@ public class AnyblockSubstitution extends Block
     public AnyblockSubstitution()
     {
         this(
-            Properties
-                .create(new Material(MaterialColor.WOOD, false, true, true, true, true, false, false, PushReaction.BLOCK))
+            Properties.create(new Material(MaterialColor.WOOD, false, true, true, true, true, false, false, PushReaction.BLOCK))
                 .doesNotBlockMovement()
                 .hardnessAndResistance(1.0F));
     }
@@ -73,24 +75,18 @@ public class AnyblockSubstitution extends Block
      */
     public BlockItem createSpecialBI(final ItemGroup itemGroup)
     {
-        return (BlockItem) new BlockItem(this, new Item.Properties().group(itemGroup))
-        {
+        return (BlockItem) new BlockItem(this, new Item.Properties().group(itemGroup)){
             @Override
             public ActionResult<ItemStack> onItemRightClick(final World worldIn, final PlayerEntity playerIn, final Hand handIn)
             {
                 if (worldIn.isRemote())
                 {
                     SHOULD_RENDER_BLOCK_TEXTURE.set(!SHOULD_RENDER_BLOCK_TEXTURE.get());
-                    for (int i = -1; i < 2; i++)
-                    {
-                        for (int j = -1; j < 2; j++)
-                        {
-                            for (int k = -1; k < 2; k++)
-                            {
-                                worldIn.markForRerender(playerIn.getPosition().add(i * CHUNK_SIZE, j * CHUNK_SIZE, k * CHUNK_SIZE));
-                            }
-                        }
-                    }
+                    final BlockPos center = playerIn.getPosition();
+                    ((ClientWorld) worldIn).markSurroundingsForRerender(
+                        center.getX() / MathConstants.CHUNK_BLOCK_SIZE,
+                        center.getY() / MathConstants.CHUNK_BLOCK_SIZE,
+                        center.getZ() / MathConstants.CHUNK_BLOCK_SIZE);
                 }
                 return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getHeldItem(handIn));
             }

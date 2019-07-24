@@ -1,7 +1,11 @@
 package com.ldtteam.structurize.structure.blueprint;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -191,7 +195,8 @@ public class BlueprintUtils
 
         // Adding Tile Entities
         final ListNBT finishedTes = new ListNBT();
-        final CompoundNBT[] tes = Arrays.stream(schem.getTileEntities()).flatMap(Arrays::stream).flatMap(Arrays::stream).filter(Objects::nonNull).toArray(CompoundNBT[]::new);
+        final CompoundNBT[] tes =
+            Arrays.stream(schem.getTileEntities()).flatMap(Arrays::stream).flatMap(Arrays::stream).filter(Objects::nonNull).toArray(CompoundNBT[]::new);
         for (final CompoundNBT te : tes)
         {
             finishedTes.add(te);
@@ -319,6 +324,24 @@ public class BlueprintUtils
     }
 
     /**
+     * Attempts to write a Blueprint to a Path.
+     *
+     * @param location The Path to write to
+     * @param schem    The Blueprint to write
+     */
+    public static void writeToStream(final Path location, final Blueprint schem)
+    {
+        try
+        {
+            writeToStream(Files.newOutputStream(location, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING), schem);
+        }
+        catch (final IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Attempts to write a Blueprint to an Output Stream.
      *
      * @param os    The Output Stream to write to
@@ -334,6 +357,44 @@ public class BlueprintUtils
         {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Attempts to read a Blueprint from a Path.
+     *
+     * @param location The Path to read from
+     * @return null when failed, blueprint otherwise
+     */
+    public static Blueprint readFromStream(final Path location)
+    {
+        try
+        {
+            return readFromStream(Files.newInputStream(location, StandardOpenOption.READ));
+        }
+        catch (final IOException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Attempts to read a Blueprint from an Input Stream.
+     *
+     * @param is The Input Stream to read from
+     * @return null when failed, blueprint otherwise
+     */
+    public static Blueprint readFromStream(final InputStream is)
+    {
+        try
+        {
+            return readBlueprintFromNBT(CompressedStreamTools.readCompressed(is));
+        }
+        catch (final IOException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

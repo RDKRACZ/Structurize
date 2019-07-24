@@ -355,12 +355,11 @@ public class Blueprint
      * Rotate the structure depending on the direction it's facing.
      *
      * @param rotation times to rotateWithMirror.
-     * @param pos      the pos to rotateWithMirror it around.
      * @param mirror   the mirror.
      * @param world    the world.
      * @return the new offset.
      */
-    public BlockPos rotateWithMirror(final Rotation rotation, final BlockPos pos, final Mirror mirror, final World world)
+    public BlockPos rotateWithMirror(final Rotation rotation, final Mirror mirror, final World world)
     {
         final BlockPos resultSize = transformedSize(new BlockPos(sizeX, sizeY, sizeZ), rotation);
         final short newSizeX = (short) resultSize.getX();
@@ -385,7 +384,7 @@ public class Blueprint
         palette = tempPalette;
 
         boolean foundAnchor = false;
-        BlockPos offset = pos;
+        BlockPos offset = null;
 
         for (short x = 0; x < sizeX; x++)
         {

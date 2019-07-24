@@ -9,12 +9,12 @@ import net.minecraft.util.math.BlockPos;
  */
 public class StructureBB
 {
-    private final int minX;
-    private final int minY;
-    private final int minZ;
-    private final int maxX;
-    private final int maxY;
-    private final int maxZ;
+    private int minX;
+    private int minY;
+    private int minZ;
+    private int maxX;
+    private int maxY;
+    private int maxZ;
 
     /**
      * Creates new structureBB.
@@ -104,5 +104,20 @@ public class StructureBB
     public Iterable<BlockPos> getPosIterator()
     {
         return BlockPos.getAllInBoxMutable(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    /**
+     * Moves BB by given vector.
+     *
+     * @param vector move vector
+     */
+    public void moveBy(final BlockPos vector)
+    {
+        minX += vector.getX();
+        minY += vector.getY();
+        minZ += vector.getZ();
+        maxX += vector.getX();
+        maxY += vector.getY();
+        maxZ += vector.getZ();
     }
 }

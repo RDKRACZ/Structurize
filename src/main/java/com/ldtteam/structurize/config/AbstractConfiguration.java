@@ -14,6 +14,23 @@ import net.minecraftforge.common.ForgeConfigSpec.LongValue;
 
 public abstract class AbstractConfiguration
 {
+    protected void createCategory(final Builder builder, final String key)
+    {
+        // TODO: missing name, translation not allowed for now
+        builder.comment(LanguageHandler.translateKey(commentTKey(key))).push(key);
+    }
+
+    protected void swapToCategory(final Builder builder, final String key)
+    {
+        finishCategory(builder);
+        createCategory(builder, key);
+    }
+
+    protected void finishCategory(final Builder builder)
+    {
+        builder.pop();
+    }
+
     private static String nameTKey(final String key)
     {
         return GeneralConstants.MOD_ID + ".config." + key;
