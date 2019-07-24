@@ -15,14 +15,6 @@
   "structurize.caliper.msg.1D": "line",
   "structurize.caliper.msg.2D": "square",
   "structurize.caliper.msg.3D": "cube",
-  "structurize.config.testlist": "Test List",
-  "structurize.config.testboolean": "Test Boolean",
-  "structurize.config.testdouble": "Test Double",
-  "structurize.config.testlong": "Test Long",
-  "structurize.config.testenum": "Test Enum",
-  "structurize.config.testlist.comment": "Test List COMMENT",
-  "structurize.config.testboolean.comment": "Test Boolean COMMENT",
-  "structurize.config.testdouble.comment": "Test Double COMMENT",
-  "structurize.config.testlong.comment": "Test Long COMMENT",
-  "structurize.config.testenum.comment": "Test Enum COMMENT"
+  "structurize.config.buildtoolsurvivescrafting": "BuildTool Survives Crafting",
+  "structurize.config.buildtoolsurvivescrafting.comment": "Should BuildTool remains after crafting when being a part of crafting recipe?"
 }

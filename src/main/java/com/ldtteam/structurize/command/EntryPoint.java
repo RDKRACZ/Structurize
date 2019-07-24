@@ -40,8 +40,7 @@ public class EntryPoint extends AbstractCommand
      */
     public static void register(final CommandDispatcher<CommandSource> dispatcher)
     {
-        final CommandTree testSubTree = new CommandTree("test").addNode(TestChatCommand.build());
-        final CommandTree structurizeRoot = new CommandTree(GeneralConstants.MOD_ID).addNode(testSubTree).addNode(TestChatCommand.build());
+        final CommandTree structurizeRoot = new CommandTree(GeneralConstants.MOD_ID).addNode(EventMovesCommand.build());
 
         dispatcher.register(structurizeRoot.build());
     }

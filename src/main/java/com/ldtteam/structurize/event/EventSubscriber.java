@@ -1,7 +1,9 @@
 package com.ldtteam.structurize.event;
 
 import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.client.render.StructureRenderer;
 import com.ldtteam.structurize.command.EntryPoint;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
@@ -34,7 +36,6 @@ public class EventSubscriber
     public static void onServerAboutToStart(final FMLServerAboutToStartEvent event)
     {
         Instances.getLogger().warn("FMLServerAboutToStartEvent");
-        Instances.getLogger().info(Instances.getConfig().getCommon().getTestBoolean());
     }
 
     /**
@@ -83,15 +84,14 @@ public class EventSubscriber
     }
 
     /**
-     * Called when config has changed.
+     * Called after world and before player's hand a gui overlays rendering.
      *
      * @param event event
      */
-    public static void onConfigChanged(final OnConfigChangedEvent event)
+    @SubscribeEvent
+    public static void onRenderWorldLast(final RenderWorldLastEvent event)
     {
-        if (event.getModID().equals(""))
-        {
-
-        }
+        Instances.getLogger().warn("RenderWorldLastEvent");
+        StructureRenderer.renderActiveEvents(event.getContext(), event.getPartialTicks());
     }
 }
