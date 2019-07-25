@@ -1,8 +1,6 @@
 package com.ldtteam.structurize.command;
 
-import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.client.gui.WindowBuildTool;
-import com.ldtteam.structurize.network.messages.TestMessage;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;

@@ -2,7 +2,6 @@ package com.ldtteam.structurize.network;
 
 import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.network.messages.IMessage;
-import com.ldtteam.structurize.network.messages.TestMessage;
 import com.ldtteam.structurize.util.Utils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -35,7 +34,8 @@ public class NetworkChannel
      */
     public NetworkChannel(final String channelName)
     {
-        rawChannel = NetworkRegistry.newSimpleChannel(Utils.createLocationFor(channelName), () -> LATEST_PROTO_VER, ACCEPTED_PROTO_VERS::equals, ACCEPTED_PROTO_VERS::equals);
+        rawChannel =
+            NetworkRegistry.newSimpleChannel(Utils.createLocationFor(channelName), () -> LATEST_PROTO_VER, ACCEPTED_PROTO_VERS::equals, ACCEPTED_PROTO_VERS::equals);
     }
 
     /**
@@ -44,7 +44,7 @@ public class NetworkChannel
     public void registerCommonMessages()
     {
         int idx = 0;
-        registerMessage(++idx, TestMessage.class);
+        // registerMessage(++idx, TestMessage.class);
     }
 
     /**

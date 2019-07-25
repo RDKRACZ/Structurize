@@ -3,6 +3,7 @@ package com.ldtteam.structurize.client.gui;
 import com.ldtteam.structurize.client.render.StructureRenderer;
 import com.ldtteam.structurize.item.BuildTool;
 import com.ldtteam.structurize.structure.PlaceEventInfoHolder;
+import com.ldtteam.structurize.structure.providers.BlueprintStructureProvider;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
@@ -11,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
  */
 public class WindowBuildTool
 {
-    private static PlaceEventInfoHolder eventReference;
+    private static PlaceEventInfoHolder<BlueprintStructureProvider> eventReference;
 
     public static void open(final PlayerEntity player)
     {
@@ -30,7 +31,7 @@ public class WindowBuildTool
         StructureRenderer.setActiveBuildToolEvent(null);
     }
 
-    public static PlaceEventInfoHolder getEvent()
+    public static PlaceEventInfoHolder<BlueprintStructureProvider> getEvent()
     {
         return eventReference;
     }

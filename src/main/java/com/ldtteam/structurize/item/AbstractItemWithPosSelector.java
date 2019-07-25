@@ -44,7 +44,7 @@ public abstract class AbstractItemWithPosSelector extends Item
      * @param playerIn event player
      * @return event result, typically success
      */
-    public abstract ActionResultType onAirRightClick(final BlockPos start, final BlockPos end, final World worldIn, final PlayerEntity playerIn);
+    public abstract ActionResultType onAirRightClick(BlockPos start, BlockPos end, World worldIn, PlayerEntity playerIn);
 
     /**
      * Uses to search for correct itemstack in both hands.
