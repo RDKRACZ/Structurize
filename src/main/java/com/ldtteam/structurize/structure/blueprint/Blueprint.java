@@ -1,15 +1,14 @@
 package com.ldtteam.structurize.structure.blueprint;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import com.ldtteam.structurize.block.IAnchorBlock;
 import com.ldtteam.structurize.structure.StructureBB;
 import com.ldtteam.structurize.util.BlockInfo;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.HangingEntity;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Mirror;
@@ -17,7 +16,6 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.common.extensions.IForgeBlockState;
 import static com.ldtteam.structurize.util.constants.MathConstants.NINETY_DEGREES;
 
 /**
@@ -38,7 +36,7 @@ public class Blueprint
     /**
      * The palette of different blocks.
      */
-    private List<IForgeBlockState> palette;
+    private List<BlockState> palette;
 
     /**
      * The name of the blueprint.
@@ -48,12 +46,12 @@ public class Blueprint
     /**
      * The name of the builders.
      */
-    private String[] architects;
+    private List<String> architects;
 
     /**
      * A list of missing modids that were missing while this schematic was loaded.
      */
-    private String[] missingMods;
+    private List<String> missingMods;
 
     /**
      * The Schematic Data, each short represents an entry in the {@link Blueprint#palette}.
@@ -68,7 +66,7 @@ public class Blueprint
     /**
      * The entities.
      */
-    private CompoundNBT[] entities = new CompoundNBT[0];
+    private List<CompoundNBT> entities = new ArrayList<>();
 
     /**
      * Constructor of a new Blueprint.
@@ -81,7 +79,7 @@ public class Blueprint
      */
     protected Blueprint(
         final StructureBB structBB,
-        final List<IForgeBlockState> palette,
+        final List<BlockState> palette,
         final short[][][] structure,
         final CompoundNBT[] tileEntities,
         final List<String> requiredMods)
@@ -104,7 +102,7 @@ public class Blueprint
         final short sizeX,
         final short sizeY,
         final short sizeZ,
-        final List<IForgeBlockState> palette,
+        final List<BlockState> palette,
         final short[][][] structure,
         final CompoundNBT[] tileEntities,
         final List<String> requiredMods)
@@ -182,19 +180,11 @@ public class Blueprint
     }
 
     /**
-     * @return the amount of Blockstates within the pallete
-     */
-    public int getPalleteSize()
-    {
-        return palette.size();
-    }
-
-    /**
      * @return the pallete (without rotation and/or mirroring)
      */
-    public IForgeBlockState[] getPalette()
+    public List<BlockState> getPalette()
     {
-        return palette.toArray(new IForgeBlockState[0]);
+        return palette;
     }
 
     /**
@@ -203,7 +193,7 @@ public class Blueprint
      * @param pos   the position to add it to.
      * @param state the state to add.
      */
-    public void addBlockState(final BlockPos pos, final IForgeBlockState state)
+    public void addBlockState(final BlockPos pos, final BlockState state)
     {
         int index = palette.indexOf(state);
 
@@ -235,17 +225,19 @@ public class Blueprint
     /**
      * @return an array of serialized TileEntities (the Pos tag has been localized to coordinates within the structure)
      */
-    public CompoundNBT[] getEntities()
+    public List<CompoundNBT> getEntities()
     {
         return entities;
     }
 
     /**
      * @param entitiesIn an array of serialized TileEntities (the Pos tag need to be localized to coordinates within the structure)
+     * @return this object.
      */
-    public void setEntities(final CompoundNBT[] entitiesIn)
+    public Blueprint setEntities(final List<CompoundNBT> entitiesIn)
     {
         entities = entitiesIn;
+        return this;
     }
 
     /**
@@ -279,7 +271,7 @@ public class Blueprint
     /**
      * @return an Array of all architects for this structure
      */
-    public String[] getArchitects()
+    public List<String> getArchitects()
     {
         return architects;
     }
@@ -290,7 +282,7 @@ public class Blueprint
      * @param architectsIn an array of architects.
      * @return this blueprint.
      */
-    public Blueprint setArchitects(final String[] architectsIn)
+    public Blueprint setArchitects(final List<String> architectsIn)
     {
         architects = architectsIn;
         return this;
@@ -300,7 +292,7 @@ public class Blueprint
      * @return An Array of all missing mods that are required to generate this structure
      *         (only works if structure was loaded from file)
      */
-    public String[] getMissingMods()
+    public List<String> getMissingMods()
     {
         return missingMods;
     }
@@ -311,7 +303,7 @@ public class Blueprint
      * @param missingModsIn the missing mods list.
      * @return this object.
      */
-    public Blueprint setMissingMods(final String... missingModsIn)
+    public Blueprint setMissingMods(final List<String> missingModsIn)
     {
         missingMods = missingModsIn;
         return this;
@@ -324,7 +316,7 @@ public class Blueprint
      */
     public final List<CompoundNBT> getEntitiesAsList()
     {
-        return Arrays.stream(entities).collect(Collectors.toList());
+        return entities;
     }
 
     /**
@@ -343,7 +335,7 @@ public class Blueprint
                 {
                     final BlockPos tempPos = new BlockPos(x, y, z);
                     final short value = structure[y][z][x];
-                    final IForgeBlockState state = palette.get(value & 0xFFFF);
+                    final BlockState state = palette.get(value & 0xFFFF);
                     list.add(new BlockInfo(tempPos, state, tileEntities[y][z][x]));
                 }
             }
@@ -367,10 +359,10 @@ public class Blueprint
         final short newSizeZ = (short) resultSize.getZ();
 
         final short[][][] newStructure = new short[newSizeY][newSizeZ][newSizeX];
-        final CompoundNBT[] newEntities = new CompoundNBT[entities.length];
+        final List<CompoundNBT> newEntities = new ArrayList<>();
         final CompoundNBT[][][] newTileEntities = new CompoundNBT[newSizeY][newSizeZ][newSizeX];
 
-        final List<IForgeBlockState> tempPalette = new ArrayList<>();
+        final List<BlockState> tempPalette = new ArrayList<>();
         for (int i = 0; i < palette.size(); i++)
         {
             tempPalette.add(i, palette.get(i).getBlockState().mirror(mirror).rotate(rotation));
@@ -394,7 +386,7 @@ public class Blueprint
                 {
                     final BlockPos tempPos = transformedBlockPos(x, y, z, mirror, rotation).add(minX, minY, minZ);
                     final short value = structure[y][z][x];
-                    final IForgeBlockState state = palette.get(value & 0xFFFF);
+                    final BlockState state = palette.get(value & 0xFFFF);
                     if (state.getBlockState().getBlock() == Blocks.STRUCTURE_VOID)
                     {
                         continue;
@@ -418,12 +410,11 @@ public class Blueprint
             }
         }
 
-        for (int i = 0; i < entities.length; i++)
+        for (final CompoundNBT entity : entities)
         {
-            final CompoundNBT entitiesCompound = entities[i];
-            if (entitiesCompound != null)
+            if (entity != null)
             {
-                newEntities[i] = transformEntityInfoWithSettings(entitiesCompound, world, new BlockPos(minX, minY, minZ), rotation, mirror);
+                newEntities.add(transformEntityInfoWithSettings(entity, world, new BlockPos(minX, minY, minZ), rotation, mirror));
             }
         }
 

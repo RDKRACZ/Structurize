@@ -12,12 +12,14 @@ import java.util.List;
 import java.util.Objects;
 import com.ldtteam.structurize.structure.StructureBB;
 import org.apache.logging.log4j.LogManager;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.HangingEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.DoubleNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.IntNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
@@ -26,7 +28,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.common.extensions.IForgeBlockState;
 import net.minecraftforge.fml.ModList;
 import static com.ldtteam.structurize.util.constants.MathConstants.CHUNK_BLOCK_SIZE;
 
@@ -52,12 +53,12 @@ public class BlueprintUtils
      *
      * @param world The World that is used for the Blueprint
      * @param start The Position of the Blueprint
-     * @param end   The Size on the X-Axis
+     * @param end   The End Position of the Blueprint
      * @return the generated Blueprint
      */
     public static Blueprint createBlueprint(final World world, final BlockPos start, final BlockPos end)
     {
-        return createBlueprint(world, start, end, null);
+        return createBlueprint(world, start, end, null, new ArrayList<>());
     }
 
     /**
@@ -65,14 +66,14 @@ public class BlueprintUtils
      *
      * @param world      The World that is used for the Blueprint
      * @param start      The Position of the Blueprint
-     * @param end        The Size on the X-Axis
+     * @param end        The End Position of the Blueprint
      * @param name       a Name for the Structure
      * @param architects an Array of Architects for the structure
      * @return the generated Blueprint
      */
-    public static Blueprint createBlueprint(final World world, final BlockPos start, final BlockPos end, final String name, final String... architects)
+    public static Blueprint createBlueprint(final World world, final BlockPos start, final BlockPos end, final String name, final List<String> architects)
     {
-        final List<IForgeBlockState> pallete = new ArrayList<>();
+        final List<BlockState> pallete = new ArrayList<>();
         // Always add AIR to Pallete
         pallete.add(Blocks.AIR.getDefaultState());
         final StructureBB structBB = new StructureBB(start, end);
@@ -84,8 +85,8 @@ public class BlueprintUtils
 
         for (final BlockPos pos : structBB.getPosIterator())
         {
-            final IForgeBlockState state = world.getBlockState(pos);
-            final String modName = state.getBlockState().getBlock().getRegistryName().getNamespace();
+            final BlockState state = world.getBlockState(pos);
+            final String modName = state.getBlock().getRegistryName().getNamespace();
 
             final BlockPos posInStruct = pos.subtract(structBB.getAnchor());
 
@@ -128,38 +129,32 @@ public class BlueprintUtils
         {
             final Vec3d oldPos = entity.getPositionVector();
             final CompoundNBT entityTag = entity.serializeNBT();
-            if (true) // (entity.writeToNBTOptional(entityTag)) replaced above
-            {
-                final ListNBT posList = new ListNBT();
-                posList.add(new DoubleNBT(oldPos.x - structBB.getAnchor().getX()));
-                posList.add(new DoubleNBT(oldPos.y - structBB.getAnchor().getY()));
-                posList.add(new DoubleNBT(oldPos.z - structBB.getAnchor().getZ()));
+            final ListNBT posList = new ListNBT();
+            posList.add(new DoubleNBT(oldPos.x - structBB.getAnchor().getX()));
+            posList.add(new DoubleNBT(oldPos.y - structBB.getAnchor().getY()));
+            posList.add(new DoubleNBT(oldPos.z - structBB.getAnchor().getZ()));
 
-                BlockPos entityPos = entity.getPosition();
-                if (entity instanceof HangingEntity)
-                {
-                    entityPos = ((HangingEntity) entity).getHangingPosition();
-                }
-                entityTag.put("Pos", posList);
-                entityTag.put("TileX", new IntNBT(entityPos.getX() - structBB.getAnchor().getX()));
-                entityTag.put("TileY", new IntNBT(entityPos.getY() - structBB.getAnchor().getY()));
-                entityTag.put("TileZ", new IntNBT(entityPos.getZ() - structBB.getAnchor().getZ()));
-                entitiesTag.add(entityTag);
+            BlockPos entityPos = entity.getPosition();
+            if (entity instanceof HangingEntity)
+            {
+                entityPos = ((HangingEntity) entity).getHangingPosition();
             }
+            entityTag.put("Pos", posList);
+            entityTag.put("TileX", new IntNBT(entityPos.getX() - structBB.getAnchor().getX()));
+            entityTag.put("TileY", new IntNBT(entityPos.getY() - structBB.getAnchor().getY()));
+            entityTag.put("TileZ", new IntNBT(entityPos.getZ() - structBB.getAnchor().getZ()));
+            entitiesTag.add(entityTag);
         }
 
         final Blueprint schem = new Blueprint(structBB, pallete, structure, tes, requiredMods);
-        schem.setEntities(entitiesTag.toArray(new CompoundNBT[0]));
+        schem.setEntities(entitiesTag);
 
         if (name != null)
         {
             schem.setName(name);
         }
 
-        if (architects != null)
-        {
-            schem.setArchitects(architects);
-        }
+        schem.setArchitects(architects == null ? new ArrayList<>() : architects);
 
         return schem;
     }
@@ -181,11 +176,11 @@ public class BlueprintUtils
         tag.putShort("size_z", schem.getSizeZ());
 
         // Create Pallete
-        final IForgeBlockState[] palette = schem.getPalette();
+        final List<BlockState> palette = schem.getPalette();
         final ListNBT paletteTag = new ListNBT();
-        for (short i = 0; i < schem.getPalleteSize(); i++)
+        for (final BlockState bs : palette)
         {
-            paletteTag.add(NBTUtil.writeBlockState(palette[i].getBlockState()));
+            paletteTag.add(NBTUtil.writeBlockState(bs));
         }
         tag.put("palette", paletteTag);
 
@@ -205,7 +200,7 @@ public class BlueprintUtils
 
         // Adding Entities
         final ListNBT finishedEntities = new ListNBT();
-        final CompoundNBT[] entities = schem.getEntities();
+        final List<CompoundNBT> entities = schem.getEntities();
         for (final CompoundNBT entity : entities)
         {
             finishedEntities.add(entity);
@@ -223,7 +218,7 @@ public class BlueprintUtils
         tag.put("required_mods", modsList);
 
         final String name = schem.getName();
-        final String[] architects = schem.getArchitects();
+        final List<String> architects = schem.getArchitects();
 
         if (name != null)
         {
@@ -258,23 +253,23 @@ public class BlueprintUtils
             final short sizeX = tag.getShort("size_x"), sizeY = tag.getShort("size_y"), sizeZ = tag.getShort("size_z");
 
             // Reading required Mods
+            final ListNBT modsList = (ListNBT) tag.get("required_mods");
             final List<String> requiredMods = new ArrayList<>();
             final List<String> missingMods = new ArrayList<>();
-            final ListNBT modsList = (ListNBT) tag.get("required_mods");
-            final short modListSize = (short) modsList.size();
-            for (int i = 0; i < modListSize; i++)
+            for (final INBT mod : modsList)
             {
-                requiredMods.add(((StringNBT) modsList.get(i)).getString());
-                if (!ModList.get().isLoaded(requiredMods.get(i)))
+                final String modName = ((StringNBT) mod).getString();
+                requiredMods.add(modName);
+                if (!ModList.get().isLoaded(modName))
                 {
-                    LogManager.getLogger().warn("Found missing mods for Blueprint, some blocks may be missing: " + requiredMods.get(i));
-                    missingMods.add(requiredMods.get(i));
+                    LogManager.getLogger().warn("Found missing mod \"{}\" for Blueprint, some blocks may be missing!", modName);
+                    missingMods.add(modName);
                 }
             }
 
             // Reading Pallete
             final ListNBT paletteTag = (ListNBT) tag.get("palette");
-            final List<IForgeBlockState> palette = new ArrayList<>();
+            final List<BlockState> palette = new ArrayList<>(paletteTag.size());
             for (short i = 0; i < paletteTag.size(); i++)
             {
                 palette.add(i, NBTUtil.readBlockState(paletteTag.getCompound(i)));
@@ -293,15 +288,13 @@ public class BlueprintUtils
 
             // Reading Entities
             final ListNBT entitiesTag = (ListNBT) tag.get("entities");
-            final CompoundNBT[] entities = new CompoundNBT[entitiesTag.size()];
-            for (short i = 0; i < entities.length; i++)
+            final List<CompoundNBT> entities = new ArrayList<>(entitiesTag.size());
+            for (short i = 0; i < entitiesTag.size(); i++)
             {
-                entities[i] = entitiesTag.getCompound(i);
+                entities.add(entitiesTag.getCompound(i));
             }
 
-            final Blueprint schem = new Blueprint(sizeX, sizeY, sizeZ, palette, blocks, tileEntities, requiredMods).setMissingMods(missingMods.toArray(new String[0]));
-
-            schem.setEntities(entities);
+            final Blueprint schem = new Blueprint(sizeX, sizeY, sizeZ, palette, blocks, tileEntities, requiredMods).setMissingMods(missingMods).setEntities(entities);
 
             if (tag.contains("name"))
             {
@@ -310,10 +303,10 @@ public class BlueprintUtils
             if (tag.contains("architects"))
             {
                 final ListNBT architectsTag = (ListNBT) tag.get("architects");
-                final String[] architects = new String[architectsTag.size()];
+                final List<String> architects = new ArrayList<>(architectsTag.size());
                 for (int i = 0; i < architectsTag.size(); i++)
                 {
-                    architects[i] = architectsTag.getString(i);
+                    architects.add(architectsTag.getString(i));
                 }
                 schem.setArchitects(architects);
             }
