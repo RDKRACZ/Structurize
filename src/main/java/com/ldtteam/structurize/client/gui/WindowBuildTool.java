@@ -21,14 +21,19 @@ public class WindowBuildTool
 
     public static void open(final BlockPos targetedPos, final PlayerEntity player)
     {
+        if (eventReference != null)
+        {
+            return;
+        }
         eventReference = PlaceEventInfoHolder.createBlueprintEvent(targetedPos, player.getEntityWorld());
-        StructureRenderer.setActiveBuildToolEvent(eventReference);
+        StructureRenderer.addActiveEvent(eventReference);
+        // TODO: allow multi events (required gui for maintaining), notify player if max events reached
     }
 
     public static void close()
     {
+        eventReference.cancel();
         eventReference = null;
-        StructureRenderer.setActiveBuildToolEvent(null);
     }
 
     public static PlaceEventInfoHolder<BlueprintStructureProvider> getEvent()

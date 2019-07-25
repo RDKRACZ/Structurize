@@ -9,14 +9,19 @@ import net.minecraftforge.common.ForgeConfigSpec;
 public class ClientConfiguration extends AbstractConfiguration
 {
     /**
+     * How many build previews can be rendered at one time.
+     */
+    public final ForgeConfigSpec.IntValue maxAmountOfRenderedEvents;
+
+    /**
      * Builds client configuration.
      *
      * @param builder config builder
      */
     protected ClientConfiguration(final ForgeConfigSpec.Builder builder)
     {
-        /**
-         * Intentionally left empty
-         */
+        createCategory(builder, "render");
+        maxAmountOfRenderedEvents = defineInteger(builder, "maxamountofrenderedevents", 10, 1, Integer.MAX_VALUE);
+        finishCategory(builder);
     }
 }

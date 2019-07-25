@@ -1,55 +1,67 @@
 package com.ldtteam.structurize.client.render;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.structure.PlaceEventInfoHolder;
-import com.ldtteam.structurize.structure.providers.IStructureDataProvider;
-import com.mojang.blaze3d.platform.GlStateManager;
-import org.lwjgl.opengl.GL11;
 import net.minecraft.client.renderer.WorldRenderer;
 
+/**
+ * Static class for rendering active events.
+ */
 public class StructureRenderer
 {
-    private static PlaceEventInfoHolder<?> activeBuildToolEvent;
-    private static PlaceEventInfoHolder<?> activeShapeToolEvent;
+    private final static List<PlaceEventInfoHolder<?>> activeEvents = new ArrayList<>();
 
     /**
-     * Sets active buildtool event for rendering.
-     *
-     * @param event new event, null for not rendering
-     * @return previous event, might be null
+     * Private constructor to hide implicit public one.
      */
-    public static PlaceEventInfoHolder<?> setActiveBuildToolEvent(final PlaceEventInfoHolder<?> event)
+    private StructureRenderer()
     {
-        final PlaceEventInfoHolder<?> previous = activeBuildToolEvent;
-        activeBuildToolEvent = event;
-        return previous;
+        /**
+         * Intentionally left empty
+         */
     }
 
     /**
-     * Sets active buildtool event for rendering.
+     * Adds active event for rendering. Use
      *
-     * @param event new event, null for not rendering
-     * @return previous event, might be null
+     * @param event new event
+     * @return whether addition succeeded or not
      */
-    public static PlaceEventInfoHolder<?> setActiveShapeToolEvent(final PlaceEventInfoHolder<?> event)
+    public static boolean addActiveEvent(final PlaceEventInfoHolder<?> event)
     {
-        final PlaceEventInfoHolder<?> previous = activeShapeToolEvent;
-        activeShapeToolEvent = event;
-        return previous;
+        if (!event.isCanceled())
+        {
+            if (activeEvents.size() < Instances.getConfig().getClient().maxAmountOfRenderedEvents.get())
+            {
+                activeEvents.add(event);
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void renderActiveEvents(final WorldRenderer worldRenderer, final float partialTicks)
     {
-        if (activeBuildToolEvent != null)
+        // TODO: should we not render remaining events if we cause tick lag?
+        final Iterator<PlaceEventInfoHolder<?>> iterator = activeEvents.iterator();
+        while (iterator.hasNext())
         {
-            renderStructureDataProvider(activeBuildToolEvent.getStructure(), worldRenderer, partialTicks);
-        }
-        if (activeShapeToolEvent != null)
-        {
-            renderStructureDataProvider(activeShapeToolEvent.getStructure(), worldRenderer, partialTicks);
+            final PlaceEventInfoHolder<?> event = iterator.next();
+            if (event.isCanceled())
+            {
+                iterator.remove();
+                continue;
+            }
+
+            renderEvent(event, worldRenderer, partialTicks);
         }
     }
 
-    private static void renderStructureDataProvider(final IStructureDataProvider dataProvider, final WorldRenderer worldRenderer, final float partialTicks)
+    private static void renderEvent(final PlaceEventInfoHolder<?> event, final WorldRenderer worldRenderer, final float partialTicks)
     {
+
     }
 }

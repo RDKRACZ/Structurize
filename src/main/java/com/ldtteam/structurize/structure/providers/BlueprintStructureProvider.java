@@ -1,9 +1,12 @@
 package com.ldtteam.structurize.structure.providers;
 
 import java.nio.file.Path;
+import java.util.List;
 import com.ldtteam.structurize.structure.blueprint.Blueprint;
 import com.ldtteam.structurize.structure.blueprint.BlueprintUtils;
 import com.ldtteam.structurize.structure.PlaceEventInfoHolder;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
@@ -96,5 +99,35 @@ public class BlueprintStructureProvider implements IStructureDataProvider
     public int getZsize()
     {
         return blueprint.getSizeZ();
+    }
+
+    @Override
+    public List<String> getRequiredMods()
+    {
+        return blueprint.getRequiredMods();
+    }
+
+    @Override
+    public List<BlockState> getStructureBlockPalette()
+    {
+        return blueprint.getPalette();
+    }
+
+    @Override
+    public short[][][] getStructureBlocks()
+    {
+        return blueprint.getStructure();
+    }
+
+    @Override
+    public List<CompoundNBT> getStructureEntities()
+    {
+        return blueprint.getEntitiesAsList();
+    }
+
+    @Override
+    public CompoundNBT[][][] getStructureTileEntities()
+    {
+        return blueprint.getTileEntities();
     }
 }

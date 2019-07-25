@@ -104,6 +104,7 @@ public class StructureBB
     public Iterable<BlockPos> getPosIterator()
     {
         return BlockPos.getAllInBoxMutable(minX, minY, minZ, maxX, maxY, maxZ);
+        // TODO: needs replacement as it iterates x|y|z while we do y|z|x
     }
 
     /**

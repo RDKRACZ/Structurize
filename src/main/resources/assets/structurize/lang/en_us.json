@@ -16,5 +16,7 @@
   "structurize.caliper.msg.2D": "square",
   "structurize.caliper.msg.3D": "cube",
   "structurize.config.buildtoolsurvivescrafting": "BuildTool Survives Crafting",
-  "structurize.config.buildtoolsurvivescrafting.comment": "Should BuildTool remains after crafting when being a part of crafting recipe?"
+  "structurize.config.buildtoolsurvivescrafting.comment": "Should BuildTool remains after crafting when being a part of crafting recipe?",
+  "structurize.config.maxamountofrenderedevents": "Max Amount Of Rendered Events",
+  "structurize.config.maxamountofrenderedevents.comment": "How many build previews can be rendered at one time."
 }

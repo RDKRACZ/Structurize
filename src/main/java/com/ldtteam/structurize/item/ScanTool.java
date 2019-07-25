@@ -3,7 +3,6 @@ package com.ldtteam.structurize.item;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.structure.blueprint.BlueprintUtils;
 import net.minecraft.client.Minecraft;
@@ -51,7 +50,7 @@ public class ScanTool extends AbstractItemWithPosSelector
             try
             {
                 Files.createDirectories(loc.getParent());
-                BlueprintUtils.writeToStream(loc, BlueprintUtils.createBlueprint(worldIn, start, end, Long.toString(System.currentTimeMillis())));
+                BlueprintUtils.writeToStream(loc, BlueprintUtils.createBlueprint(worldIn, start, end, Long.toString(System.currentTimeMillis()), null));
             }
             catch (final IOException e)
             {

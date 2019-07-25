@@ -1,13 +1,9 @@
 package com.ldtteam.structurize.structure;
 
-import java.nio.file.Path;
-import com.ldtteam.structurize.structure.blueprint.Blueprint;
-import com.ldtteam.structurize.structure.blueprint.BlueprintUtils;
+import java.util.UUID;
 import com.ldtteam.structurize.structure.providers.BlueprintStructureProvider;
 import com.ldtteam.structurize.structure.providers.IStructureDataProvider;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -21,9 +17,11 @@ import net.minecraft.world.World;
  */
 public class PlaceEventInfoHolder<T extends IStructureDataProvider>
 {
+    private final UUID eventId = UUID.randomUUID();
     private StructureBB position;
     private T structure;
     private World world;
+    private boolean isCanceled = false;
 
     /**
      * Creates a new placement event info holder.
@@ -55,6 +53,35 @@ public class PlaceEventInfoHolder<T extends IStructureDataProvider>
     }
 
     /**
+     * Sends event to server where is accepted by selected buildProvider.
+     * When accepted on server every player is notified to cancel this event clientside.
+     *
+     * @param playerUUID player id to match event originator later
+     */
+    public void passToBuildProvider(final UUID playerUUID)
+    {
+
+    }
+
+    /**
+     * Sets cancel state. Event will be removed from every active list asap.
+     */
+    public void cancel()
+    {
+        isCanceled = true;
+    }
+
+    /**
+     * Getter for isCanceled state.
+     *
+     * @return isCanceled state
+     */
+    public boolean isCanceled()
+    {
+        return isCanceled;
+    }
+
+    /**
      * Getter for position wrapper.
      *
      * @return position wrapper
@@ -72,5 +99,25 @@ public class PlaceEventInfoHolder<T extends IStructureDataProvider>
     public T getStructure()
     {
         return structure;
+    }
+
+    /**
+     * Getter for world reference.
+     *
+     * @return world reference
+     */
+    public World getWorld()
+    {
+        return world;
+    }
+
+    /**
+     * Getter for unique event id.
+     *
+     * @return event id
+     */
+    public UUID getEventId()
+    {
+        return eventId;
     }
 }
