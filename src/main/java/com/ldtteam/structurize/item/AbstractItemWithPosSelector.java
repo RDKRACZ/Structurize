@@ -89,42 +89,26 @@ public abstract class AbstractItemWithPosSelector extends Item
 
     /**
      * <p>
-     * Structurize: Prevent block breaking client side. Captures first position client side.
-     * <p/>
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean onBlockStartBreak(final ItemStack itemstack, final BlockPos pos, final PlayerEntity player)
-    {
-        if (player.getEntityWorld().isRemote())
-        {
-            itemstack.getOrCreateTag().put(NBT_START_POS, NBTUtil.writeBlockPos(pos));
-            LanguageHandler.sendMessageToPlayer(player, START_POS_TKEY, pos.getX(), pos.getY(), pos.getZ());
-        }
-        return true;
-    }
-
-    /**
-     * <p>
-     * Structurize: Prevent block breaking server side. Captures first position server side.
+     * Structurize: Prevent block breaking. Captures first position.
      * <p/>
      * {@inheritDoc}
      */
     @Override
     public boolean canPlayerBreakBlockWhileHolding(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player)
     {
-        if (!player.getEntityWorld().isRemote())
+        final ItemStack itemstack;
+        if (player.getHeldItemMainhand().getItem().equals(getRegisteredItemInstance()))
         {
-            final ItemStack itemstack;
-            if (player.getHeldItemMainhand().getItem().equals(getRegisteredItemInstance()))
-            {
-                itemstack = player.getHeldItemMainhand();
-            }
-            else
-            {
-                itemstack = player.getHeldItemOffhand();
-            }
-            itemstack.getOrCreateTag().put(NBT_START_POS, NBTUtil.writeBlockPos(pos));
+            itemstack = player.getHeldItemMainhand();
+        }
+        else
+        {
+            itemstack = player.getHeldItemOffhand();
+        }
+        itemstack.getOrCreateTag().put(NBT_START_POS, NBTUtil.writeBlockPos(pos));
+        if (player.getEntityWorld().isRemote())
+        {
+            LanguageHandler.sendMessageToPlayer(player, START_POS_TKEY, pos.getX(), pos.getY(), pos.getZ());
         }
         return false;
     }

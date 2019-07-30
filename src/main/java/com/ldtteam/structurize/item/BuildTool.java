@@ -12,8 +12,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
 
 /**
  * BuildTool item class
@@ -27,12 +25,7 @@ public class BuildTool extends Item
      */
     public BuildTool(final ItemGroup itemGroup)
     {
-        this(
-            new Item.Properties().maxDamage(0)
-                .containerItem(Instances.getConfig().getCommon().buildToolSurvivesCrafting.get() ? ModItems.BUILD_TOOL : null)
-                .setNoRepair()
-                .rarity(Rarity.UNCOMMON)
-                .group(itemGroup));
+        this(new Item.Properties().maxDamage(0).setNoRepair().rarity(Rarity.UNCOMMON).group(itemGroup));
     }
 
     /**
@@ -56,7 +49,10 @@ public class BuildTool extends Item
     public ActionResult<ItemStack> onItemRightClick(final World worldIn, final PlayerEntity playerIn, final Hand handIn)
     {
         final ItemStack itemstack = playerIn.getHeldItem(handIn);
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> WindowBuildTool.open(playerIn));
+        if (!worldIn.isRemote())
+        {
+            WindowBuildTool.open(playerIn);
+        }
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
 
@@ -69,7 +65,38 @@ public class BuildTool extends Item
     @Override
     public ActionResultType onItemUse(final ItemUseContext context)
     {
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> WindowBuildTool.open(context.getPos(), context.getPlayer()));
+        if (!context.getWorld().isRemote())
+        {
+            WindowBuildTool.open(context.getPos(), context.getPlayer());
+        }
         return ActionResultType.SUCCESS;
+    }
+
+    /**
+     * <p>
+     * Structurize: return build tool when used for crafting.
+     * <p/>
+     * {@inheritDoc}
+     */
+    @Override
+    public ItemStack getContainerItem(final ItemStack itemStack)
+    {
+        if (!hasContainerItem(itemStack))
+        {
+            return ItemStack.EMPTY;
+        }
+        return itemStack.copy();
+    }
+
+    /**
+     * <p>
+     * Structurize: check if build tool should be returned when used for crafting.
+     * <p/>
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasContainerItem(final ItemStack itemStack)
+    {
+        return !itemStack.isEmpty() && Instances.getConfig().getServer().buildToolSurvivesCrafting.get();
     }
 }

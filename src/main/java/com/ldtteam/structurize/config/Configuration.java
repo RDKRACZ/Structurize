@@ -10,6 +10,16 @@ import org.apache.commons.lang3.tuple.Pair;
  */
 public class Configuration
 {
+    /*
+     * Few instructions:
+     * set additional states like "requires world restart":
+     * - defineBoolean(builder.worldRestart(), "key", true);
+     * use lowercased keys
+     * don't forget to create lang keys:
+     * - modid.config.key - for name, usually same as key but formatted
+     * - modid.config.key.comment - description
+     */
+
     /**
      * Loaded everywhere, not synced
      */
