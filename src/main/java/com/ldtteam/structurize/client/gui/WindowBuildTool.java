@@ -1,8 +1,8 @@
 package com.ldtteam.structurize.client.gui;
 
-import com.ldtteam.structurize.client.render.StructureRenderer;
+import com.ldtteam.structurize.client.render.EventRenderer;
 import com.ldtteam.structurize.item.BuildTool;
-import com.ldtteam.structurize.structure.PlaceEventInfoHolder;
+import com.ldtteam.structurize.pipeline.PlaceEventInfoHolder;
 import com.ldtteam.structurize.structure.providers.BlueprintStructureProvider;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -14,19 +14,10 @@ public class WindowBuildTool
 {
     private static PlaceEventInfoHolder<BlueprintStructureProvider> eventReference;
 
-    public static void open(final PlayerEntity player)
-    {
-        open(player.getPosition(), player);
-    }
-
     public static void open(final BlockPos targetedPos, final PlayerEntity player)
     {
-        if (eventReference != null)
-        {
-            return;
-        }
         eventReference = PlaceEventInfoHolder.createBlueprintEvent(targetedPos, player.getEntityWorld());
-        StructureRenderer.addActiveEvent(eventReference);
+        EventRenderer.addActiveEvent(eventReference);
         // TODO: allow multi events (required gui for maintaining), notify player if max events reached
     }
 
@@ -38,6 +29,7 @@ public class WindowBuildTool
 
     public static PlaceEventInfoHolder<BlueprintStructureProvider> getEvent()
     {
+        eventReference.setRedraw(); // called here cuz action origin is not gui but commands
         return eventReference;
     }
 }

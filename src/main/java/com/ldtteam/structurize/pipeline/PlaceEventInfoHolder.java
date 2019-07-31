@@ -1,6 +1,7 @@
-package com.ldtteam.structurize.structure;
+package com.ldtteam.structurize.pipeline;
 
 import java.util.UUID;
+import com.ldtteam.structurize.structure.StructureBB;
 import com.ldtteam.structurize.structure.providers.BlueprintStructureProvider;
 import com.ldtteam.structurize.structure.providers.IStructureDataProvider;
 import net.minecraft.client.Minecraft;
@@ -23,9 +24,24 @@ public class PlaceEventInfoHolder<T extends IStructureDataProvider>
     private World world;
     private boolean isCanceled = false;
 
+    // TODO: render wrapper
+    private boolean shouldRedraw = false;
+
+    public void setRedraw()
+    {
+        shouldRedraw = true;
+    }
+
+    public boolean shouldRedraw()
+    {
+        final boolean result = shouldRedraw;
+        shouldRedraw = false;
+        return result;
+    }
+
     /**
      * Creates a new placement event info holder.
-     * TODO: add facing
+     * TODO: add facing?
      *
      * @param structure structure provider
      * @param anchorPos position where should structure begin
@@ -35,7 +51,7 @@ public class PlaceEventInfoHolder<T extends IStructureDataProvider>
     {
         this.structure = structure;
         this.world = world;
-        position = new StructureBB(anchorPos, anchorPos.add(structure.getXsize(), structure.getYsize(), structure.getZsize()));
+        position = new StructureBB(anchorPos, anchorPos);
     }
 
     /**
@@ -47,7 +63,8 @@ public class PlaceEventInfoHolder<T extends IStructureDataProvider>
      */
     public static PlaceEventInfoHolder<BlueprintStructureProvider> createBlueprintEvent(final BlockPos anchorPos, final World world)
     {
-        final PlaceEventInfoHolder<BlueprintStructureProvider> result = new PlaceEventInfoHolder<>(BlueprintStructureProvider.create(world), anchorPos, world);
+        final PlaceEventInfoHolder<BlueprintStructureProvider> result = new PlaceEventInfoHolder<>(BlueprintStructureProvider.create(), anchorPos, world);
+        result.getStructure().setEvent(result);
         result.getStructure().setStructurePath(Minecraft.getInstance().gameDir.toPath().resolve("structurize").resolve("tempschem.blueprint").toAbsolutePath());
         return result;
     }
@@ -60,7 +77,7 @@ public class PlaceEventInfoHolder<T extends IStructureDataProvider>
      */
     public void passToBuildProvider(final UUID playerUUID)
     {
-
+        structure.applyMirrorRotationOnStructure();
     }
 
     /**

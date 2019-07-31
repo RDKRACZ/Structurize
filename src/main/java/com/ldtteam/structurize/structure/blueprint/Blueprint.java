@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import com.ldtteam.structurize.block.IAnchorBlock;
 import com.ldtteam.structurize.structure.StructureBB;
-import com.ldtteam.structurize.util.BlockInfo;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.HangingEntity;
@@ -320,36 +319,12 @@ public class Blueprint
     }
 
     /**
-     * Get a list of all blockInfo objects in the blueprint.
-     *
-     * @return a list of all blockinfo (position, blockState, tileEntityData).
-     */
-    public final List<BlockInfo> getBlockInfoAsList()
-    {
-        final List<BlockInfo> list = new ArrayList<>();
-        for (short x = 0; x < sizeX; x++)
-        {
-            for (short y = 0; y < sizeY; y++)
-            {
-                for (short z = 0; z < sizeZ; z++)
-                {
-                    final BlockPos tempPos = new BlockPos(x, y, z);
-                    final short value = structure[y][z][x];
-                    final BlockState state = palette.get(value & 0xFFFF);
-                    list.add(new BlockInfo(tempPos, state, tileEntities[y][z][x]));
-                }
-            }
-        }
-        return list;
-    }
-
-    /**
      * Rotate the structure depending on the direction it's facing.
      *
      * @param rotation times to rotateWithMirror.
      * @param mirror   the mirror.
      * @param world    the world.
-     * @return the new offset.
+     * @return position around which was blueprint rotated.
      */
     public BlockPos rotateWithMirror(final Rotation rotation, final Mirror mirror, final World world)
     {
@@ -375,7 +350,6 @@ public class Blueprint
 
         palette = tempPalette;
 
-        boolean foundAnchor = false;
         BlockPos offset = null;
 
         for (short x = 0; x < sizeX; x++)
@@ -394,7 +368,6 @@ public class Blueprint
                     if (state.getBlockState().getBlock() instanceof IAnchorBlock)
                     {
                         offset = tempPos;
-                        foundAnchor = true;
                     }
                     newStructure[tempPos.getY()][tempPos.getZ()][tempPos.getX()] = value;
 
@@ -418,52 +391,9 @@ public class Blueprint
             }
         }
 
-        BlockPos temp;
-        if (rotation.equals(Rotation.CLOCKWISE_90) || rotation.equals(Rotation.COUNTERCLOCKWISE_90) || mirror.equals(Mirror.FRONT_BACK))
+        if (offset == null)
         {
-            if (minX == minZ)
-            {
-                temp = new BlockPos(resultSize.getX(), resultSize.getY(), minZ > 0 ? -resultSize.getZ() : resultSize.getZ());
-            }
-            else
-            {
-                temp = new BlockPos(minX > 0 ? -resultSize.getX() : resultSize.getX(), resultSize.getY(), minZ > 0 ? -resultSize.getZ() : resultSize.getZ());
-            }
-
-            Rotation theRotation = rotation;
-            if (rotation == Rotation.CLOCKWISE_90)
-            {
-                theRotation = Rotation.COUNTERCLOCKWISE_90;
-            }
-            else if (rotation == Rotation.COUNTERCLOCKWISE_90)
-            {
-                theRotation = Rotation.CLOCKWISE_90;
-            }
-
-            temp = temp.rotate(theRotation);
-        }
-        else
-        {
-            temp = resultSize;
-        }
-
-        if (!foundAnchor)
-        {
-            BlockPos tempSize = new BlockPos(temp.getX(), 0, temp.getZ());
-            if (rotation == Rotation.CLOCKWISE_90)
-            {
-                tempSize = new BlockPos(-temp.getZ(), 0, temp.getX());
-            }
-            if (rotation == Rotation.CLOCKWISE_180)
-            {
-                tempSize = new BlockPos(-temp.getX(), 0, -temp.getZ());
-            }
-            if (rotation == Rotation.COUNTERCLOCKWISE_90)
-            {
-                tempSize = new BlockPos(temp.getZ(), 0, -temp.getX());
-            }
-
-            offset = new BlockPos(tempSize.getX() / 2, 0, tempSize.getZ() / 2).add(minX, minY, minZ);
+            offset = new BlockPos(sizeX / 2, sizeY / 2, sizeZ / 2);
         }
 
         sizeX = newSizeX;
@@ -548,14 +478,20 @@ public class Blueprint
      * @param mirror     the mirror.
      * @return the updated nbt.
      */
-    private CompoundNBT transformEntityInfoWithSettings(final CompoundNBT entityInfo, final World world, final BlockPos pos, final Rotation rotation, final Mirror mirror)
+    private CompoundNBT transformEntityInfoWithSettings(
+        final CompoundNBT entityInfo,
+        final World world,
+        final BlockPos pos,
+        final Rotation rotation,
+        final Mirror mirror)
     {
         final Entity finalEntity = EntityType.loadEntityUnchecked(entityInfo, world).get();
         if (finalEntity != null)
         {
             final Vec3d entityVec = Blueprint.transformedVec3d(rotation, mirror, finalEntity.getPositionVector()).add(new Vec3d(pos));
             finalEntity.prevRotationYaw = (float) (finalEntity.getMirroredYaw(mirror) - NINETY_DEGREES);
-            final double rotationYaw = finalEntity.getMirroredYaw(mirror) + ((double) finalEntity.getMirroredYaw(mirror) - (double) finalEntity.getRotatedYaw(rotation));
+            final double rotationYaw =
+                finalEntity.getMirroredYaw(mirror) + ((double) finalEntity.getMirroredYaw(mirror) - (double) finalEntity.getRotatedYaw(rotation));
 
             if (finalEntity instanceof HangingEntity)
             {

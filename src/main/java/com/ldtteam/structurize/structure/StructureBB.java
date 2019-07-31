@@ -1,5 +1,8 @@
 package com.ldtteam.structurize.structure;
 
+import com.ldtteam.structurize.util.CubeCoordinateIterator;
+import org.jetbrains.annotations.NotNull;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
@@ -55,6 +58,16 @@ public class StructureBB
     }
 
     /**
+     * Zero based peek is blockpos made from sizes.
+     *
+     * @return zero based peek blockpos
+     */
+    public BlockPos getZeroBasedPeek()
+    {
+        return new BlockPos(getXSize() - 1, getYSize() - 1, getZSize() - 1);
+    }
+
+    /**
      * Always possitive or zero x size.
      *
      * @return X width
@@ -95,16 +108,33 @@ public class StructureBB
     }
 
     /**
-     * Returns pos iterator from anchor to peek using MC default behaviour.
+     * Converts to MC AABB using current sizes.
+     *
+     * @return AABB
+     */
+    public AxisAlignedBB toZeroBasedAABB()
+    {
+        return new AxisAlignedBB(0, 0, 0, getXSize(), getYSize(), getZSize());
+    }
+
+    /**
+     * Creates new pos iterator from anchor to peek using y|z|x iteration order (x iterates first).
      *
      * @return pos iterator
-     * @see link to MC default behaviour {@link BlockPos#getAllInBoxMutable(int, int, int, int, int, int)
-     *      BlockPos.getAllInBoxMutable()}
      */
     public Iterable<BlockPos> getPosIterator()
     {
-        return BlockPos.getAllInBoxMutable(minX, minY, minZ, maxX, maxY, maxZ);
-        // TODO: needs replacement as it iterates x|y|z while we do y|z|x
+        return new CubeCoordinateIterator(getAnchor(), getPeek());
+    }
+
+    /**
+     * Creates new pos iterator from 0,0,0 to zero based peek using y|z|x iteration order (x iterates first).
+     *
+     * @return pos iterator
+     */
+    public Iterable<BlockPos> getZeroBasedPosIterator()
+    {
+        return new CubeCoordinateIterator(BlockPos.ZERO, getZeroBasedPeek());
     }
 
     /**
@@ -112,7 +142,7 @@ public class StructureBB
      *
      * @param vector move vector
      */
-    public void moveBy(final BlockPos vector)
+    public void moveBy(@NotNull final BlockPos vector)
     {
         minX += vector.getX();
         minY += vector.getY();
@@ -120,5 +150,86 @@ public class StructureBB
         maxX += vector.getX();
         maxY += vector.getY();
         maxZ += vector.getZ();
+    }
+
+    /**
+     * Recalculates peek to match given size.
+     *
+     * @param newXSize new X axis size
+     * @param newYSize new Y axis size
+     * @param newZSize new Z axis size
+     */
+    public void resize(final int newXSize, final int newYSize, final int newZSize)
+    {
+        maxX = minX + newXSize - 1;
+        maxY = minY + newYSize - 1;
+        maxZ = minZ + newZSize - 1;
+    }
+
+    /**
+     * Rotates clockwise around given center.
+     *
+     * @param center real world pos to rotate around
+     */
+    public void rotateCW(@NotNull final BlockPos center)
+    {
+        rotate(center, Rotation.CLOCKWISE_90);
+    }
+
+    /**
+     * Rotates counterclockwise around given center.
+     *
+     * @param center real world pos to rotate around
+     */
+    public void rotateCCW(@NotNull final BlockPos center)
+    {
+        rotate(center, Rotation.COUNTERCLOCKWISE_90);
+    }
+
+    private void rotate(@NotNull final BlockPos center, final Rotation rotation)
+    {
+        BlockPos min = getAnchor();
+        BlockPos max = getPeek();
+
+        // translate
+        min = min.subtract(center);
+        max = max.subtract(center);
+
+        // rotate
+        min = min.rotate(rotation);
+        max = max.rotate(rotation);
+
+        // translate
+        min = min.add(center);
+        max = max.add(center);
+
+        minX = Math.min(min.getX(), max.getX());
+        minZ = Math.min(min.getZ(), max.getZ());
+        maxX = Math.max(min.getX(), max.getX());
+        maxZ = Math.max(min.getZ(), max.getZ());
+    }
+
+    /**
+     * Mirrors through YZ plane using given center.
+     *
+     * @param center real world pos to mirror over
+     */
+    public void mirrorX(@NotNull final BlockPos center)
+    {
+        final int oldMin = minX;
+        minX = -maxX + 2 * center.getX();
+        maxX = -oldMin + 2 * center.getX();
+    }
+
+    /**
+     * Mirrors through XY plane using given center.
+     *
+     * @param center real world pos to mirror over
+     */
+    public void mirrorZ(@NotNull final BlockPos center)
+    {
+        final int oldMin = minZ;
+        minZ = -maxZ + 2 * center.getZ();
+        maxZ = -oldMin + 2 * center.getZ();
     }
 }

@@ -1,6 +1,7 @@
 package com.ldtteam.structurize.block;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import com.ldtteam.structurize.client.render.EventRenderer;
 import com.ldtteam.structurize.util.constants.MathConstants;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -24,7 +25,7 @@ import net.minecraft.world.World;
 /**
  * Anyblock substitution block class
  */
-public class AnyblockSubstitution extends Block
+public class AnyblockSubstitution extends Block implements IAnchorBlock
 {
     /**
      * Whether block instances should render texture or not.
@@ -80,6 +81,7 @@ public class AnyblockSubstitution extends Block
                 if (worldIn.isRemote())
                 {
                     SHOULD_RENDER_BLOCK_TEXTURE.set(!SHOULD_RENDER_BLOCK_TEXTURE.get());
+                    EventRenderer.recompileTesselators();
                     final BlockPos center = playerIn.getPosition();
                     ((ClientWorld) worldIn).markSurroundingsForRerender(
                         center.getX() / MathConstants.CHUNK_BLOCK_SIZE,

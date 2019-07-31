@@ -7,6 +7,7 @@ public class MathConstants
 {
     // Math
     public static final double NINETY_DEGREES = 90D;
+    public static final double ONE_HUNDRED_EIGHTY_DEGREES = 180D;
 
     // Minecraft
     public static final int CHUNK_BLOCK_SIZE = 16;

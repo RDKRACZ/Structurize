@@ -1,6 +1,7 @@
 package com.ldtteam.structurize.command;
 
 import com.ldtteam.structurize.client.gui.WindowBuildTool;
+import com.ldtteam.structurize.client.render.EventRenderer;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -14,12 +15,13 @@ public class EventMovesCommand extends AbstractCommand
 
     protected static LiteralArgumentBuilder<CommandSource> build()
     {
-        return newLiteral("buildtoolevent").then(newLiteral("move").then(newArgument(POS_ARG, BlockPosArgument.blockPos()).executes(s -> move(s))))
-            .then(newLiteral("rotateCW").executes(s -> rotateCW(s)))
-            .then(newLiteral("rotateCCW").executes(s -> rotateCCW(s)))
-            .then(newLiteral("mirrorX").executes(s -> mirrorX(s)))
-            .then(newLiteral("mirrorZ").executes(s -> mirrorZ(s)))
-            .then(newLiteral("close").executes(s -> close(s)));
+        return newLiteral("renderEvents").then(newLiteral("moveCurrent").then(newArgument(POS_ARG, BlockPosArgument.blockPos()).executes(s -> move(s))))
+            .then(newLiteral("rotateCWcurrent").executes(s -> rotateCW(s)))
+            .then(newLiteral("rotateCCWcurrent").executes(s -> rotateCCW(s)))
+            .then(newLiteral("mirrorCurrent").executes(s -> mirror(s)))
+            .then(newLiteral("closeCurrent").executes(s -> close(s)))
+            .then(newLiteral("closeAll").executes(s -> closeAll(s)))
+            .then(newLiteral("resetLagStats").executes(s -> resetLS(s)));
     }
 
     private static int move(final CommandContext<CommandSource> command) throws CommandSyntaxException
@@ -41,21 +43,27 @@ public class EventMovesCommand extends AbstractCommand
         return 1;
     }
 
-    private static int mirrorX(final CommandContext<CommandSource> command) throws CommandSyntaxException
+    private static int mirror(final CommandContext<CommandSource> command) throws CommandSyntaxException
     {
-        WindowBuildTool.getEvent().getStructure().mirrorX();
-        return 1;
-    }
-
-    private static int mirrorZ(final CommandContext<CommandSource> command) throws CommandSyntaxException
-    {
-        WindowBuildTool.getEvent().getStructure().mirrorZ();
+        WindowBuildTool.getEvent().getStructure().mirror();
         return 1;
     }
 
     private static int close(final CommandContext<CommandSource> command) throws CommandSyntaxException
     {
         WindowBuildTool.close();
+        return 1;
+    }
+
+    private static int closeAll(final CommandContext<CommandSource> command) throws CommandSyntaxException
+    {
+        EventRenderer.cancelAllActiveEvents();
+        return 1;
+    }
+
+    private static int resetLS(final CommandContext<CommandSource> command) throws CommandSyntaxException
+    {
+        EventRenderer.resetLagStats();
         return 1;
     }
 }

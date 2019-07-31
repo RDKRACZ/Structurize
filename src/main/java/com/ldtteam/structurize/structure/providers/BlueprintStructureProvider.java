@@ -4,13 +4,13 @@ import java.nio.file.Path;
 import java.util.List;
 import com.ldtteam.structurize.structure.blueprint.Blueprint;
 import com.ldtteam.structurize.structure.blueprint.BlueprintUtils;
-import com.ldtteam.structurize.structure.PlaceEventInfoHolder;
+import com.ldtteam.structurize.block.IAnchorBlock;
+import com.ldtteam.structurize.pipeline.PlaceEventInfoHolder;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 /**
  * Blueprint structure wrapper for {@link PlaceEventInfoHolder}
@@ -19,7 +19,10 @@ public class BlueprintStructureProvider implements IStructureDataProvider
 {
     private Blueprint blueprint;
     private Path blueprintPath;
-    private World world;
+    private PlaceEventInfoHolder<BlueprintStructureProvider> event;
+    private Rotation rotation = Rotation.NONE;
+    private boolean mirror = false;
+    private BlockPos mirrorRotationAnchor = null;
 
     private BlueprintStructureProvider()
     {
@@ -28,14 +31,21 @@ public class BlueprintStructureProvider implements IStructureDataProvider
     /**
      * Creates new structure provider.
      *
-     * @param world build and render world
      * @return new instance
      */
-    public static BlueprintStructureProvider create(final World world)
+    public static BlueprintStructureProvider create()
     {
-        final BlueprintStructureProvider result = new BlueprintStructureProvider();
-        result.world = world;
-        return result;
+        return new BlueprintStructureProvider();
+    }
+
+    /**
+     * Sets event reference.
+     *
+     * @param eventIn actual event
+     */
+    public void setEvent(final PlaceEventInfoHolder<BlueprintStructureProvider> eventIn)
+    {
+        event = eventIn;
     }
 
     /**
@@ -47,6 +57,8 @@ public class BlueprintStructureProvider implements IStructureDataProvider
     {
         blueprint = BlueprintUtils.readFromStream(path);
         blueprintPath = path;
+        mirrorRotationAnchor = null;
+        event.getPosition().resize(getXsize(), getYsize(), getZsize());
     }
 
     /**
@@ -60,27 +72,74 @@ public class BlueprintStructureProvider implements IStructureDataProvider
     }
 
     @Override
+    public BlockPos getZeroBasedMirrorRotationAnchor()
+    {
+        if (mirrorRotationAnchor == null)
+        {
+            short index = 0;
+            for (final BlockState bs : getBlockPalette())
+            {
+                if (bs.getBlock() instanceof IAnchorBlock)
+                {
+                    break;
+                }
+                index++;
+            }
+            for (final BlockPos pos : event.getPosition().getZeroBasedPosIterator())
+            {
+                if (getBlocks()[pos.getY()][pos.getZ()][pos.getX()] == index)
+                {
+                    mirrorRotationAnchor = pos;
+                    break;
+                }
+            }
+            if (mirrorRotationAnchor == null)
+            {
+                mirrorRotationAnchor = new BlockPos(getXsize() / 2, getYsize() / 2, getZsize() / 2);
+            }
+        }
+        return mirrorRotationAnchor;
+    }
+
+    @Override
     public void rotateClockwise()
     {
-        final BlockPos offset = blueprint.rotateWithMirror(Rotation.CLOCKWISE_90, Mirror.NONE, world);
+        rotation = rotation.add(Rotation.CLOCKWISE_90);
+        event.getPosition().rotateCW(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
     }
 
     @Override
     public void rotateCounterClockwise()
     {
-        final BlockPos offset = blueprint.rotateWithMirror(Rotation.COUNTERCLOCKWISE_90, Mirror.NONE, world);
+        rotation = rotation.add(Rotation.COUNTERCLOCKWISE_90);
+        event.getPosition().rotateCCW(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
     }
 
     @Override
-    public void mirrorX()
+    public Rotation getRotation()
     {
-        final BlockPos offset = blueprint.rotateWithMirror(Rotation.NONE, Mirror.FRONT_BACK, world);
+        return rotation;
     }
 
     @Override
-    public void mirrorZ()
+    public void mirror()
     {
-        final BlockPos offset = blueprint.rotateWithMirror(Rotation.NONE, Mirror.LEFT_RIGHT, world);
+        mirror = !mirror;
+        event.getPosition().mirrorX(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
+    }
+
+    @Override
+    public boolean isMirrored()
+    {
+        return mirror;
+    }
+
+    @Override
+    public void applyMirrorRotationOnStructure()
+    {
+        blueprint.rotateWithMirror(rotation, mirror ? Mirror.FRONT_BACK : Mirror.NONE, event.getWorld());
+        rotation = Rotation.NONE;
+        mirror = false;
     }
 
     @Override
@@ -108,25 +167,25 @@ public class BlueprintStructureProvider implements IStructureDataProvider
     }
 
     @Override
-    public List<BlockState> getStructureBlockPalette()
+    public List<BlockState> getBlockPalette()
     {
         return blueprint.getPalette();
     }
 
     @Override
-    public short[][][] getStructureBlocks()
+    public short[][][] getBlocks()
     {
         return blueprint.getStructure();
     }
 
     @Override
-    public List<CompoundNBT> getStructureEntities()
+    public List<CompoundNBT> getEntities()
     {
         return blueprint.getEntitiesAsList();
     }
 
     @Override
-    public CompoundNBT[][][] getStructureTileEntities()
+    public CompoundNBT[][][] getTileEntities()
     {
         return blueprint.getTileEntities();
     }

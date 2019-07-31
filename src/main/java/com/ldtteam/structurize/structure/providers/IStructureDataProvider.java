@@ -4,12 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Interface for providing structure for {@link PlaceEventInfoHolder}
  */
 public interface IStructureDataProvider
 {
+    /**
+     * Getter for zero based anchor used when rotating/mirroring structure.
+     * This method can be time expensive, result must be cached by implementation.
+     *
+     * @return anchor for rotating/mirroring structure
+     */
+    BlockPos getZeroBasedMirrorRotationAnchor();
+
     /**
      * Rotates structure clockwise.
      */
@@ -21,14 +31,34 @@ public interface IStructureDataProvider
     void rotateCounterClockwise();
 
     /**
-     * Mirrors structure along X axis.
+     * Getter for unapplied rotation.
+     *
+     * @return current rotation
+     * @see #rotateClockwise()
+     * @see #rotateCounterClockwise()
+     * @see #applyMirrorRotationOnStructure()
      */
-    void mirrorX();
+    Rotation getRotation();
 
     /**
-     * Mirrors structure along Z axis.
+     * Mirrors structure through XY|YZ plane according to current rotation.
+     * Applied before rotation.
      */
-    void mirrorZ();
+    void mirror();
+
+    /**
+     * Getter for unapplied mirror.
+     *
+     * @return current mirror
+     * @see #mirror()
+     * @see #applyMirrorRotationOnStructure()
+     */
+    boolean isMirrored();
+
+    /**
+     * Takes current rotation and mirror and apply them on structure data then resets their values.
+     */
+    void applyMirrorRotationOnStructure();
 
     /**
      * Getter for X block size.
@@ -63,38 +93,38 @@ public interface IStructureDataProvider
      *
      * @return structure block palette
      */
-    List<BlockState> getStructureBlockPalette();
+    List<BlockState> getBlockPalette();
 
     /**
      * Structure blocks 3d array, indexes: y|z|x.
      *
      * @return structure blocks array
      */
-    short[][][] getStructureBlocks();
+    short[][][] getBlocks();
 
     /**
      * List of structure entities.
      *
      * @return structure entities list
      */
-    List<CompoundNBT> getStructureEntities();
+    List<CompoundNBT> getEntities();
 
     /**
      * Structure tile entities 3d array, indexes: y|z|x.
      *
      * @return structure tile entities array
      */
-    CompoundNBT[][][] getStructureTileEntities();
+    CompoundNBT[][][] getTileEntities();
 
     /**
      * Converts actual structure pallete to list of required mod IDs.
      *
      * @return list of required mods IDs
      */
-    default List<String> getRequiredModsFromStructurePalette()
+    default List<String> getRequiredModsFromBlockPalette()
     {
         final List<String> reqMods = new ArrayList<>();
-        for (final BlockState bs : getStructureBlockPalette())
+        for (final BlockState bs : getBlockPalette())
         {
             final String newMod = bs.getBlock().getRegistryName().getNamespace();
             if (!reqMods.contains(newMod))
