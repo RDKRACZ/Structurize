@@ -2,12 +2,11 @@ package com.ldtteam.structurize.client.render;
 
 import com.ldtteam.structurize.pipeline.PlaceEventInfoHolder;
 import com.ldtteam.structurize.structure.providers.IStructureDataProvider;
+import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 
 public class RenderEventWrapper<T extends IStructureDataProvider, U extends PlaceEventInfoHolder<T>>
 {
-    private Rotation rotation = Rotation.NONE;
-    private boolean mirror = false;
     private boolean shouldRedraw = false;
     private final U event;
 
@@ -21,8 +20,9 @@ public class RenderEventWrapper<T extends IStructureDataProvider, U extends Plac
      */
     public void rotateClockwise()
     {
-        rotation = rotation.add(Rotation.CLOCKWISE_90);
         event.getPosition().rotateCW(event.getStructure().getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
+        event.getStructure().applyMirrorRotationOnStructure(Rotation.CLOCKWISE_90, Mirror.NONE);
+        setRedraw();
     }
 
     /**
@@ -30,50 +30,31 @@ public class RenderEventWrapper<T extends IStructureDataProvider, U extends Plac
      */
     public void rotateCounterClockwise()
     {
-        rotation = rotation.add(Rotation.COUNTERCLOCKWISE_90);
         event.getPosition().rotateCCW(event.getStructure().getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
+        event.getStructure().applyMirrorRotationOnStructure(Rotation.COUNTERCLOCKWISE_90, Mirror.NONE);
+        setRedraw();
     }
 
     /**
-     * Getter for unapplied rotation.
-     *
-     * @return current rotation
-     * @see #rotateClockwise()
-     * @see #rotateCounterClockwise()
-     * @see #applyMirrorRotationOnStructure()
-     */
-    public Rotation getRotation()
-    {
-        return rotation;
-    }
-
-    /**
-     * Mirrors structure through XY|YZ plane according to current rotation.
+     * Mirrors structure through YZ plane according to current rotation.
      * Applied before rotation.
      */
-    public void mirror()
+    public void mirrorX()
     {
-        mirror = !mirror;
-        if (rotation.equals(Rotation.NONE) || rotation.equals(Rotation.CLOCKWISE_180))
-        {
-            event.getPosition().mirrorX(event.getStructure().getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
-        }
-        else
-        {
-            event.getPosition().mirrorZ(event.getStructure().getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
-        }
+        event.getPosition().mirrorX(event.getStructure().getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
+        event.getStructure().applyMirrorRotationOnStructure(Rotation.NONE, Mirror.FRONT_BACK);
+        setRedraw();
     }
 
     /**
-     * Getter for unapplied mirror.
-     *
-     * @return current mirror
-     * @see #mirror()
-     * @see #applyMirrorRotationOnStructure()
+     * Mirrors structure through XY plane according to current rotation.
+     * Applied before rotation.
      */
-    public boolean isMirrored()
+    public void mirrorZ()
     {
-        return mirror;
+        event.getPosition().mirrorZ(event.getStructure().getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
+        event.getStructure().applyMirrorRotationOnStructure(Rotation.NONE, Mirror.LEFT_RIGHT);
+        setRedraw();
     }
 
     public void setRedraw()

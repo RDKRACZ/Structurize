@@ -17,7 +17,7 @@ public class WindowBuildTool
 
     public static void open(final BlockPos targetedPos, final PlayerEntity player)
     {
-        eventReference = new RenderEventWrapper(PlaceEventInfoHolder.createBlueprintEvent(targetedPos, player.getEntityWorld()));
+        eventReference = new RenderEventWrapper<>(PlaceEventInfoHolder.createBlueprintEvent(targetedPos, player.getEntityWorld()));
         EventRenderer.addActiveEvent(eventReference);
         // TODO: allow multi events (required gui for maintaining), notify player if max events reached
     }
@@ -30,7 +30,6 @@ public class WindowBuildTool
 
     public static RenderEventWrapper<BlueprintStructureProvider, PlaceEventInfoHolder<BlueprintStructureProvider>> getRenderEvent()
     {
-        eventReference.setRedraw(); // called here cuz action origin is not gui but commands
         return eventReference;
     }
 }

@@ -91,28 +91,21 @@ public class StructureWorld extends World implements IBlockReader
         {
             return Blocks.VOID_AIR.getDefaultState();
         }
-        return RenderTransformers.transformBlockState(getStructure().getBlockPalette().get(index));
-        // TODO: cache removed, should be back?
+        return getStructure().getBlockPalette().get(index);
+        // return RenderTransformers.transformBlockState(getStructure().getBlockPalette().get(index));
+        // TODO: cache removed, should be back? hell no, causing lags as hell
     }
 
     @Nullable
     @Override
     public TileEntity getTileEntity(@NotNull final BlockPos pos)
     {
-        CompoundNBT teData;
-        try
-        {
-            teData = getStructure().getTileEntities()[pos.getY()][pos.getZ()][pos.getX()];
-        }
-        catch (final ArrayIndexOutOfBoundsException e)
-        {
-            return null;
-        }
+        CompoundNBT teData = getStructure().getTileEntities().get(pos);
         if (teData == null)
         {
             return null;
         }
-        teData = RenderTransformers.transformTileEntity(teData);
+        // teData = RenderTransformers.transformTileEntity(teData);
         final String entityId = teData.getString("id");
 
         try
@@ -135,7 +128,7 @@ public class StructureWorld extends World implements IBlockReader
             Instances.getLogger().error("Could not create tile entity: " + entityId + " with nbt: " + teData.toString(), ex);
         }
         return null;
-        // TODO: cache removed, should be back?
+        // TODO: cache removed, should be back? hell no, causing lags as hell
     }
 
     @NotNull

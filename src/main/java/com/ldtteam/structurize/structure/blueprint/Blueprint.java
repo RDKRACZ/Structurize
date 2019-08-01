@@ -60,7 +60,7 @@ public class Blueprint
     /**
      * The tileentities.
      */
-    private CompoundNBT[][][] tileEntities;
+    private List<CompoundNBT> tileEntities;
 
     /**
      * The entities.
@@ -80,7 +80,7 @@ public class Blueprint
         final StructureBB structBB,
         final List<BlockState> palette,
         final short[][][] structure,
-        final CompoundNBT[] tileEntities,
+        final List<CompoundNBT> tileEntities,
         final List<String> requiredMods)
     {
         this((short) structBB.getXSize(), (short) structBB.getYSize(), (short) structBB.getZSize(), palette, structure, tileEntities, requiredMods);
@@ -103,7 +103,7 @@ public class Blueprint
         final short sizeZ,
         final List<BlockState> palette,
         final short[][][] structure,
-        final CompoundNBT[] tileEntities,
+        final List<CompoundNBT> tileEntities,
         final List<String> requiredMods)
     {
         this.sizeX = sizeX;
@@ -111,15 +111,7 @@ public class Blueprint
         this.sizeZ = sizeZ;
         this.palette = palette;
         this.structure = structure;
-        this.tileEntities = new CompoundNBT[sizeY][sizeZ][sizeX];
-
-        for (final CompoundNBT te : tileEntities)
-        {
-            if (te != null)
-            {
-                this.tileEntities[te.getShort("y")][te.getShort("z")][te.getShort("x")] = te;
-            }
-        }
+        this.tileEntities = tileEntities;
         this.requiredMods = requiredMods;
     }
 
@@ -146,7 +138,7 @@ public class Blueprint
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
         this.structure = new short[sizeY][sizeZ][sizeX];
-        this.tileEntities = new CompoundNBT[sizeY][sizeZ][sizeX];
+        this.tileEntities = new ArrayList<>();
 
         this.requiredMods = new ArrayList<>();
         this.palette = new ArrayList<>();
@@ -216,7 +208,7 @@ public class Blueprint
     /**
      * @return an array of serialized TileEntities (posX, posY and posZ tags have been localized to coordinates within the structure)
      */
-    public CompoundNBT[][][] getTileEntities()
+    public List<CompoundNBT> getTileEntities()
     {
         return tileEntities;
     }
@@ -324,34 +316,24 @@ public class Blueprint
      * @param rotation times to rotateWithMirror.
      * @param mirror   the mirror.
      * @param world    the world.
-     * @return position around which was blueprint rotated.
      */
-    public BlockPos rotateWithMirror(final Rotation rotation, final Mirror mirror, final World world)
+    public void rotateWithMirror(final Rotation rotation, final Mirror mirror, final World world)
     {
         final BlockPos resultSize = transformedSize(new BlockPos(sizeX, sizeY, sizeZ), rotation);
-        final short newSizeX = (short) resultSize.getX();
-        final short newSizeY = (short) resultSize.getY();
-        final short newSizeZ = (short) resultSize.getZ();
-
-        final short[][][] newStructure = new short[newSizeY][newSizeZ][newSizeX];
-        final List<CompoundNBT> newEntities = new ArrayList<>();
-        final CompoundNBT[][][] newTileEntities = new CompoundNBT[newSizeY][newSizeZ][newSizeX];
 
         final List<BlockState> tempPalette = new ArrayList<>();
         for (int i = 0; i < palette.size(); i++)
         {
             tempPalette.add(i, palette.get(i).getBlockState().mirror(mirror).rotate(rotation));
         }
+        palette = tempPalette;
 
         final BlockPos extremes = transformedBlockPos(sizeX, sizeY, sizeZ, mirror, rotation);
         final int minX = extremes.getX() < 0 ? -extremes.getX() - 1 : 0;
         final int minY = extremes.getY() < 0 ? -extremes.getY() - 1 : 0;
         final int minZ = extremes.getZ() < 0 ? -extremes.getZ() - 1 : 0;
 
-        palette = tempPalette;
-
-        BlockPos offset = null;
-
+        final short[][][] newStructure = new short[resultSize.getY()][resultSize.getZ()][resultSize.getX()];
         for (short x = 0; x < sizeX; x++)
         {
             for (short y = 0; y < sizeY; y++)
@@ -359,30 +341,13 @@ public class Blueprint
                 for (short z = 0; z < sizeZ; z++)
                 {
                     final BlockPos tempPos = transformedBlockPos(x, y, z, mirror, rotation).add(minX, minY, minZ);
-                    final short value = structure[y][z][x];
-                    final BlockState state = palette.get(value & 0xFFFF);
-                    if (state.getBlockState().getBlock() == Blocks.STRUCTURE_VOID)
-                    {
-                        continue;
-                    }
-                    if (state.getBlockState().getBlock() instanceof IAnchorBlock)
-                    {
-                        offset = tempPos;
-                    }
-                    newStructure[tempPos.getY()][tempPos.getZ()][tempPos.getX()] = value;
-
-                    final CompoundNBT compound = tileEntities[y][z][x];
-                    if (compound != null)
-                    {
-                        compound.putInt("x", tempPos.getX());
-                        compound.putInt("y", tempPos.getY());
-                        compound.putInt("z", tempPos.getZ());
-                    }
-                    newTileEntities[tempPos.getY()][tempPos.getZ()][tempPos.getX()] = compound;
+                    newStructure[tempPos.getY()][tempPos.getZ()][tempPos.getX()] = structure[y][z][x];
                 }
             }
         }
+        structure = newStructure;
 
+        final List<CompoundNBT> newEntities = new ArrayList<>();
         for (final CompoundNBT entity : entities)
         {
             if (entity != null)
@@ -390,21 +355,25 @@ public class Blueprint
                 newEntities.add(transformEntityInfoWithSettings(entity, world, new BlockPos(minX, minY, minZ), rotation, mirror));
             }
         }
-
-        if (offset == null)
-        {
-            offset = new BlockPos(sizeX / 2, sizeY / 2, sizeZ / 2);
-        }
-
-        sizeX = newSizeX;
-        sizeY = newSizeY;
-        sizeZ = newSizeZ;
-
-        structure = newStructure;
         entities = newEntities;
+
+        final List<CompoundNBT> newTileEntities = new ArrayList<>();
+        for (final CompoundNBT te : tileEntities)
+        {
+            if (te != null)
+            {
+                final BlockPos pos = transformedBlockPos(te.getInt("x"), te.getInt("y"), te.getInt("z"), mirror, rotation);
+                te.putInt("x", pos.getX());
+                te.putInt("y", pos.getY());
+                te.putInt("z", pos.getZ());
+                newTileEntities.add(te);
+            }
+        }
         tileEntities = newTileEntities;
 
-        return offset;
+        sizeX = (short) resultSize.getX();
+        sizeY = (short) resultSize.getY();
+        sizeZ = (short) resultSize.getZ();
     }
 
     /**
@@ -429,43 +398,31 @@ public class Blueprint
     /**
      * Transforms a blockpos with mirror and rotation.
      *
-     * @param xIn      the x input.
+     * @param x        the x input.
      * @param y        the y input.
-     * @param zIn      the z input.
+     * @param z        the z input.
      * @param mirror   the mirror.
      * @param rotation the rotation.
      * @return the resulting position.
      */
-    public static BlockPos transformedBlockPos(final int xIn, final int y, final int zIn, final Mirror mirror, final Rotation rotation)
+    public static BlockPos transformedBlockPos(final int x, final int y, final int z, final Mirror mirror, final Rotation rotation)
     {
-        int x = xIn;
-        int z = zIn;
-
-        boolean flag = true;
+        final BlockPos result;
 
         switch (mirror)
         {
             case LEFT_RIGHT:
-                z = -zIn;
+                result = new BlockPos(x, y, -z);
                 break;
             case FRONT_BACK:
-                x = -xIn;
+                result = new BlockPos(-x, y, z);
                 break;
             default:
-                flag = false;
+                result = new BlockPos(x, y, z);
+                break;
         }
 
-        switch (rotation)
-        {
-            case COUNTERCLOCKWISE_90:
-                return new BlockPos(z, y, -x);
-            case CLOCKWISE_90:
-                return new BlockPos(-z, y, x);
-            case CLOCKWISE_180:
-                return new BlockPos(-x, y, -z);
-            default:
-                return flag ? new BlockPos(x, y, z) : new BlockPos(xIn, y, zIn);
-        }
+        return result.rotate(rotation);
     }
 
     /**

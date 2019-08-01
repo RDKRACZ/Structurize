@@ -18,7 +18,8 @@ public class EventMovesCommand extends AbstractCommand
         return newLiteral("renderEvents").then(newLiteral("moveCurrent").then(newArgument(POS_ARG, BlockPosArgument.blockPos()).executes(s -> move(s))))
             .then(newLiteral("rotateCWcurrent").executes(s -> rotateCW(s)))
             .then(newLiteral("rotateCCWcurrent").executes(s -> rotateCCW(s)))
-            .then(newLiteral("mirrorCurrent").executes(s -> mirror(s)))
+            .then(newLiteral("mirrorXCurrent").executes(s -> mirrorX(s)))
+            .then(newLiteral("mirrorZCurrent").executes(s -> mirrorZ(s)))
             .then(newLiteral("closeCurrent").executes(s -> close(s)))
             .then(newLiteral("closeAll").executes(s -> closeAll(s)))
             .then(newLiteral("resetLagStats").executes(s -> resetLS(s)));
@@ -28,6 +29,7 @@ public class EventMovesCommand extends AbstractCommand
     {
         final BlockPos vec = BlockPosArgument.getBlockPos(command, POS_ARG);
         WindowBuildTool.getRenderEvent().getEvent().getPosition().moveBy(vec);
+        WindowBuildTool.getRenderEvent().setRedraw();
         return 1;
     }
 
@@ -43,9 +45,15 @@ public class EventMovesCommand extends AbstractCommand
         return 1;
     }
 
-    private static int mirror(final CommandContext<CommandSource> command) throws CommandSyntaxException
+    private static int mirrorX(final CommandContext<CommandSource> command) throws CommandSyntaxException
     {
-        WindowBuildTool.getRenderEvent().mirror();
+        WindowBuildTool.getRenderEvent().mirrorX();
+        return 1;
+    }
+
+    private static int mirrorZ(final CommandContext<CommandSource> command) throws CommandSyntaxException
+    {
+        WindowBuildTool.getRenderEvent().mirrorZ();
         return 1;
     }
 

@@ -122,7 +122,7 @@ public class EventRenderer
         final Vec3d projectedView = Minecraft.getInstance().gameRenderer.getActiveRenderInfo().getProjectedView();
         try
         {
-            eventCache.get(event, () -> new StructureRenderer(event)).draw(projectedView, recompileTesselators || event.shouldRedraw());
+            eventCache.get(event, () -> new StructureRenderer(event, true)).draw(projectedView, recompileTesselators || event.shouldRedraw());
         }
         catch (final ExecutionException e)
         {

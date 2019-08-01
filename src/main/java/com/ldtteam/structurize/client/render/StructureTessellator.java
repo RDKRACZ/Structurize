@@ -12,6 +12,13 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class StructureTessellator
 {
+    private enum State
+    {
+        NEW,
+        BUILDING,
+        READY,
+        BUILT;
+    }
 
     private static final int VERTEX_COMPONENT_SIZE = 3;
     private static final int COLOR_COMPONENT_SIZE = 4;
@@ -27,7 +34,7 @@ public class StructureTessellator
     private final BufferBuilder builder;
     private final VertexBuffer buffer = new VertexBuffer(DefaultVertexFormats.BLOCK);
     private final VertexBufferUploader vboUploader = new VertexBufferUploader();
-    private boolean isReadOnly = false;
+    private State state = State.NEW;
 
     public StructureTessellator()
     {
@@ -126,12 +133,22 @@ public class StructureTessellator
      */
     public void startBuilding()
     {
-        if (isReadOnly)
+        if (state != State.NEW)
         {
             throw new IllegalStateException("Tessellator already build before");
         }
 
+        state = State.BUILDING;
         builder.begin(GL_QUADS, DefaultVertexFormats.BLOCK);
+    }
+
+    public BufferBuilder getBuilder()
+    {
+        if (state != State.BUILDING)
+        {
+            throw new IllegalStateException("Cannot retrieve BufferBuilder when Tessellator is in readonly.");
+        }
+        return this.builder;
     }
 
     /**
@@ -140,35 +157,34 @@ public class StructureTessellator
      */
     public void finishBuilding()
     {
-        if (!isReadOnly)
+        if (state != State.BUILDING)
         {
-            this.builder.finishDrawing();
+            throw new IllegalStateException("Tessellator already build before");
+        }
+        this.builder.finishDrawing();
+        state = State.READY;
+    }
 
+    public void ensureUploaded()
+    {
+        if (state == State.READY)
+        {
             // Tell optifine that we are loading a new instance into the GPU.
             // This ensures that normals are calculated so that we know in which direction a face is facing. (Aka what is outside and what
             // inside)
             OptifineCompat.getInstance().beforeBuilderUpload(this);
             this.vboUploader.draw(this.builder);
-            this.isReadOnly = true;
+            state = State.BUILT;
         }
-        else
-        {
-            throw new IllegalStateException("Tessellator already build before");
-        }
-    }
-
-    public BufferBuilder getBuilder()
-    {
-        if (isReadOnly)
-        {
-            throw new IllegalStateException("Cannot retrieve BufferBuilder when Tessellator is in readonly.");
-        }
-
-        return this.builder;
     }
 
     public VertexBuffer getBuffer()
     {
         return buffer;
+    }
+
+    public boolean isBuilt()
+    {
+        return state == State.READY || state == State.BUILT;
     }
 }

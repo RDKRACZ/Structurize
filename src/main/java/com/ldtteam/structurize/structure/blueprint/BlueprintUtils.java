@@ -119,8 +119,6 @@ public class BlueprintUtils
             structure[posInStruct.getY()][posInStruct.getZ()][posInStruct.getX()] = (short) pallete.indexOf(state);
         }
 
-        final CompoundNBT[] tes = tileEntities.toArray(new CompoundNBT[0]);
-
         final List<CompoundNBT> entitiesTag = new ArrayList<>();
 
         final List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(null, structBB.toAABB());
@@ -146,7 +144,7 @@ public class BlueprintUtils
             entitiesTag.add(entityTag);
         }
 
-        final Blueprint schem = new Blueprint(structBB, pallete, structure, tes, requiredMods);
+        final Blueprint schem = new Blueprint(structBB, pallete, structure, tileEntities, requiredMods);
         schem.setEntities(entitiesTag);
 
         if (name != null)
@@ -176,9 +174,8 @@ public class BlueprintUtils
         tag.putShort("size_z", schem.getSizeZ());
 
         // Create Pallete
-        final List<BlockState> palette = schem.getPalette();
         final ListNBT paletteTag = new ListNBT();
-        for (final BlockState bs : palette)
+        for (final BlockState bs : schem.getPalette())
         {
             paletteTag.add(NBTUtil.writeBlockState(bs));
         }
@@ -190,9 +187,7 @@ public class BlueprintUtils
 
         // Adding Tile Entities
         final ListNBT finishedTes = new ListNBT();
-        final CompoundNBT[] tes =
-            Arrays.stream(schem.getTileEntities()).flatMap(Arrays::stream).flatMap(Arrays::stream).filter(Objects::nonNull).toArray(CompoundNBT[]::new);
-        for (final CompoundNBT te : tes)
+        for (final CompoundNBT te : schem.getTileEntities())
         {
             finishedTes.add(te);
         }
@@ -200,17 +195,15 @@ public class BlueprintUtils
 
         // Adding Entities
         final ListNBT finishedEntities = new ListNBT();
-        final List<CompoundNBT> entities = schem.getEntities();
-        for (final CompoundNBT entity : entities)
+        for (final CompoundNBT entity : schem.getEntities())
         {
             finishedEntities.add(entity);
         }
         tag.put("entities", finishedEntities);
 
         // Adding Required Mods
-        final List<String> requiredMods = schem.getRequiredMods();
         final ListNBT modsList = new ListNBT();
-        for (final String requiredMod : requiredMods)
+        for (final String requiredMod : schem.getRequiredMods())
         {
             // modsList.set(i,);
             modsList.add(new StringNBT(requiredMod));
@@ -280,10 +273,10 @@ public class BlueprintUtils
 
             // Reading Tile Entities
             final ListNBT teTag = (ListNBT) tag.get("tile_entities");
-            final CompoundNBT[] tileEntities = new CompoundNBT[teTag.size()];
-            for (short i = 0; i < tileEntities.length; i++)
+            final List<CompoundNBT> tileEntities = new ArrayList<>(teTag.size());
+            for (short i = 0; i < teTag.size(); i++)
             {
-                tileEntities[i] = teTag.getCompound(i);
+                tileEntities.add(teTag.getCompound(i));
             }
 
             // Reading Entities
@@ -294,7 +287,8 @@ public class BlueprintUtils
                 entities.add(entitiesTag.getCompound(i));
             }
 
-            final Blueprint schem = new Blueprint(sizeX, sizeY, sizeZ, palette, blocks, tileEntities, requiredMods).setMissingMods(missingMods).setEntities(entities);
+            final Blueprint schem =
+                new Blueprint(sizeX, sizeY, sizeZ, palette, blocks, tileEntities, requiredMods).setMissingMods(missingMods).setEntities(entities);
 
             if (tag.contains("name"))
             {

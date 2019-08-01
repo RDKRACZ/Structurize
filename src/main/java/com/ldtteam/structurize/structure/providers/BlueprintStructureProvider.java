@@ -1,7 +1,9 @@
 package com.ldtteam.structurize.structure.providers;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import com.ldtteam.structurize.structure.blueprint.Blueprint;
 import com.ldtteam.structurize.structure.blueprint.BlueprintUtils;
 import com.ldtteam.structurize.block.IAnchorBlock;
@@ -21,6 +23,7 @@ public class BlueprintStructureProvider implements IStructureDataProvider
     private Path blueprintPath;
     private PlaceEventInfoHolder<BlueprintStructureProvider> event;
     private BlockPos mirrorRotationAnchor = null;
+    private Map<BlockPos, CompoundNBT> transformedTEs = null;
 
     private BlueprintStructureProvider()
     {
@@ -100,9 +103,11 @@ public class BlueprintStructureProvider implements IStructureDataProvider
     }
 
     @Override
-    public void applyMirrorRotationOnStructure(final Rotation rotation, final boolean mirror)
+    public void applyMirrorRotationOnStructure(final Rotation rotation, final Mirror mirror)
     {
-        blueprint.rotateWithMirror(rotation, mirror ? Mirror.FRONT_BACK : Mirror.NONE, event.getWorld());
+        mirrorRotationAnchor = null;
+        transformedTEs = null;
+        blueprint.rotateWithMirror(rotation, mirror, event.getWorld());
     }
 
     @Override
@@ -148,8 +153,16 @@ public class BlueprintStructureProvider implements IStructureDataProvider
     }
 
     @Override
-    public CompoundNBT[][][] getTileEntities()
+    public Map<BlockPos, CompoundNBT> getTileEntities()
     {
-        return blueprint.getTileEntities();
+        if (transformedTEs == null)
+        {
+            transformedTEs = new HashMap<>();
+            for (final CompoundNBT te : blueprint.getTileEntities())
+            {
+                transformedTEs.put(new BlockPos(te.getInt("x"), te.getInt("y"), te.getInt("z")), te);
+            }
+        }
+        return transformedTEs;
     }
 }

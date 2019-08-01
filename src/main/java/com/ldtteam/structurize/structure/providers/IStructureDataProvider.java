@@ -2,6 +2,7 @@ package com.ldtteam.structurize.structure.providers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Mirror;
@@ -27,7 +28,7 @@ public interface IStructureDataProvider
      * @param rotation rotation from render wrapper
      * @param mirror   is mirrored from render wrapper
      */
-    void applyMirrorRotationOnStructure(Rotation rotation, boolean mirror);
+    void applyMirrorRotationOnStructure(Rotation rotation, Mirror mirror);
 
     /**
      * Getter for X block size.
@@ -83,7 +84,7 @@ public interface IStructureDataProvider
      *
      * @return structure tile entities array
      */
-    CompoundNBT[][][] getTileEntities();
+    Map<BlockPos, CompoundNBT> getTileEntities();
 
     /**
      * Converts actual structure pallete to list of required mod IDs.
