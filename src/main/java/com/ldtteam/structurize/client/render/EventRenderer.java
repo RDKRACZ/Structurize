@@ -8,7 +8,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import com.ldtteam.structurize.Instances;
-import com.ldtteam.structurize.pipeline.PlaceEventInfoHolder;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -19,11 +18,11 @@ import net.minecraft.util.math.Vec3d;
  */
 public class EventRenderer
 {
-    private static final List<PlaceEventInfoHolder<?>> activeEvents = new ArrayList<>();
-    private static final Cache<PlaceEventInfoHolder<?>, StructureRenderer> eventCache = CacheBuilder.newBuilder()
+    private static final List<RenderEventWrapper<?, ?>> activeEvents = new ArrayList<>();
+    private static final Cache<RenderEventWrapper<?, ?>, StructureRenderer> eventCache = CacheBuilder.newBuilder()
         .maximumSize(Instances.getConfig().getClient().prerendedStructureCacheSize.get())
         .removalListener(
-            (RemovalListener<PlaceEventInfoHolder<?>, StructureRenderer>) notification -> notification.getValue()
+            (RemovalListener<RenderEventWrapper<?, ?>, StructureRenderer>) notification -> notification.getValue()
                 .getTessellator()
                 .getBuffer()
                 .deleteGlBuffers())
@@ -44,9 +43,9 @@ public class EventRenderer
 
     public static void cancelAllActiveEvents()
     {
-        for (final PlaceEventInfoHolder<?> e : activeEvents)
+        for (final RenderEventWrapper<?, ?> e : activeEvents)
         {
-            e.cancel();
+            e.getEvent().cancel();
         }
     }
 
@@ -67,9 +66,9 @@ public class EventRenderer
      * @param event new event
      * @return whether addition succeeded or not
      */
-    public static boolean addActiveEvent(final PlaceEventInfoHolder<?> event)
+    public static boolean addActiveEvent(final RenderEventWrapper<?, ?> event)
     {
-        if (!event.isCanceled())
+        if (!event.getEvent().isCanceled())
         {
             if (activeEvents.size() < Instances.getConfig().getClient().maxAmountOfRenderedEvents.get())
             {
@@ -90,12 +89,12 @@ public class EventRenderer
     {
         final long start = System.nanoTime();
         // should we not render remaining events if we cause tick lag?
-        final Iterator<PlaceEventInfoHolder<?>> iterator = activeEvents.iterator();
+        final Iterator<RenderEventWrapper<?, ?>> iterator = activeEvents.iterator();
         while (iterator.hasNext())
         {
             // TODO: should get proper culling
-            final PlaceEventInfoHolder<?> event = iterator.next();
-            if (event.isCanceled())
+            final RenderEventWrapper<?, ?> event = iterator.next();
+            if (event.getEvent().isCanceled())
             {
                 iterator.remove();
                 continue;
@@ -117,13 +116,13 @@ public class EventRenderer
      *
      * @param event event to render
      */
-    private static void renderEvent(final PlaceEventInfoHolder<?> event)
+    private static void renderEvent(final RenderEventWrapper<?, ?> event)
     {
         final long start = System.nanoTime();
         final Vec3d projectedView = Minecraft.getInstance().gameRenderer.getActiveRenderInfo().getProjectedView();
         try
         {
-            eventCache.get(event, () -> new StructureRenderer(event)).draw(event, projectedView, recompileTesselators || event.shouldRedraw());
+            eventCache.get(event, () -> new StructureRenderer(event)).draw(projectedView, recompileTesselators || event.shouldRedraw());
         }
         catch (final ExecutionException e)
         {
@@ -145,12 +144,12 @@ public class EventRenderer
      * @param event event to render
      * @param view  screen view
      */
-    private static void renderStructureBB(final PlaceEventInfoHolder<?> event, final Vec3d view)
+    private static void renderStructureBB(final RenderEventWrapper<?, ?> event, final Vec3d view)
     {
         GlStateManager.lineWidth(2.0F);
         GlStateManager.disableTexture();
         GlStateManager.depthMask(false);
-        WorldRenderer.drawSelectionBoundingBox(event.getPosition().toAABB().expand(1, 1, 1).offset(view.scale(-1)), 1.0F, 1.0F, 1.0F, 1.0F);
+        WorldRenderer.drawSelectionBoundingBox(event.getEvent().getPosition().toAABB().expand(1, 1, 1).offset(view.scale(-1)), 1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.depthMask(true);
         GlStateManager.enableTexture();
     }

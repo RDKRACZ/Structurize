@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
 import com.ldtteam.structurize.Instances;
-import com.ldtteam.structurize.pipeline.PlaceEventInfoHolder;
 import com.ldtteam.structurize.structure.providers.IStructureDataProvider;
 import org.jetbrains.annotations.NotNull;
 import net.minecraft.block.AirBlock;
@@ -41,18 +40,14 @@ import net.minecraft.world.storage.MapData;
  */
 public class StructureWorld extends World implements IBlockReader
 {
-    /**
-     * Structure with the info we need.
-     */
-    private final IStructureDataProvider structure;
-    private final PlaceEventInfoHolder<?> event;
+    private final RenderEventWrapper<?, ?> event;
 
     /**
      * Constructor to create a new world/blockAccess.
      *
      * @param event event
      */
-    public StructureWorld(final PlaceEventInfoHolder<?> event)
+    public StructureWorld(final RenderEventWrapper<?, ?> event)
     {
         super(
             Minecraft.getInstance().world.getWorldInfo(),
@@ -67,7 +62,6 @@ public class StructureWorld extends World implements IBlockReader
             Minecraft.getInstance().world.getProfiler(),
             true);
         this.event = event;
-        this.structure = event.getStructure();
     }
 
     /**
@@ -77,27 +71,27 @@ public class StructureWorld extends World implements IBlockReader
      */
     public IStructureDataProvider getStructure()
     {
-        return structure;
+        return event.getEvent().getStructure();
     }
 
     @NotNull
     @Override
     public BlockState getBlockState(@NotNull final BlockPos pos)
     {
-        if (Minecraft.getInstance().world.getBlockState(pos.add(event.getPosition().getAnchor())).isSolid())
+        if (Minecraft.getInstance().world.getBlockState(pos.add(event.getEvent().getPosition().getAnchor())).isSolid())
         {
             return Blocks.VOID_AIR.getDefaultState();
         }
         final short index;
         try
         {
-            index = structure.getBlocks()[pos.getY()][pos.getZ()][pos.getX()];
+            index = getStructure().getBlocks()[pos.getY()][pos.getZ()][pos.getX()];
         }
         catch (final ArrayIndexOutOfBoundsException e)
         {
             return Blocks.VOID_AIR.getDefaultState();
         }
-        return RenderTransformers.transformBlockState(structure.getBlockPalette().get(index));
+        return RenderTransformers.transformBlockState(getStructure().getBlockPalette().get(index));
         // TODO: cache removed, should be back?
     }
 
@@ -108,7 +102,7 @@ public class StructureWorld extends World implements IBlockReader
         CompoundNBT teData;
         try
         {
-            teData = structure.getTileEntities()[pos.getY()][pos.getZ()][pos.getX()];
+            teData = getStructure().getTileEntities()[pos.getY()][pos.getZ()][pos.getX()];
         }
         catch (final ArrayIndexOutOfBoundsException e)
         {

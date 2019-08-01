@@ -24,21 +24,6 @@ public class PlaceEventInfoHolder<T extends IStructureDataProvider>
     private World world;
     private boolean isCanceled = false;
 
-    // TODO: render wrapper
-    private boolean shouldRedraw = false;
-
-    public void setRedraw()
-    {
-        shouldRedraw = true;
-    }
-
-    public boolean shouldRedraw()
-    {
-        final boolean result = shouldRedraw;
-        shouldRedraw = false;
-        return result;
-    }
-
     /**
      * Creates a new placement event info holder.
      * TODO: add facing?
@@ -77,7 +62,7 @@ public class PlaceEventInfoHolder<T extends IStructureDataProvider>
      */
     public void passToBuildProvider(final UUID playerUUID)
     {
-        structure.applyMirrorRotationOnStructure();
+
     }
 
     /**

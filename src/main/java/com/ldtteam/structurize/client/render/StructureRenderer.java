@@ -36,26 +36,26 @@ import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
  */
 public class StructureRenderer
 {
-    private static final float HALF_PERCENT_SHRINK = 0.995F;
-
     private final StructureWorld structureWorld;
     private final List<TileEntity> tileEntities;
     private final List<Entity> entities;
     private StructureTessellator tessellator;
     private final BlockPos mirrorRotationAnchor;
+    private final RenderEventWrapper<?, ?> event;
 
     /**
      * Static factory utility method to handle the extraction of the values from the blueprint.
      *
      * @param event The blueprint to create an instance for.
      */
-    public StructureRenderer(final PlaceEventInfoHolder<?> event)
+    public StructureRenderer(final RenderEventWrapper<?, ?> event)
     {
+        this.event = event;
         this.structureWorld = new StructureWorld(event);
-        this.tileEntities = instantiateTileEntities(event.getStructure());
-        this.entities = instantiateEntities(event.getStructure());
+        this.tileEntities = instantiateTileEntities();
+        this.entities = instantiateEntities();
         this.tessellator = new StructureTessellator();
-        this.mirrorRotationAnchor = event.getStructure().getZeroBasedMirrorRotationAnchor();
+        this.mirrorRotationAnchor = event.getEvent().getStructure().getZeroBasedMirrorRotationAnchor();
 
         this.setup();
     }
@@ -95,7 +95,7 @@ public class StructureRenderer
      * @param view         drawing offset
      * @param recompTessel whether tesselator should be recompiled or not
      */
-    public void draw(final PlaceEventInfoHolder<?> event, final Vec3d view, final boolean recompTessel)
+    public void draw(final Vec3d view, final boolean recompTessel)
     {
         if (recompTessel)
         {
@@ -104,7 +104,7 @@ public class StructureRenderer
         }
 
         // Handle things like mirror, rotation and offset.
-        preBlueprintDraw(event, view);
+        preBlueprintDraw(view);
 
         // Draw normal blocks.
         tessellator.draw();
@@ -150,17 +150,17 @@ public class StructureRenderer
         postBlueprintDraw();
     }
 
-    private void preBlueprintDraw(final PlaceEventInfoHolder<?> event, final Vec3d view)
+    private void preBlueprintDraw(final Vec3d view)
     {
         final ITextureObject textureObject = Minecraft.getInstance().getTextureMap();
         GlStateManager.bindTexture(textureObject.getGlTextureId());
 
         GlStateManager.pushMatrix();
-        final Vec3d translatedView = new Vec3d(event.getPosition().getAnchor()).subtract(view);
+        final Vec3d translatedView = new Vec3d(event.getEvent().getPosition().getAnchor()).subtract(view);
         GlStateManager.translated(translatedView.getX(), translatedView.getY(), translatedView.getZ());
 
-        RenderUtil.applyRotationToYAxis(event.getStructure().getRotation(), mirrorRotationAnchor);
-        RenderUtil.applyMirror(event.getStructure().isMirrored() ? Mirror.FRONT_BACK : Mirror.NONE, mirrorRotationAnchor);
+        RenderUtil.applyRotationToYAxis(event.getRotation(), mirrorRotationAnchor);
+        RenderUtil.applyMirror(event.isMirrored() ? Mirror.FRONT_BACK : Mirror.NONE, mirrorRotationAnchor);
 
         // GlStateManager.scaled(HALF_PERCENT_SHRINK, HALF_PERCENT_SHRINK, HALF_PERCENT_SHRINK); testing without clipping fix
         GlStateManager.enableBlend();
@@ -189,13 +189,15 @@ public class StructureRenderer
      * @return list of tileentities
      */
 
-    private List<TileEntity> instantiateTileEntities(final IStructureDataProvider structure)
+    private List<TileEntity> instantiateTileEntities()
     {
         final List<TileEntity> result = new ArrayList<>();
+        final BlockPos end = new BlockPos(
+            event.getEvent().getStructure().getXsize() - 1,
+            event.getEvent().getStructure().getYsize() - 1,
+            event.getEvent().getStructure().getZsize() - 1);
 
-        for (final BlockPos bp : new CubeCoordinateIterator(
-            BlockPos.ZERO,
-            new BlockPos(structure.getXsize() - 1, structure.getYsize() - 1, structure.getZsize() - 1)))
+        for (final BlockPos bp : new CubeCoordinateIterator(BlockPos.ZERO, end))
         {
             final TileEntity te = structureWorld.getTileEntity(bp);
             if (te != null)
@@ -214,9 +216,11 @@ public class StructureRenderer
      * @return A list of entities in the blueprint
      */
 
-    public List<Entity> instantiateEntities(final IStructureDataProvider structure)
+    public List<Entity> instantiateEntities()
     {
-        return structure.getEntities()
+        return event.getEvent()
+            .getStructure()
+            .getEntities()
             .stream()
             .map(entityInfo -> RenderTransformers.transformEntity(entityInfo))
             .map(entityInfo -> constructEntity(entityInfo, structureWorld))

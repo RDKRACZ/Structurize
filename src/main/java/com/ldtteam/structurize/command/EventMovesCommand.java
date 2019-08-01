@@ -27,25 +27,25 @@ public class EventMovesCommand extends AbstractCommand
     private static int move(final CommandContext<CommandSource> command) throws CommandSyntaxException
     {
         final BlockPos vec = BlockPosArgument.getBlockPos(command, POS_ARG);
-        WindowBuildTool.getEvent().getPosition().moveBy(vec);
+        WindowBuildTool.getRenderEvent().getEvent().getPosition().moveBy(vec);
         return 1;
     }
 
     private static int rotateCW(final CommandContext<CommandSource> command) throws CommandSyntaxException
     {
-        WindowBuildTool.getEvent().getStructure().rotateClockwise();
+        WindowBuildTool.getRenderEvent().rotateClockwise();
         return 1;
     }
 
     private static int rotateCCW(final CommandContext<CommandSource> command) throws CommandSyntaxException
     {
-        WindowBuildTool.getEvent().getStructure().rotateCounterClockwise();
+        WindowBuildTool.getRenderEvent().rotateCounterClockwise();
         return 1;
     }
 
     private static int mirror(final CommandContext<CommandSource> command) throws CommandSyntaxException
     {
-        WindowBuildTool.getEvent().getStructure().mirror();
+        WindowBuildTool.getRenderEvent().mirror();
         return 1;
     }
 

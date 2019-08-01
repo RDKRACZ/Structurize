@@ -20,8 +20,6 @@ public class BlueprintStructureProvider implements IStructureDataProvider
     private Blueprint blueprint;
     private Path blueprintPath;
     private PlaceEventInfoHolder<BlueprintStructureProvider> event;
-    private Rotation rotation = Rotation.NONE;
-    private boolean mirror = false;
     private BlockPos mirrorRotationAnchor = null;
 
     private BlueprintStructureProvider()
@@ -102,44 +100,9 @@ public class BlueprintStructureProvider implements IStructureDataProvider
     }
 
     @Override
-    public void rotateClockwise()
-    {
-        rotation = rotation.add(Rotation.CLOCKWISE_90);
-        event.getPosition().rotateCW(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
-    }
-
-    @Override
-    public void rotateCounterClockwise()
-    {
-        rotation = rotation.add(Rotation.COUNTERCLOCKWISE_90);
-        event.getPosition().rotateCCW(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
-    }
-
-    @Override
-    public Rotation getRotation()
-    {
-        return rotation;
-    }
-
-    @Override
-    public void mirror()
-    {
-        mirror = !mirror;
-        event.getPosition().mirrorX(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
-    }
-
-    @Override
-    public boolean isMirrored()
-    {
-        return mirror;
-    }
-
-    @Override
-    public void applyMirrorRotationOnStructure()
+    public void applyMirrorRotationOnStructure(final Rotation rotation, final boolean mirror)
     {
         blueprint.rotateWithMirror(rotation, mirror ? Mirror.FRONT_BACK : Mirror.NONE, event.getWorld());
-        rotation = Rotation.NONE;
-        mirror = false;
     }
 
     @Override

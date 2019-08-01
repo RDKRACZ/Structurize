@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
@@ -21,44 +22,12 @@ public interface IStructureDataProvider
     BlockPos getZeroBasedMirrorRotationAnchor();
 
     /**
-     * Rotates structure clockwise.
-     */
-    void rotateClockwise();
-
-    /**
-     * Rotates structure counterclockwise.
-     */
-    void rotateCounterClockwise();
-
-    /**
-     * Getter for unapplied rotation.
+     * Takes given rotation and mirror and apply them on structure data.
      *
-     * @return current rotation
-     * @see #rotateClockwise()
-     * @see #rotateCounterClockwise()
-     * @see #applyMirrorRotationOnStructure()
+     * @param rotation rotation from render wrapper
+     * @param mirror   is mirrored from render wrapper
      */
-    Rotation getRotation();
-
-    /**
-     * Mirrors structure through XY|YZ plane according to current rotation.
-     * Applied before rotation.
-     */
-    void mirror();
-
-    /**
-     * Getter for unapplied mirror.
-     *
-     * @return current mirror
-     * @see #mirror()
-     * @see #applyMirrorRotationOnStructure()
-     */
-    boolean isMirrored();
-
-    /**
-     * Takes current rotation and mirror and apply them on structure data then resets their values.
-     */
-    void applyMirrorRotationOnStructure();
+    void applyMirrorRotationOnStructure(Rotation rotation, boolean mirror);
 
     /**
      * Getter for X block size.
