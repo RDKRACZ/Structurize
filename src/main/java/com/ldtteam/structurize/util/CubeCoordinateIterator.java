@@ -41,7 +41,8 @@ public class CubeCoordinateIterator implements Iterable<BlockPos>
     @Override
     public Iterator<BlockPos> iterator()
     {
-        return new Iterator<BlockPos>(){
+        return new Iterator<BlockPos>()
+        {
             @Override
             public boolean hasNext()
             {
@@ -63,7 +64,7 @@ public class CubeCoordinateIterator implements Iterable<BlockPos>
                 else if (y < endY)
                 {
                     y++;
-                    if (y < endY)
+                    if (y <= endY)
                     {
                         x = startX;
                         z = startZ;

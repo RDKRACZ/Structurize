@@ -23,6 +23,28 @@ public interface IStructureDataProvider
     BlockPos getZeroBasedMirrorRotationAnchor();
 
     /**
+     * Rotates structure clockwise.
+     */
+    void rotateClockwise();
+
+    /**
+     * Rotates structure counterclockwise.
+     */
+    void rotateCounterClockwise();
+
+    /**
+     * Mirrors structure through YZ plane according to current rotation.
+     * Applied before rotation.
+     */
+    void mirrorX();
+
+    /**
+     * Mirrors structure through XY plane according to current rotation.
+     * Applied before rotation.
+     */
+    void mirrorZ();
+
+    /**
      * Takes given rotation and mirror and apply them on structure data.
      *
      * @param rotation rotation from render wrapper

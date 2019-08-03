@@ -2,7 +2,6 @@ package com.ldtteam.structurize.structure.blueprint;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ldtteam.structurize.block.IAnchorBlock;
 import com.ldtteam.structurize.structure.StructureBB;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -362,7 +361,7 @@ public class Blueprint
         {
             if (te != null)
             {
-                final BlockPos pos = transformedBlockPos(te.getInt("x"), te.getInt("y"), te.getInt("z"), mirror, rotation);
+                final BlockPos pos = transformedBlockPos(te.getInt("x"), te.getInt("y"), te.getInt("z"), mirror, rotation).add(minX, minY, minZ);
                 te.putInt("x", pos.getX());
                 te.putInt("y", pos.getY());
                 te.putInt("z", pos.getZ());

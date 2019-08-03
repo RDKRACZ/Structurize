@@ -1,5 +1,6 @@
 package com.ldtteam.structurize.client.render;
 
+import com.ldtteam.structurize.Instances;
 import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
@@ -66,7 +67,7 @@ public class StructureTessellator
 
     private static void preBlueprintDraw()
     {
-        OptifineCompat.getInstance().preBlueprintDraw();
+        Instances.getOptifineCompat().preBlueprintDraw();
 
         GlStateManager.enableClientState(GL_VERTEX_ARRAY);
 
@@ -79,7 +80,7 @@ public class StructureTessellator
 
         // Optifine uses its one vertexformats.
         // It handles the setting of the pointers itself.
-        if (OptifineCompat.getInstance().setupArrayPointers())
+        if (Instances.getOptifineCompat().setupArrayPointers())
         {
             return;
         }
@@ -124,7 +125,7 @@ public class StructureTessellator
         }
 
         // Disable the pointers again.
-        OptifineCompat.getInstance().postBlueprintDraw();
+        Instances.getOptifineCompat().postBlueprintDraw();
     }
 
     /**
@@ -172,7 +173,7 @@ public class StructureTessellator
             // Tell optifine that we are loading a new instance into the GPU.
             // This ensures that normals are calculated so that we know in which direction a face is facing. (Aka what is outside and what
             // inside)
-            OptifineCompat.getInstance().beforeBuilderUpload(this);
+            Instances.getOptifineCompat().beforeBuilderUpload(this);
             this.vboUploader.draw(this.builder);
             state = State.BUILT;
         }

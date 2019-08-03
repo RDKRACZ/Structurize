@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
 import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.pipeline.PlaceEventInfoHolder;
 import com.ldtteam.structurize.structure.providers.IStructureDataProvider;
 import org.jetbrains.annotations.NotNull;
 import net.minecraft.block.AirBlock;
@@ -40,19 +41,20 @@ import net.minecraft.world.storage.MapData;
  */
 public class StructureWorld extends World implements IBlockReader
 {
-    private final RenderEventWrapper<?, ?> event;
+    private final PlaceEventInfoHolder<?> event;
 
     /**
      * Constructor to create a new world/blockAccess.
      *
      * @param event event
      */
-    public StructureWorld(final RenderEventWrapper<?, ?> event)
+    public StructureWorld(final PlaceEventInfoHolder<?> event)
     {
         super(
             Minecraft.getInstance().world.getWorldInfo(),
             Minecraft.getInstance().world.dimension.getType(),
-            new BiFunction<World, Dimension, AbstractChunkProvider>(){
+            new BiFunction<World, Dimension, AbstractChunkProvider>()
+            {
                 @Override
                 public AbstractChunkProvider apply(final World world, final Dimension dimension)
                 {
@@ -71,14 +73,14 @@ public class StructureWorld extends World implements IBlockReader
      */
     public IStructureDataProvider getStructure()
     {
-        return event.getEvent().getStructure();
+        return event.getStructure();
     }
 
     @NotNull
     @Override
     public BlockState getBlockState(@NotNull final BlockPos pos)
     {
-        if (Minecraft.getInstance().world.getBlockState(pos.add(event.getEvent().getPosition().getAnchor())).isSolid())
+        if (Minecraft.getInstance().world.getBlockState(pos.add(event.getPosition().getAnchor())).isSolid())
         {
             return Blocks.VOID_AIR.getDefaultState();
         }
@@ -91,9 +93,8 @@ public class StructureWorld extends World implements IBlockReader
         {
             return Blocks.VOID_AIR.getDefaultState();
         }
-        return getStructure().getBlockPalette().get(index);
-        // return RenderTransformers.transformBlockState(getStructure().getBlockPalette().get(index));
-        // TODO: cache removed, should be back? hell no, causing lags as hell
+        return RenderTransformers.transformBlockState(getStructure().getBlockPalette().get(index));
+        // cache removed, should be back? hell no, causing lags as hell
     }
 
     @Nullable
@@ -105,7 +106,7 @@ public class StructureWorld extends World implements IBlockReader
         {
             return null;
         }
-        // teData = RenderTransformers.transformTileEntity(teData);
+        teData = RenderTransformers.transformTileEntity(teData);
         final String entityId = teData.getString("id");
 
         try
@@ -128,7 +129,7 @@ public class StructureWorld extends World implements IBlockReader
             Instances.getLogger().error("Could not create tile entity: " + entityId + " with nbt: " + teData.toString(), ex);
         }
         return null;
-        // TODO: cache removed, should be back? hell no, causing lags as hell
+        // cache removed, should be back? hell no, causing lags as hell
     }
 
     @NotNull
@@ -181,7 +182,7 @@ public class StructureWorld extends World implements IBlockReader
     public void playMovingSound(
         @Nullable final PlayerEntity player,
         final Entity entity,
-        final SoundEvent event,
+        final SoundEvent eventIn,
         final SoundCategory category,
         final float volume,
         final float pitch)

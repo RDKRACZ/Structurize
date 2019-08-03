@@ -1,7 +1,6 @@
 package com.ldtteam.structurize.event;
 
 import com.ldtteam.structurize.Instances;
-import com.ldtteam.structurize.client.render.EventRenderer;
 import com.ldtteam.structurize.command.EntryPoint;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -90,6 +89,6 @@ public class EventSubscriber
     @SubscribeEvent
     public static void onRenderWorldLast(final RenderWorldLastEvent event)
     {
-        EventRenderer.renderActiveEvents(event.getContext(), event.getPartialTicks());
+        Instances.getEventRenderer().renderActiveEvents(event.getContext(), event.getPartialTicks());
     }
 }

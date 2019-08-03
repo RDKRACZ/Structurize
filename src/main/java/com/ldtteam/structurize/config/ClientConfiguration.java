@@ -14,9 +14,9 @@ public class ClientConfiguration extends AbstractConfiguration
     public final ForgeConfigSpec.IntValue maxAmountOfRenderedEvents;
 
     /**
-     * How many prerendered structures can be cached at one time.
+     * Should texture of light (anyblock) placeholder be toggleable (visible/invisible states)?
      */
-    public final ForgeConfigSpec.IntValue prerendedStructureCacheSize;
+    public final ForgeConfigSpec.BooleanValue toggleableLightTexture;
 
     /**
      * Builds client configuration.
@@ -27,7 +27,7 @@ public class ClientConfiguration extends AbstractConfiguration
     {
         createCategory(builder, "render");
         maxAmountOfRenderedEvents = defineInteger(builder, "maxamountofrenderedevents", 10, 1, Integer.MAX_VALUE);
-        prerendedStructureCacheSize = defineInteger(builder.worldRestart(), "prerendedstructurecachesize", 40, 5, Integer.MAX_VALUE);
+        toggleableLightTexture = defineBoolean(builder, "toggleablelighttexture", true);
         finishCategory(builder);
     }
 }

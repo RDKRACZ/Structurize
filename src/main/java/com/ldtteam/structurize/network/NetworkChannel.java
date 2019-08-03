@@ -34,8 +34,8 @@ public class NetworkChannel
      */
     public NetworkChannel(final String channelName)
     {
-        rawChannel =
-            NetworkRegistry.newSimpleChannel(Utils.createLocationFor(channelName), () -> LATEST_PROTO_VER, ACCEPTED_PROTO_VERS::equals, ACCEPTED_PROTO_VERS::equals);
+        rawChannel = NetworkRegistry
+            .newSimpleChannel(Utils.createLocationFor(channelName), () -> LATEST_PROTO_VER, ACCEPTED_PROTO_VERS::equals, ACCEPTED_PROTO_VERS::equals);
     }
 
     /**

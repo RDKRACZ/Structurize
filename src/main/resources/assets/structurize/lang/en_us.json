@@ -19,6 +19,6 @@
   "structurize.config.buildtoolsurvivescrafting.comment": "Should BuildTool remains after crafting when being a part of crafting recipe?",
   "structurize.config.maxamountofrenderedevents": "Max Amount Of Rendered Events",
   "structurize.config.maxamountofrenderedevents.comment": "How many build previews can be rendered at one time.",
-  "structurize.config.prerendedstructurecachesize": "Prerended Structure Cache Size",
-  "structurize.config.prerendedstructurecachesize.comment": "How many prerendered structures can be cached at one time."
+  "structurize.config.toggleablelighttexture": "Toggleable Light Placeholder Texture",
+  "structurize.config.toggleablelighttexture.comment": "Should texture of light (anyblock) placeholder be toggleable (visible/invisible states)?"
 }

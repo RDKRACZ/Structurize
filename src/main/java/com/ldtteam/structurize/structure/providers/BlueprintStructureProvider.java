@@ -103,6 +103,38 @@ public class BlueprintStructureProvider implements IStructureDataProvider
     }
 
     @Override
+    public void rotateClockwise()
+    {
+        applyMirrorRotationOnStructure(Rotation.CLOCKWISE_90, Mirror.NONE);
+        event.getPosition().rotateCW(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
+        event.getRenderer().recompile();
+    }
+
+    @Override
+    public void rotateCounterClockwise()
+    {
+        applyMirrorRotationOnStructure(Rotation.COUNTERCLOCKWISE_90, Mirror.NONE);
+        event.getPosition().rotateCCW(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
+        event.getRenderer().recompile();
+    }
+
+    @Override
+    public void mirrorX()
+    {
+        applyMirrorRotationOnStructure(Rotation.NONE, Mirror.FRONT_BACK);
+        event.getPosition().mirrorX(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
+        event.getRenderer().recompile();
+    }
+
+    @Override
+    public void mirrorZ()
+    {
+        applyMirrorRotationOnStructure(Rotation.NONE, Mirror.LEFT_RIGHT);
+        event.getPosition().mirrorZ(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
+        event.getRenderer().recompile();
+    }
+
+    @Override
     public void applyMirrorRotationOnStructure(final Rotation rotation, final Mirror mirror)
     {
         mirrorRotationAnchor = null;

@@ -1,5 +1,6 @@
 package com.ldtteam.structurize.client.render;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -30,6 +31,12 @@ public class StructureChunk extends Chunk
     {
         super(worldIn, new ChunkPos(x, z), new Biome[0]);
         this.world = (StructureWorld) worldIn;
+    }
+
+    @Override
+    public BlockState getBlockState(final BlockPos pos)
+    {
+        return world.getBlockState(pos);
     }
 
     @Nullable

@@ -1,8 +1,7 @@
 package com.ldtteam.structurize.block;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import com.ldtteam.structurize.client.render.EventRenderer;
-import com.ldtteam.structurize.util.constants.MathConstants;
+import com.ldtteam.structurize.Instances;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -19,18 +18,19 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.SectionPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 /**
  * Anyblock substitution block class
  */
-public class AnyblockSubstitution extends Block implements IAnchorBlock
+public class AnyblockSubstitution extends Block
 {
     /**
      * Whether block instances should render texture or not.
      */
-    private static final AtomicBoolean SHOULD_RENDER_BLOCK_TEXTURE = new AtomicBoolean(false);
+    private static final AtomicBoolean SHOULD_RENDER_BLOCK_TEXTURE = new AtomicBoolean(true);
 
     /**
      * Creates default anyblock substitution block.
@@ -63,7 +63,9 @@ public class AnyblockSubstitution extends Block implements IAnchorBlock
     @Override
     public BlockRenderType getRenderType(final BlockState state)
     {
-        return SHOULD_RENDER_BLOCK_TEXTURE.get() ? BlockRenderType.MODEL : BlockRenderType.INVISIBLE;
+        return SHOULD_RENDER_BLOCK_TEXTURE.get() || !Instances.getConfig().getClient().toggleableLightTexture.get()
+            ? BlockRenderType.MODEL
+            : BlockRenderType.INVISIBLE;
     }
 
     /**
@@ -74,19 +76,17 @@ public class AnyblockSubstitution extends Block implements IAnchorBlock
      */
     public BlockItem createSpecialBI(final ItemGroup itemGroup)
     {
-        return (BlockItem) new BlockItem(this, new Item.Properties().group(itemGroup)){
+        return (BlockItem) new BlockItem(this, new Item.Properties().group(itemGroup))
+        {
             @Override
             public ActionResult<ItemStack> onItemRightClick(final World worldIn, final PlayerEntity playerIn, final Hand handIn)
             {
-                if (worldIn.isRemote())
+                if (worldIn.isRemote() && Instances.getConfig().getClient().toggleableLightTexture.get())
                 {
                     SHOULD_RENDER_BLOCK_TEXTURE.set(!SHOULD_RENDER_BLOCK_TEXTURE.get());
-                    EventRenderer.recompileTesselators();
-                    final BlockPos center = playerIn.getPosition();
-                    ((ClientWorld) worldIn).markSurroundingsForRerender(
-                        center.getX() / MathConstants.CHUNK_BLOCK_SIZE,
-                        center.getY() / MathConstants.CHUNK_BLOCK_SIZE,
-                        center.getZ() / MathConstants.CHUNK_BLOCK_SIZE);
+                    final SectionPos center = SectionPos.from(playerIn.getPosition());
+                    ((ClientWorld) worldIn).markSurroundingsForRerender(center.getX(), center.getY(), center.getZ());
+                    Instances.getEventRenderer().recompileTessellators();
                 }
                 return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getHeldItem(handIn));
             }

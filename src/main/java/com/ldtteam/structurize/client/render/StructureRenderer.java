@@ -9,22 +9,18 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.pipeline.PlaceEventInfoHolder;
-import com.ldtteam.structurize.structure.providers.IStructureDataProvider;
 import com.ldtteam.structurize.util.CubeCoordinateIterator;
 import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Mirror;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.model.ModelDataManager;
@@ -41,10 +37,10 @@ public class StructureRenderer
     private List<TileEntity> tileEntities;
     private List<Entity> entities;
     private StructureTessellator tessellator;
-    private final RenderEventWrapper<?, ?> event;
+    private final PlaceEventInfoHolder<?> event;
     private Object updateLock = new Object();
     private Thread currentUpdateThread;
-    private boolean keepUpdating = false;
+    private boolean keepRecompiling = false;
 
     /**
      * Static factory utility method to handle the extraction of the values from the blueprint.
@@ -52,7 +48,7 @@ public class StructureRenderer
      * @param event       The blueprint to create an instance for.
      * @param shouldSetup if setup thread should be created
      */
-    public StructureRenderer(final RenderEventWrapper<?, ?> event, final boolean shouldSetup)
+    public StructureRenderer(final PlaceEventInfoHolder<?> event, final boolean shouldSetup)
     {
         this.event = event;
         this.structureWorld = new StructureWorld(event);
@@ -63,9 +59,21 @@ public class StructureRenderer
         }
     }
 
+    /**
+     * Marks tessellator for recompiling, usually because of updating structure data.
+     */
+    public void recompile()
+    {
+        keepRecompiling = true;
+    }
+
+    /**
+     * Creates thread for building new values from actual structure data.
+     * Updates this instance with new values once thread completes its job.
+     */
     private void setup()
     {
-        keepUpdating = false;
+        keepRecompiling = false;
         final StructureTessellator newTessellator = new StructureTessellator();
         currentUpdateThread = new Thread(() -> {
             final StructureRenderer struct = new StructureRenderer(event, false);
@@ -82,7 +90,9 @@ public class StructureRenderer
     }
 
     /**
-     * Sets up the renders VBO.
+     * Builds new values and compiles blocks into given tessellator.
+     *
+     * @param tess tessellator to compile into
      */
     private void setup0(final StructureTessellator tess)
     {
@@ -92,21 +102,18 @@ public class StructureRenderer
         tess.startBuilding();
 
         final Random random = new Random();
+        final BlockPos structEnd = new BlockPos(
+            structureWorld.getStructure().getXsize() - 1,
+            structureWorld.getStructure().getYsize() - 1,
+            structureWorld.getStructure().getZsize() - 1);
 
-        for (int y = 0; y < structureWorld.getStructure().getYsize(); y++)
+        for (final BlockPos bp : new CubeCoordinateIterator(BlockPos.ZERO, structEnd))
         {
-            for (int z = 0; z < structureWorld.getStructure().getZsize(); z++)
-            {
-                for (int x = 0; x < structureWorld.getStructure().getXsize(); x++)
-                {
-                    final BlockPos bp = new BlockPos(x, y, z);
-                    final BlockState bs = structureWorld.getBlockState(bp);
+            final BlockState bs = structureWorld.getBlockState(bp);
 
-                    Minecraft.getInstance()
-                        .getBlockRendererDispatcher()
-                        .renderBlock(bs, bp, structureWorld, tess.getBuilder(), random, ModelDataManager.getModelData(structureWorld, bp));
-                }
-            }
+            Minecraft.getInstance()
+                .getBlockRendererDispatcher()
+                .renderBlock(bs, bp, structureWorld, tess.getBuilder(), random, ModelDataManager.getModelData(structureWorld, bp));
         }
 
         tess.finishBuilding();
@@ -127,13 +134,15 @@ public class StructureRenderer
                 return;
             }
 
+            // Is tessellator uploaded to gpu
             tessellator.ensureUploaded();
 
-            if (recompTessel || keepUpdating)
+            // Should render data be updated
+            if (recompTessel || keepRecompiling)
             {
                 if (currentUpdateThread != null && currentUpdateThread.isAlive())
                 {
-                    keepUpdating = true;
+                    keepRecompiling = true;
                 }
                 else
                 {
@@ -141,15 +150,22 @@ public class StructureRenderer
                 }
             }
 
-            // Handle things like mirror, rotation and offset.
-            preBlueprintDraw(view);
+            // Translate view
+            GlStateManager.pushMatrix();
+            final Vec3d translatedView = new Vec3d(event.getPosition().getAnchor()).subtract(view);
+            GlStateManager.translated(translatedView.getX(), translatedView.getY(), translatedView.getZ());
+
+            // Setup rendering
+            GlStateManager.bindTexture(Minecraft.getInstance().getTextureMap().getGlTextureId());
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.clearCurrentColor();
 
             // Draw normal blocks.
             tessellator.draw();
 
-            RenderHelper.enableStandardItemLighting();
-
             // Draw tile entities.
+            RenderHelper.enableStandardItemLighting();
             tileEntities.forEach(tileEntity -> {
                 GlStateManager.pushMatrix();
                 final int combinedLight = tileEntity.getWorld().getCombinedLight(tileEntity.getPos(), 0);
@@ -163,7 +179,6 @@ public class StructureRenderer
                     .render(tileEntity, tileEntity.getPos().getX(), tileEntity.getPos().getY(), tileEntity.getPos().getZ(), 1f);
                 GlStateManager.popMatrix();
             });
-
             RenderHelper.disableStandardItemLighting();
 
             // Draw entities
@@ -186,54 +201,22 @@ public class StructureRenderer
                 GlStateManager.popMatrix();
             });
 
-            postBlueprintDraw();
+            // Setdown rendering
+            GlStateManager.clearCurrentColor();
+            GlStateManager.disableBlend();
+            GlStateManager.popMatrix();
         }
-    }
-
-    private void preBlueprintDraw(final Vec3d view)
-    {
-        final ITextureObject textureObject = Minecraft.getInstance().getTextureMap();
-        GlStateManager.bindTexture(textureObject.getGlTextureId());
-
-        GlStateManager.pushMatrix();
-        final Vec3d translatedView = new Vec3d(event.getEvent().getPosition().getAnchor()).subtract(view);
-        GlStateManager.translated(translatedView.getX(), translatedView.getY(), translatedView.getZ());
-
-        // RenderUtil.applyRotationToYAxis(event.getRotation(), mirrorRotationAnchor);
-        // RenderUtil.applyMirror(event.isMirrored() ? Mirror.FRONT_BACK : Mirror.NONE, mirrorRotationAnchor);
-
-        // GlStateManager.scaled(HALF_PERCENT_SHRINK, HALF_PERCENT_SHRINK, HALF_PERCENT_SHRINK); testing without clipping fix
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        GlStateManager.clearCurrentColor();
-    }
-
-    private void postBlueprintDraw()
-    {
-        GlStateManager.clearCurrentColor();
-        GlStateManager.disableBlend();
-        GlStateManager.popMatrix();
-    }
-
-    public StructureTessellator getTessellator()
-    {
-        return tessellator;
     }
 
     /**
      * Creates list of tileentities from given structure, sets their world to given one.
      *
-     * @param structure structure provider
      * @return list of tileentities
      */
-
     private List<TileEntity> instantiateTileEntities()
     {
         final List<TileEntity> result = new ArrayList<>();
-        final BlockPos end = new BlockPos(
-            event.getEvent().getStructure().getXsize() - 1,
-            event.getEvent().getStructure().getYsize() - 1,
-            event.getEvent().getStructure().getZsize() - 1);
+        final BlockPos end = new BlockPos(event.getStructure().getXsize() - 1, event.getStructure().getYsize() - 1, event.getStructure().getZsize() - 1);
 
         for (final BlockPos bp : new CubeCoordinateIterator(BlockPos.ZERO, end))
         {
@@ -248,26 +231,29 @@ public class StructureRenderer
     }
 
     /**
-     * Creates a list of entities located in the blueprint, placed inside that blueprints block access world.
+     * Creates list of entities located in the blueprint, placed inside that blueprints block access world.
      *
-     * @param structure The blueprint whos entities need to be instantiated.
-     * @return A list of entities in the blueprint
+     * @return list of entities
      */
-
     public List<Entity> instantiateEntities()
     {
-        return event.getEvent()
-            .getStructure()
+        return event.getStructure()
             .getEntities()
             .stream()
             .map(entityInfo -> RenderTransformers.transformEntity(entityInfo))
-            .map(entityInfo -> constructEntity(entityInfo, structureWorld))
+            .map(entityInfo -> constructEntity(entityInfo))
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
 
+    /**
+     * Creates new Entity from given nbt data.
+     *
+     * @param entityData entity nbt data
+     * @return entity if success, null otherwise
+     */
     @Nullable
-    private Entity constructEntity(@Nullable final CompoundNBT entityData, final StructureWorld structureWorld)
+    private Entity constructEntity(@Nullable final CompoundNBT entityData)
     {
         if (entityData == null)
         {

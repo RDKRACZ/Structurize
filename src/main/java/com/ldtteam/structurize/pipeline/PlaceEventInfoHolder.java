@@ -1,6 +1,7 @@
 package com.ldtteam.structurize.pipeline;
 
 import java.util.UUID;
+import com.ldtteam.structurize.client.render.StructureRenderer;
 import com.ldtteam.structurize.structure.StructureBB;
 import com.ldtteam.structurize.structure.providers.BlueprintStructureProvider;
 import com.ldtteam.structurize.structure.providers.IStructureDataProvider;
@@ -19,6 +20,7 @@ import net.minecraft.world.World;
 public class PlaceEventInfoHolder<T extends IStructureDataProvider>
 {
     private final UUID eventId = UUID.randomUUID();
+    private StructureRenderer renderer;
     private StructureBB position;
     private T structure;
     private World world;
@@ -81,6 +83,25 @@ public class PlaceEventInfoHolder<T extends IStructureDataProvider>
     public boolean isCanceled()
     {
         return isCanceled;
+    }
+
+    public void setRenderer(StructureRenderer renderer)
+    {
+        this.renderer = renderer;
+    }
+
+    /**
+     * Getter for structure renderer.
+     *
+     * @return structure renderer
+     */
+    public StructureRenderer getRenderer()
+    {
+        if (renderer == null)
+        {
+            renderer = new StructureRenderer(this, true);
+        }
+        return renderer;
     }
 
     /**

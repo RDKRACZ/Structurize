@@ -15,8 +15,6 @@ import java.lang.reflect.Method;
  */
 public class OptifineCompat
 {
-    private static OptifineCompat ourInstance = new OptifineCompat();
-
     private Method isShadersEnabledMethod;
     private Method preRenderChunkLayerMethod;
     private Method postRenderChunkLayerMethod;
@@ -24,25 +22,17 @@ public class OptifineCompat
     private Method calcNormalForLayerMethod;
     private Method beginUpdateChunksMethod;
     private Method endUpdateChunksMethod;
-
-    private boolean currentShadowPassFieldValue = false;
     private Field isShadowPassField;
+    private boolean currentShadowPassFieldValue = false;
 
-    private boolean enableOptifine = false;
+    private boolean enableOptifine;
 
     /**
-     * Private constructor to hide implicit public one.
+     * Creates new instance.
      */
-    private OptifineCompat()
+    public OptifineCompat()
     {
-        /**
-         * Intentionally left empty
-         */
-    }
-
-    public static OptifineCompat getInstance()
-    {
-        return ourInstance;
+        enableOptifine = false;
     }
 
     /**
@@ -246,6 +236,12 @@ public class OptifineCompat
         }
     }
 
+    /**
+     * Fires errors into logger. Prevents all future executions of every method.
+     *
+     * @param invokeOrAccess invoke or access string
+     * @param e              expection reference
+     */
     private void shutdown(final String invokeOrAccess, final Exception e)
     {
         Instances.getLogger().error("Failed to {} Optifine related rendering methods. Disabling Optifine Compat.", invokeOrAccess);

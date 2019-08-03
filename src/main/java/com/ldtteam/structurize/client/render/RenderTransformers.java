@@ -74,6 +74,11 @@ public class RenderTransformers
      */
     public static BlockState transformBlockState(@NotNull final BlockState blockState)
     {
+        if (blockStateTransformers.isEmpty())
+        {
+            return blockState;
+        }
+
         return blockStateTransformers.keySet()
             .stream()
             .filter(p -> p.test(blockState))
@@ -91,6 +96,11 @@ public class RenderTransformers
      */
     public static CompoundNBT transformTileEntity(@NotNull final CompoundNBT tileEntity)
     {
+        if (tileEntityTransformers.isEmpty())
+        {
+            return tileEntity;
+        }
+
         return tileEntityTransformers.keySet()
             .stream()
             .filter(p -> p.test(tileEntity))
@@ -108,6 +118,11 @@ public class RenderTransformers
      */
     public static CompoundNBT transformEntity(@NotNull final CompoundNBT entity)
     {
+        if (entityTransformers.isEmpty())
+        {
+            return entity;
+        }
+
         return entityTransformers.keySet()
             .stream()
             .filter(p -> p.test(entity))
