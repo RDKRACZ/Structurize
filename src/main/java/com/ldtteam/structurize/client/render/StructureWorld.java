@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
 import com.ldtteam.structurize.Instances;
-import com.ldtteam.structurize.pipeline.PlaceEventInfoHolder;
+import com.ldtteam.structurize.pipeline.build.EventInfoHolder;
 import com.ldtteam.structurize.structure.providers.IStructureDataProvider;
 import org.jetbrains.annotations.NotNull;
 import net.minecraft.block.AirBlock;
@@ -41,14 +41,14 @@ import net.minecraft.world.storage.MapData;
  */
 public class StructureWorld extends World implements IBlockReader
 {
-    private final PlaceEventInfoHolder<?> event;
+    private final EventInfoHolder<?> event;
 
     /**
      * Constructor to create a new world/blockAccess.
      *
      * @param event event
      */
-    public StructureWorld(final PlaceEventInfoHolder<?> event)
+    public StructureWorld(final EventInfoHolder<?> event)
     {
         super(
             Minecraft.getInstance().world.getWorldInfo(),

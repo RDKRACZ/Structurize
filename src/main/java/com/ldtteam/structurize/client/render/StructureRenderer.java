@@ -8,8 +8,8 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import com.ldtteam.structurize.Instances;
-import com.ldtteam.structurize.pipeline.PlaceEventInfoHolder;
-import com.ldtteam.structurize.util.CubeCoordinateIterator;
+import com.ldtteam.structurize.pipeline.build.EventInfoHolder;
+import com.ldtteam.structurize.util.CubePosIterator;
 import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +37,7 @@ public class StructureRenderer
     private List<TileEntity> tileEntities;
     private List<Entity> entities;
     private StructureTessellator tessellator;
-    private final PlaceEventInfoHolder<?> event;
+    private final EventInfoHolder<?> event;
     private Object updateLock = new Object();
     private Thread currentUpdateThread;
     private boolean keepRecompiling = false;
@@ -48,7 +48,7 @@ public class StructureRenderer
      * @param event       The blueprint to create an instance for.
      * @param shouldSetup if setup thread should be created
      */
-    public StructureRenderer(final PlaceEventInfoHolder<?> event, final boolean shouldSetup)
+    public StructureRenderer(final EventInfoHolder<?> event, final boolean shouldSetup)
     {
         this.event = event;
         this.structureWorld = new StructureWorld(event);
@@ -107,7 +107,7 @@ public class StructureRenderer
             structureWorld.getStructure().getYsize() - 1,
             structureWorld.getStructure().getZsize() - 1);
 
-        for (final BlockPos bp : new CubeCoordinateIterator(BlockPos.ZERO, structEnd))
+        for (final BlockPos bp : new CubePosIterator(BlockPos.ZERO, structEnd))
         {
             final BlockState bs = structureWorld.getBlockState(bp);
 
@@ -218,7 +218,7 @@ public class StructureRenderer
         final List<TileEntity> result = new ArrayList<>();
         final BlockPos end = new BlockPos(event.getStructure().getXsize() - 1, event.getStructure().getYsize() - 1, event.getStructure().getZsize() - 1);
 
-        for (final BlockPos bp : new CubeCoordinateIterator(BlockPos.ZERO, end))
+        for (final BlockPos bp : new CubePosIterator(BlockPos.ZERO, end))
         {
             final TileEntity te = structureWorld.getTileEntity(bp);
             if (te != null)

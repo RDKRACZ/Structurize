@@ -1,5 +1,6 @@
 package com.ldtteam.structurize.network;
 
+import java.util.function.Supplier;
 import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.network.messages.IMessage;
 import com.ldtteam.structurize.util.Utils;
@@ -44,30 +45,23 @@ public class NetworkChannel
     public void registerCommonMessages()
     {
         int idx = 0;
-        // registerMessage(++idx, TestMessage.class);
+        // registerMessage(++idx, TestMessage.class, TestMessage::new);
     }
 
     /**
      * Register a message into rawChannel.
      *
-     * @param <MSG>    message class type
-     * @param id       network id
-     * @param msgClazz message class
+     * @param <MSG>      message class type
+     * @param id         network id
+     * @param msgClazz   message class
+     * @param msgCreator supplier with new instance of msgClazz
      */
-    private <MSG extends IMessage> void registerMessage(final int id, final Class<MSG> msgClazz)
+    private <MSG extends IMessage> void registerMessage(final int id, final Class<MSG> msgClazz, final Supplier<MSG> msgCreator)
     {
         rawChannel.registerMessage(id, msgClazz, (msg, buf) -> msg.toBytes(buf), (buf) -> {
-            try
-            {
-                final MSG msg = msgClazz.newInstance();
-                msg.fromBytes(buf);
-                return msg;
-            }
-            catch (final InstantiationException | IllegalAccessException e)
-            {
-                e.printStackTrace();
-            }
-            return null;
+            final MSG msg = msgCreator.get();
+            msg.fromBytes(buf);
+            return msg;
         }, (msg, ctxIn) -> {
             final Context ctx = ctxIn.get();
             final LogicalSide packetOrigin = ctx.getDirection().getOriginationSide();

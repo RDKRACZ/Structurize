@@ -7,7 +7,7 @@ import java.util.Map;
 import com.ldtteam.structurize.structure.blueprint.Blueprint;
 import com.ldtteam.structurize.structure.blueprint.BlueprintUtils;
 import com.ldtteam.structurize.block.IAnchorBlock;
-import com.ldtteam.structurize.pipeline.PlaceEventInfoHolder;
+import com.ldtteam.structurize.pipeline.build.EventInfoHolder;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Mirror;
@@ -15,17 +15,17 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 /**
- * Blueprint structure wrapper for {@link PlaceEventInfoHolder}
+ * Blueprint structure wrapper for {@link EventInfoHolder}
  */
-public class BlueprintStructureProvider implements IStructureDataProvider
+public class BlueprintStructureDataProvider implements IStructureDataProvider
 {
     private Blueprint blueprint;
     private Path blueprintPath;
-    private PlaceEventInfoHolder<BlueprintStructureProvider> event;
+    private EventInfoHolder<BlueprintStructureDataProvider> event;
     private BlockPos mirrorRotationAnchor = null;
     private Map<BlockPos, CompoundNBT> transformedTEs = null;
 
-    private BlueprintStructureProvider()
+    private BlueprintStructureDataProvider()
     {
     }
 
@@ -34,9 +34,9 @@ public class BlueprintStructureProvider implements IStructureDataProvider
      *
      * @return new instance
      */
-    public static BlueprintStructureProvider create()
+    public static BlueprintStructureDataProvider create()
     {
-        return new BlueprintStructureProvider();
+        return new BlueprintStructureDataProvider();
     }
 
     /**
@@ -44,7 +44,7 @@ public class BlueprintStructureProvider implements IStructureDataProvider
      *
      * @param eventIn actual event
      */
-    public void setEvent(final PlaceEventInfoHolder<BlueprintStructureProvider> eventIn)
+    public void setEvent(final EventInfoHolder<BlueprintStructureDataProvider> eventIn)
     {
         event = eventIn;
     }

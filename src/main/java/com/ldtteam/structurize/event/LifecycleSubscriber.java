@@ -114,9 +114,12 @@ public class LifecycleSubscriber
     public static void processIMC(final InterModProcessEvent event)
     {
         Instances.getLogger().warn("InterModProcessEvent");
+        Instances.getComponentRegistries().unfreeze();
+        Instances.getComponentRegistries().registerDefaults();
         /*
          * LOGGER.info("Got IMC {}", event.getIMCStream().map(m -> m.getMessageSupplier().get()).collect(Collectors.toList()));
          */
+        Instances.getComponentRegistries().freeze();
     }
 
     /**

@@ -4,6 +4,7 @@ import com.ldtteam.structurize.client.render.EventRenderer;
 import com.ldtteam.structurize.client.render.OptifineCompat;
 import com.ldtteam.structurize.config.Configuration;
 import com.ldtteam.structurize.network.NetworkChannel;
+import com.ldtteam.structurize.pipeline.ComponentRegistries;
 import com.ldtteam.structurize.util.constants.GeneralConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +23,7 @@ public class Instances
     private static final Configuration MOD_CONFIG;
     private static final OptifineCompat OPTIFINE_COMPAT;
     private static final EventRenderer EVENT_RENDERER;
+    private static final ComponentRegistries COMPONENT_REGISTRIES;
 
     static
     {
@@ -30,6 +32,7 @@ public class Instances
         MOD_CONFIG = new Configuration(ModLoadingContext.get().getActiveContainer());
         OPTIFINE_COMPAT = DistExecutor.callWhenOn(Dist.CLIENT, () -> () -> new OptifineCompat());
         EVENT_RENDERER = DistExecutor.callWhenOn(Dist.CLIENT, () -> () -> new EventRenderer());
+        COMPONENT_REGISTRIES = new ComponentRegistries();
     }
 
     /**
@@ -80,5 +83,13 @@ public class Instances
     public static EventRenderer getEventRenderer()
     {
         return EVENT_RENDERER;
+    }
+
+    /**
+     * @return structure component scanner/placer registries
+     */
+    public static ComponentRegistries getComponentRegistries()
+    {
+        return COMPONENT_REGISTRIES;
     }
 }

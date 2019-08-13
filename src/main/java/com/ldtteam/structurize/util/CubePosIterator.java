@@ -7,7 +7,7 @@ import net.minecraft.util.math.BlockPos;
 /**
  * Iterates x|z|y through cube.
  */
-public class CubeCoordinateIterator implements Iterable<BlockPos>
+public class CubePosIterator implements Iterable<BlockPos>
 {
     private final int startX;
     private final int startY;
@@ -25,7 +25,7 @@ public class CubeCoordinateIterator implements Iterable<BlockPos>
      * @param start start pos, must have every coord lower or same as end
      * @param end   end pos
      */
-    public CubeCoordinateIterator(final BlockPos start, final BlockPos end)
+    public CubePosIterator(final BlockPos start, final BlockPos end)
     {
         this.startX = start.getX();
         this.startY = start.getY();

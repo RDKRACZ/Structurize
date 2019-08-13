@@ -1,6 +1,6 @@
-package com.ldtteam.structurize.structure;
+package com.ldtteam.structurize.structure.util;
 
-import com.ldtteam.structurize.util.CubeCoordinateIterator;
+import com.ldtteam.structurize.util.CubePosIterator;
 import org.jetbrains.annotations.NotNull;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -124,7 +124,7 @@ public class StructureBB
      */
     public Iterable<BlockPos> getPosIterator()
     {
-        return new CubeCoordinateIterator(getAnchor(), getPeek());
+        return new CubePosIterator(getAnchor(), getPeek());
     }
 
     /**
@@ -134,7 +134,7 @@ public class StructureBB
      */
     public Iterable<BlockPos> getZeroBasedPosIterator()
     {
-        return new CubeCoordinateIterator(BlockPos.ZERO, getZeroBasedPeek());
+        return new CubePosIterator(BlockPos.ZERO, getZeroBasedPeek());
     }
 
     /**

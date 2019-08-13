@@ -2,7 +2,7 @@ package com.ldtteam.structurize.structure.blueprint;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.ldtteam.structurize.structure.StructureBB;
+import com.ldtteam.structurize.structure.util.StructureBB;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.HangingEntity;
@@ -323,7 +323,7 @@ public class Blueprint
         final List<BlockState> tempPalette = new ArrayList<>();
         for (int i = 0; i < palette.size(); i++)
         {
-            tempPalette.add(i, palette.get(i).getBlockState().mirror(mirror).rotate(rotation));
+            tempPalette.add(i, palette.get(i).mirror(mirror).rotate(rotation));
         }
         palette = tempPalette;
 

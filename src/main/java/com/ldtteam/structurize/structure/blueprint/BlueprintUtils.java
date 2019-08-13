@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
-import com.ldtteam.structurize.structure.StructureBB;
+import com.ldtteam.structurize.structure.util.StructureBB;
 import org.apache.logging.log4j.LogManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

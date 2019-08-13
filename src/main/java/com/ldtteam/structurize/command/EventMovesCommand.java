@@ -21,7 +21,8 @@ public class EventMovesCommand extends AbstractCommand
             .then(newLiteral("mirrorXCurrent").executes(s -> mirrorX(s)))
             .then(newLiteral("mirrorZCurrent").executes(s -> mirrorZ(s)))
             .then(newLiteral("closeCurrent").executes(s -> close(s)))
-            .then(newLiteral("closeAll").executes(s -> closeAll(s)));
+            .then(newLiteral("closeAll").executes(s -> closeAll(s)))
+            .then(newLiteral("placeCurrent").executes(s -> placeCurrent(s)));
     }
 
     private static int move(final CommandContext<CommandSource> command) throws CommandSyntaxException
@@ -58,13 +59,20 @@ public class EventMovesCommand extends AbstractCommand
 
     private static int close(final CommandContext<CommandSource> command) throws CommandSyntaxException
     {
-        WindowBuildTool.close();
+        WindowBuildTool.closeAndCancel();
         return 1;
     }
 
     private static int closeAll(final CommandContext<CommandSource> command) throws CommandSyntaxException
     {
         Instances.getEventRenderer().cancelAllActiveEvents();
+        return 1;
+    }
+
+    private static int placeCurrent(final CommandContext<CommandSource> command) throws CommandSyntaxException
+    {
+        WindowBuildTool.getEvent().passToBuildProvider(null);
+        WindowBuildTool.close();
         return 1;
     }
 }
