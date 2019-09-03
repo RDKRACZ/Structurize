@@ -64,7 +64,7 @@ public class EventInfoHolder<T extends IStructureDataProvider>
      */
     public void passToBuildProvider(final UUID playerUUID)
     {
-        BuildProvider.place(this);
+
     }
 
     /**

@@ -1,11 +1,12 @@
 buildscript {
+    apply from: 'build.properties'
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: forge_gradle_ver, changing: true
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -13,9 +14,9 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.0'
-group = 'com.ldtteam.structurize' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'structurize'
+version = mod_ver
+group = mod_class_group // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = mod_id
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
@@ -25,7 +26,7 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: '20190813-1.14.3'
+    mappings channel: mappings_channel, version: mappings_version
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -71,7 +72,7 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.14.4-28.0.45'
+    minecraft minecraft_launch_dep
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
@@ -91,22 +92,22 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    compile 'com.intellij:annotations:+@jar'
+    compile com_intel_annotations
 
-    testCompile 'junit:junit:4.12'
-    testCompile "org.mockito:mockito-core:1.+"
+    testCompile junit_junit
+    testCompile org_mocki_mockitocore
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
     manifest {
         attributes([
-            "Specification-Title": "structurize",
-            "Specification-Vendor": "structurizesareus",
+            "Specification-Title": mod_id,
+            "Specification-Vendor": mod_author,
             "Specification-Version": "1", // We are version 1 of ourselves
-            "Implementation-Title": project.name,
+            "Implementation-Title": name,
             "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"structurizesareus",
+            "Implementation-Vendor" : mod_author,
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
@@ -120,18 +121,6 @@ def reobfFile = file("$buildDir/reobfJar/output.jar")
 def reobfArtifact = artifacts.add('default', reobfFile) {
     type 'jar'
     builtBy 'reobfJar'
-}
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact reobfArtifact
-        }
-    }
-    repositories {
-        maven {
-            url "file:///${project.projectDir}/mcmodsrepo"
-        }
-    }
 }
 
 task setupCIWorkspace {

@@ -2,6 +2,7 @@ package com.ldtteam.structurize.command;
 
 import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.client.gui.WindowBuildTool;
+import com.ldtteam.structurize.pipeline.build.BuildProvider;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -71,7 +72,7 @@ public class EventMovesCommand extends AbstractCommand
 
     private static int placeCurrent(final CommandContext<CommandSource> command) throws CommandSyntaxException
     {
-        WindowBuildTool.getEvent().passToBuildProvider(null);
+        BuildProvider.oldInstantPlaceCaller(WindowBuildTool.getEvent());
         WindowBuildTool.close();
         return 1;
     }

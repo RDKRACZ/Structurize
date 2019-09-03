@@ -35,7 +35,7 @@ public class ComponentRegistries
         freeze();
     }
 
-    private <T extends IForgeRegistryEntry<T>> RegistryBuilder<T> buildRegistry(final Class<T> clazz, final String name)
+    protected static <T extends IForgeRegistryEntry<T>> RegistryBuilder<T> buildRegistry(final Class<T> clazz, final String name)
     {
         return new RegistryBuilder<T>().setName(new ResourceLocation(GeneralConstants.MOD_ID, name))
             .setDefaultKey(new ResourceLocation(GeneralConstants.MOD_ID, "default"))
@@ -47,6 +47,7 @@ public class ComponentRegistries
 
     public void registerDefaults()
     {
+        // TODO: switch to proper register events
         final String defaultName = new ResourceLocation(GeneralConstants.MOD_ID, "default").toString();
         DefaultScanners.getDefaultBlockStateScanner().setRegistryName(defaultName).buildAndRegister();
         DefaultScanners.getDefaultTileEntityScanner().setRegistryName(defaultName).buildAndRegister();
