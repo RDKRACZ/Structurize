@@ -251,13 +251,13 @@ public class StructureWorld extends World implements IBlockReader
 
     @Nullable
     @Override
-    public MapData func_217406_a(@NotNull final String stringIn)
+    public MapData getMapData(@NotNull final String stringIn)
     {
         return null;
     }
 
     @Override
-    public void func_217399_a(@NotNull final MapData mapDataIn)
+    public void registerMapData(@NotNull final MapData mapDataIn)
     {
 
     }
