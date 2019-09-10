@@ -1,6 +1,7 @@
 package com.ldtteam.structurize.client.render;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -44,5 +45,11 @@ public class StructureChunk extends Chunk
     public TileEntity getTileEntity(@NotNull final BlockPos pos, final CreateEntityType creationMode)
     {
         return world.getTileEntity(pos);
+    }
+
+    @Override
+    public IFluidState getFluidState(final BlockPos pos)
+    {
+        return world.getFluidState(pos);
     }
 }

@@ -16,6 +16,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.scoreboard.Scoreboard;
@@ -80,7 +82,7 @@ public class StructureWorld extends World implements IBlockReader
     @Override
     public BlockState getBlockState(@NotNull final BlockPos pos)
     {
-        if (Minecraft.getInstance().world.getBlockState(pos.add(event.getPosition().getAnchor())).isSolid())
+        if (isOutsideBuildHeight(pos) || Minecraft.getInstance().world.getBlockState(pos.add(event.getPosition().getAnchor())).isSolid())
         {
             return Blocks.VOID_AIR.getDefaultState();
         }
@@ -95,6 +97,19 @@ public class StructureWorld extends World implements IBlockReader
         }
         return RenderTransformers.transformBlockState(getStructure().getBlockPalette().get(index));
         // cache removed, should be back? hell no, causing lags as hell
+    }
+
+    @Override
+    public IFluidState getFluidState(final BlockPos pos)
+    {
+        if (isOutsideBuildHeight(pos))
+        {
+            return Fluids.EMPTY.getDefaultState();
+        }
+        else
+        {
+            return getBlockState(pos).getFluidState();
+        }
     }
 
     @Nullable
