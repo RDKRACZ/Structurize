@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.pipeline.build.EventInfoHolder;
 import com.ldtteam.structurize.util.CubePosIterator;
-import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.block.BlockState;
@@ -166,45 +165,26 @@ public class StructureRenderer
             GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             GlStateManager.clearCurrentColor();
 
-            // Draw normal blocks.
-            tessellator.draw();
-
             // Draw tile entities.
+            Minecraft.getInstance().gameRenderer.disableLightmap();
+
             RenderHelper.enableStandardItemLighting();
+            TileEntityRendererDispatcher.instance.preDrawBatch();
             tileEntities.forEach(tileEntity -> {
-                GlStateManager.pushMatrix();
-                final int combinedLight = tileEntity.getWorld().getCombinedLight(tileEntity.getPos(), 0);
-                final int lightMapX = combinedLight % 65536;
-                final int lightMapY = combinedLight / 65536;
-                GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, (float) lightMapX, (float) lightMapY);
-
-                GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-
                 TileEntityRendererDispatcher.instance
                     .render(tileEntity, tileEntity.getPos().getX(), tileEntity.getPos().getY(), tileEntity.getPos().getZ(), 1f);
-                GlStateManager.popMatrix();
             });
+            TileEntityRendererDispatcher.instance.drawBatch();
             RenderHelper.disableStandardItemLighting();
 
             // Draw entities
             entities.forEach(entity -> {
-                GlStateManager.pushMatrix();
-                int brightnessForRender = entity.getBrightnessForRender();
-
-                if (entity.isBurning())
-                {
-                    brightnessForRender = 15728880;
-                }
-
-                final int lightMapX = brightnessForRender % 65536;
-                final int lightMapY = brightnessForRender / 65536;
-                GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, (float) lightMapX, (float) lightMapY);
-                GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-
                 Minecraft.getInstance().getRenderManager().renderEntity(entity, entity.posX, entity.posY, entity.posZ, entity.rotationYaw, 0, true);
-
-                GlStateManager.popMatrix();
+                Minecraft.getInstance().gameRenderer.disableLightmap();
             });
+
+            // Draw normal blocks.
+            tessellator.draw();
 
             // Setdown rendering
             GlStateManager.clearCurrentColor();
