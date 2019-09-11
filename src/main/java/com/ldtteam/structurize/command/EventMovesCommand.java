@@ -3,6 +3,8 @@ package com.ldtteam.structurize.command;
 import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.client.gui.WindowBuildTool;
 import com.ldtteam.structurize.pipeline.build.BuildProvider;
+import com.ldtteam.structurize.pipeline.build.RawPlacer;
+import com.ldtteam.structurize.pipeline.defaults.build.InstantBuildProvider;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -23,7 +25,8 @@ public class EventMovesCommand extends AbstractCommand
             .then(newLiteral("mirrorZCurrent").executes(s -> mirrorZ(s)))
             .then(newLiteral("closeCurrent").executes(s -> close(s)))
             .then(newLiteral("closeAll").executes(s -> closeAll(s)))
-            .then(newLiteral("placeCurrent").executes(s -> placeCurrent(s)));
+            .then(newLiteral("placeCurrent").executes(s -> placeCurrent(s)))
+            .then(newLiteral("stageCurrentBP").executes(s -> stageCurrentBP(s)));
     }
 
     private static int move(final CommandContext<CommandSource> command) throws CommandSyntaxException
@@ -72,8 +75,14 @@ public class EventMovesCommand extends AbstractCommand
 
     private static int placeCurrent(final CommandContext<CommandSource> command) throws CommandSyntaxException
     {
-        BuildProvider.oldInstantPlaceCaller(WindowBuildTool.getEvent());
-        WindowBuildTool.close();
+        new InstantBuildProvider().build(new RawPlacer(WindowBuildTool.getEvent()));
+        WindowBuildTool.closeAndCancel();
+        return 1;
+    }
+
+    private static int stageCurrentBP(final CommandContext<CommandSource> command) throws CommandSyntaxException
+    {
+        InstantBuildProvider.runStage();
         return 1;
     }
 }

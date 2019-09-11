@@ -20,8 +20,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelDataManager;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
@@ -128,8 +130,9 @@ public class StructureRenderer
      *
      * @param view         drawing offset
      * @param recompTessel whether tesselator should be recompiled or not
+     * @param partialTicks partial ticks
      */
-    public void draw(final Vec3d view, final boolean recompTessel)
+    public void draw(final Vec3d view, final boolean recompTessel, final float partialTicks)
     {
         synchronized (updateLock)
         {
@@ -169,17 +172,25 @@ public class StructureRenderer
             Minecraft.getInstance().gameRenderer.disableLightmap();
 
             RenderHelper.enableStandardItemLighting();
+            final World previous = TileEntityRendererDispatcher.instance.world;
+            TileEntityRendererDispatcher.instance.setWorld(structureWorld);
             TileEntityRendererDispatcher.instance.preDrawBatch();
             tileEntities.forEach(tileEntity -> {
                 TileEntityRendererDispatcher.instance
-                    .render(tileEntity, tileEntity.getPos().getX(), tileEntity.getPos().getY(), tileEntity.getPos().getZ(), 1f);
+                    .render(tileEntity, tileEntity.getPos().getX(), tileEntity.getPos().getY(), tileEntity.getPos().getZ(), partialTicks);
+                Minecraft.getInstance().gameRenderer.disableLightmap();
+                if (tileEntity.getType() == TileEntityType.BEACON || tileEntity.getType() == TileEntityType.END_GATEWAY)
+                {
+                    GlStateManager.disableFog();
+                }
             });
             TileEntityRendererDispatcher.instance.drawBatch();
+            TileEntityRendererDispatcher.instance.setWorld(previous);
             RenderHelper.disableStandardItemLighting();
 
             // Draw entities
             entities.forEach(entity -> {
-                Minecraft.getInstance().getRenderManager().renderEntity(entity, entity.posX, entity.posY, entity.posZ, entity.rotationYaw, 0, true);
+                Minecraft.getInstance().getRenderManager().renderEntity(entity, entity.posX, entity.posY, entity.posZ, entity.rotationYaw, partialTicks, true);
                 Minecraft.getInstance().gameRenderer.disableLightmap();
             });
 

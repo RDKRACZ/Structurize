@@ -2,6 +2,7 @@ package com.ldtteam.structurize.pipeline.build;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.BlockStateComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.EntityComponentPlacer;
@@ -9,9 +10,12 @@ import com.ldtteam.structurize.pipeline.build.ComponentPlacer.TileEntityComponen
 import com.ldtteam.structurize.structure.util.StructureBB;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class RawPlacer
@@ -41,6 +45,32 @@ public class RawPlacer
         structureTileEntities = event.getStructure().getTileEntities();
         structurePosition = event.getPosition();
         structureWorld = event.getWorld();
+    }
+
+    public Tuple<TileEntity, BlockPos> transformDataToTileEntity(final CompoundNBT teCompound, final BlockPos tePos)
+    {
+        final BlockPos worldPos = structurePosition.getAnchor().add(tePos);
+        final TileEntity te = TileEntity.create(teCompound);
+
+        te.setPos(worldPos);
+        te.setWorld(structureWorld);
+
+        return new Tuple<TileEntity, BlockPos>(te, worldPos);
+    }
+
+    public Tuple<Entity, Vec3d> transformDataToEntity(final CompoundNBT entityCompound)
+    {
+        final Optional<EntityType<?>> type = EntityType.readEntityType(entityCompound);
+        if (!type.isPresent())
+        {
+            Instances.getLogger().warn("Can't find entity type.");
+            return null;
+        }
+        final Entity entity = type.get().create(structureWorld);
+        entity.deserializeNBT(entityCompound);
+        final Vec3d newPos = entity.getPositionVector().add(new Vec3d(structurePosition.getAnchor()));
+        entity.setPosition(newPos.getX(), newPos.getY(), newPos.getZ());
+        return new Tuple<Entity, Vec3d>(entity, newPos);
     }
 
     public static BlockStateComponentPlacer getBlockStatePlacer(final BlockState blockState)

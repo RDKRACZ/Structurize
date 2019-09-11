@@ -15,6 +15,8 @@ import net.minecraft.util.math.Vec3d;
  */
 public class EventRenderer
 {
+    private static final float FALLBACK_PARTIAL_TICKS = 0.5f;
+
     private final List<EventInfoHolder<?>> activeEvents = new ArrayList<>();
     private boolean recompileTesselators = false;
 
@@ -75,6 +77,7 @@ public class EventRenderer
     public void renderActiveEvents(final WorldRenderer worldRenderer, final float partialTicks)
     {
         // TODO: should we not render remaining events if we cause tick lag?
+        final float modifiedPartialTicks = Instances.getConfig().getClient().structurePartialTicks.get() ? partialTicks : FALLBACK_PARTIAL_TICKS;
         final Iterator<EventInfoHolder<?>> iterator = activeEvents.iterator();
         while (iterator.hasNext())
         {
@@ -86,7 +89,7 @@ public class EventRenderer
                 continue;
             }
 
-            renderEvent(event);
+            renderEvent(event, modifiedPartialTicks);
         }
         recompileTesselators = false;
     }
@@ -96,11 +99,11 @@ public class EventRenderer
      *
      * @param event event to render
      */
-    private void renderEvent(final EventInfoHolder<?> event)
+    private void renderEvent(final EventInfoHolder<?> event, final float partialTicks)
     {
         final Vec3d projectedView = Minecraft.getInstance().gameRenderer.getActiveRenderInfo().getProjectedView();
 
-        event.getRenderer().draw(projectedView, recompileTesselators);
+        event.getRenderer().draw(projectedView, recompileTesselators, partialTicks);
 
         renderStructureBB(event, projectedView);
     }

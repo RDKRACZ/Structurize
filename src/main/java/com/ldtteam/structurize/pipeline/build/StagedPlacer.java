@@ -1,27 +1,37 @@
 package com.ldtteam.structurize.pipeline.build;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.pipeline.build.ComponentPlacer.BlockStateComponentPlacer;
+import com.ldtteam.structurize.pipeline.build.ComponentPlacer.EntityComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.TileEntityComponentPlacer;
+import com.ldtteam.structurize.structure.util.StructureBB;
+import com.ldtteam.structurize.util.FastIterator;
 import com.ldtteam.structurize.util.Stage;
 import com.ldtteam.structurize.util.Stage.StageData;
 import org.apache.commons.lang3.ObjectUtils.Null;
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
+import net.minecraft.world.World;
 
-public class StagedPlacer extends RawPlacer implements Iterator<StagedPlacer.PlaceAction>
+public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer.PlaceAction<?>>
 {
     /*
      * Building stages, recommended order is the same as follows.
@@ -30,19 +40,19 @@ public class StagedPlacer extends RawPlacer implements Iterator<StagedPlacer.Pla
     /**
      * Fixes holes using given block in a layer under the lowest structure layer.
      */
-    public static final Stage<Block, StagedPlacer> FIX_FLOOR_WITH = Stages.BlockStages.FIX_FLOOR_WITH;
+    public static final Stage<BlockState, StagedPlacer> FIX_FLOOR_WITH = Stages.BlockStateStages.FIX_FLOOR_WITH;
     /**
      * Fixes holes using given block in a layer above the highest structure layer.
      */
-    public static final Stage<Block, StagedPlacer> FIX_CEILING_WITH = Stages.BlockStages.FIX_CEILING_WITH;
+    public static final Stage<BlockState, StagedPlacer> FIX_CEILING_WITH = Stages.BlockStateStages.FIX_CEILING_WITH;
     /**
      * Replaces fluids using given block in ceiling and every wall.
      */
-    public static final Stage<Block, StagedPlacer> FIX_FLUIDS_WITH = Stages.BlockStages.FIX_FLUIDS_WITH;
+    public static final Stage<BlockState, StagedPlacer> FIX_FLUIDS_WITH = Stages.BlockStateStages.FIX_FLUIDS_WITH;
     /**
      * Clears structureBB with given block.
      */
-    public static final Stage<Block, StagedPlacer> CLEAR_WITH = Stages.BlockStages.CLEAR_WITH;
+    public static final Stage<BlockState, StagedPlacer> CLEAR_WITH = Stages.BlockStateStages.CLEAR_WITH;
     /**
      * Places all solid blocks.
      */
@@ -85,9 +95,9 @@ public class StagedPlacer extends RawPlacer implements Iterator<StagedPlacer.Pla
     public static final Stage<Supplier<Runnable>, StagedPlacer> CUSTOM_STAGE = Stages.CustomStage.CUSTOM_STAGE;
 
     private final Iterator<StageData<?, StagedPlacer>> stages;
+    private StageData<?, StagedPlacer> currentStage; // because linkedList node is not exposed...
     private final BiConsumer<Stage<?, StagedPlacer>, Stage<?, StagedPlacer>> onStageChangeListener;
-    private boolean destroyed = false;
-    private Iterator<PlaceAction> runningIterator;
+    private FastIterator<PlaceAction<?>> runningIterator;
 
     public StagedPlacer(final RawPlacer placer)
     {
@@ -107,12 +117,17 @@ public class StagedPlacer extends RawPlacer implements Iterator<StagedPlacer.Pla
         super(placer);
         this.stages = stages == null ? null : stages.iterator();
         this.onStageChangeListener = onStageChangeListener;
+        currentStage = this.stages.next();
+        currentStage.runStage(this);
     }
 
     public static LinkedList<StageData<?, StagedPlacer>> createDefaultStages(final boolean requirements, final boolean supportFallingIfBottom)
     {
         final LinkedList<StageData<?, StagedPlacer>> defStages = new LinkedList<>();
-        defStages.add(CLEAR_WITH.createData(Blocks.AIR));
+        defStages.add(FIX_FLOOR_WITH.createData(Blocks.DIRT.getDefaultState()));
+        defStages.add(FIX_CEILING_WITH.createData(Blocks.STONE.getDefaultState()));
+        defStages.add(FIX_FLUIDS_WITH.createData(Blocks.GLASS.getDefaultState()));
+        defStages.add(CLEAR_WITH.createData(Blocks.AIR.getDefaultState()));
         defStages.add(PLACE_SOLID.createData(requirements));
         defStages.add(PLACE_FALLING.createData(new Tuple<>(requirements, supportFallingIfBottom)));
         defStages.add(PLACE_NON_SOLID.createData(requirements));
@@ -126,41 +141,186 @@ public class StagedPlacer extends RawPlacer implements Iterator<StagedPlacer.Pla
 
     public void nextStage(final Stage<?, StagedPlacer> previous)
     {
-        final StageData<?, StagedPlacer> next = stages.next();
-        onStageChangeListener.accept(previous, next.getStage());
-        next.runStage(this);
+        currentStage = stages.next();
+        onStageChangeListener.accept(previous, currentStage.getStage());
+        currentStage.runStage(this);
+    }
+
+    private Set<BlockPos> getNonSolidBlockPosIn(final StructureBB structureBB)
+    {
+        final Set<BlockPos> result = new HashSet<>();
+        for (final BlockPos pos : structureBB.getPosIterator())
+        {
+            if (!structureWorld.getBlockState(pos).isSolid())
+            {
+                result.add(pos);
+            }
+        }
+        return result;
     }
 
     /**
      * Fixes holes using given block in a layer under the lowest structure layer.
      */
-    public void fixFloorWith(final StageData<Block, StagedPlacer> stageData)
+    public void fixFloorWith(final StageData<BlockState, StagedPlacer> stageData)
     {
-        stageData.endStage(this);
+        final StructureBB toCheck = new StructureBB(structurePosition.getAnchor().down(), structurePosition.getPeek().down(structurePosition.getYSize()));
+        final Set<BlockPos> nonSolidPosList = getNonSolidBlockPosIn(toCheck);
+
+        if (nonSolidPosList.isEmpty())
+        {
+            stageData.endStage(this);
+            return;
+        }
+
+        final BlockState fillBlock = stageData.getData();
+        final BlockStateComponentPlacer blockStatePlacer = getBlockStatePlacer(fillBlock);
+        runningIterator = new ActionIterator<BlockPos>(nonSolidPosList.iterator(), pos -> {
+            return new PlaceAction<BlockState>(
+                () -> blockStatePlacer.getRequirements(fillBlock, structureWorld, pos),
+                () -> blockStatePlacer.place(fillBlock, structureWorld, pos),
+                fillBlock,
+                fillBlock.getBlock().getRegistryName(),
+                structureWorld,
+                pos);
+        });
     }
 
     /**
      * Fixes holes using given block in a layer above the highest structure layer.
      */
-    public void fixCeilingWith(final StageData<Block, StagedPlacer> stageData)
+    public void fixCeilingWith(final StageData<BlockState, StagedPlacer> stageData)
     {
-        stageData.endStage(this);
+        final StructureBB toCheck = new StructureBB(structurePosition.getAnchor().up(structurePosition.getYSize()), structurePosition.getPeek().up());
+        final Set<BlockPos> nonSolidPosList = getNonSolidBlockPosIn(toCheck);
+
+        if (nonSolidPosList.isEmpty())
+        {
+            stageData.endStage(this);
+            return;
+        }
+
+        final BlockState fillBlock = stageData.getData();
+        final BlockStateComponentPlacer blockStatePlacer = getBlockStatePlacer(fillBlock);
+        runningIterator = new ActionIterator<BlockPos>(nonSolidPosList.iterator(), pos -> {
+            return new PlaceAction<BlockState>(
+                () -> blockStatePlacer.getRequirements(fillBlock, structureWorld, pos),
+                () -> blockStatePlacer.place(fillBlock, structureWorld, pos),
+                fillBlock,
+                fillBlock.getBlock().getRegistryName(),
+                structureWorld,
+                pos);
+        });
+    }
+
+    private void addFluidBlockPosFromInto(final StructureBB structureBB, final Set<BlockPos> fluidPosList)
+    {
+        for (final BlockPos pos : structureBB.getPosIterator())
+        {
+            if (!structureWorld.getBlockState(pos).getFluidState().isEmpty())
+            {
+                fluidPosList.add(pos);
+            }
+        }
     }
 
     /**
      * Replaces fluids using given block in ceiling and every wall.
      */
-    public void fixFluidsWith(final StageData<Block, StagedPlacer> stageData)
+    public void fixFluidsWith(final StageData<BlockState, StagedPlacer> stageData)
     {
-        stageData.endStage(this);
+        final Set<BlockPos> fluidPosList = new HashSet<>();
+        addFluidBlockPosFromInto(
+            new StructureBB(structurePosition.getAnchor().west(), structurePosition.getPeek().west(structurePosition.getXSize())),
+            fluidPosList);
+        addFluidBlockPosFromInto(
+            new StructureBB(structurePosition.getAnchor().north(), structurePosition.getPeek().north(structurePosition.getZSize())),
+            fluidPosList);
+        addFluidBlockPosFromInto(
+            new StructureBB(structurePosition.getAnchor().east(structurePosition.getXSize()), structurePosition.getPeek().east()),
+            fluidPosList);
+        addFluidBlockPosFromInto(
+            new StructureBB(structurePosition.getAnchor().south(structurePosition.getZSize()), structurePosition.getPeek().south()),
+            fluidPosList);
+        addFluidBlockPosFromInto(
+            new StructureBB(structurePosition.getAnchor().up(structurePosition.getYSize()), structurePosition.getPeek().up()),
+            fluidPosList);
+
+        if (fluidPosList.isEmpty())
+        {
+            stageData.endStage(this);
+            return;
+        }
+
+        final BlockState fillBlock = stageData.getData();
+        final BlockStateComponentPlacer blockStatePlacer = getBlockStatePlacer(fillBlock);
+        runningIterator = new ActionIterator<BlockPos>(fluidPosList.iterator(), pos -> {
+            return new PlaceAction<BlockState>(
+                () -> blockStatePlacer.getRequirements(fillBlock, structureWorld, pos),
+                () -> blockStatePlacer.place(fillBlock, structureWorld, pos),
+                fillBlock,
+                fillBlock.getBlock().getRegistryName(),
+                structureWorld,
+                pos);
+        });
     }
 
     /**
      * Clears structureBB with given block.
      */
-    public void clearWith(final StageData<Block, StagedPlacer> stageData)
+    public void clearWith(final StageData<BlockState, StagedPlacer> stageData)
     {
-        stageData.endStage(this);
+        final BlockState fillBlock = stageData.getData();
+
+        final List<List<BlockPos>> rowsToClear = new ArrayList<>();
+        List<BlockPos> tempList = new ArrayList<>();
+        final MutableBlockPos tempPos = new MutableBlockPos();
+
+        for (int y = 0; y < structurePosition.getYSize(); y++)
+        {
+            tempPos.setY(y);
+            for (int x = 0; x < structurePosition.getXSize(); x++)
+            {
+                tempPos.setX(x);
+                for (int z = 0; z < structurePosition.getZSize(); z++)
+                {
+                    tempPos.setZ(z);
+                    if (!structureWorld.getBlockState(tempPos).equals(fillBlock))
+                    {
+                        tempList.add(tempPos.toImmutable());
+                    }
+                }
+
+                if (!tempList.isEmpty())
+                {
+                    rowsToClear.add(tempList);
+                    tempList = new ArrayList<>();
+                }
+            }
+        }
+
+        if (rowsToClear.isEmpty())
+        {
+            stageData.endStage(this);
+            return;
+        }
+
+        final BlockStateComponentPlacer blockStatePlacer = getBlockStatePlacer(fillBlock);
+        runningIterator = new ActionIterator<List<BlockPos>>(rowsToClear.iterator(), posList -> {
+            return new PlaceAction<BlockState>(() -> {
+                final List<ItemStack> result = new ArrayList<>();
+                for (final BlockPos pos : posList)
+                {
+                    blockStatePlacer.getRequirements(fillBlock, structureWorld, pos);
+                }
+                return result;
+            }, () -> {
+                for (final BlockPos pos : posList)
+                {
+                    blockStatePlacer.place(fillBlock, structureWorld, pos);
+                }
+            }, fillBlock, fillBlock.getBlock().getRegistryName(), structureWorld, null);
+        });
     }
 
     /**
@@ -200,18 +360,25 @@ public class StagedPlacer extends RawPlacer implements Iterator<StagedPlacer.Pla
      */
     public void placeTileEntities(final StageData<Boolean, StagedPlacer> stageData)
     {
-        // create fast iterator to perform whole stage without requirements
-        runningIterator =
-            new ActionIterator<Map.Entry<BlockPos, CompoundNBT>, StagedPlacer>(this, stageData, structureTileEntities.entrySet().iterator(), entry -> {
-                final CompoundNBT teCompound = entry.getValue();
-                final BlockPos worldPos = structurePosition.getAnchor().add(entry.getKey());
-                final TileEntity te = TileEntity.create(teCompound);
-                te.setPos(worldPos);
-                te.setWorld(structureWorld);
-                final TileEntityComponentPlacer tePlacer = getTileEntityPlacer(te);
+        if (structureTileEntities.isEmpty())
+        {
+            stageData.endStage(this);
+            return;
+        }
 
-                return new PlaceAction(() -> tePlacer.getRequirements(te, structureWorld, worldPos), () -> tePlacer.place(te, structureWorld, worldPos));
-            });
+        runningIterator = new ActionIterator<Map.Entry<BlockPos, CompoundNBT>>(structureTileEntities.entrySet().iterator(), entry -> {
+            final Tuple<TileEntity, BlockPos> transformedTe = transformDataToTileEntity(entry.getValue(), entry.getKey());
+            final TileEntity te = transformedTe.getA();
+            final TileEntityComponentPlacer tePlacer = getTileEntityPlacer(te);
+
+            return new PlaceAction<TileEntity>(
+                () -> tePlacer.getRequirements(te, structureWorld, transformedTe.getB()),
+                () -> tePlacer.place(te, structureWorld, transformedTe.getB()),
+                te,
+                te.getType().getRegistryName(),
+                structureWorld,
+                transformedTe.getB());
+        });
     }
 
     /**
@@ -227,7 +394,26 @@ public class StagedPlacer extends RawPlacer implements Iterator<StagedPlacer.Pla
      */
     public void placeEntities(final StageData<Boolean, StagedPlacer> stageData)
     {
-        stageData.endStage(this);
+        if (structureEntities.isEmpty())
+        {
+            stageData.endStage(this);
+            return;
+        }
+
+        runningIterator = new ActionIterator<CompoundNBT>(structureEntities.iterator(), entityNBT -> {
+            final Tuple<Entity, Vec3d> transformedTe = transformDataToEntity(entityNBT);
+            final Entity entity = transformedTe.getA();
+            final BlockPos entityPos = new BlockPos(transformedTe.getB());
+            final EntityComponentPlacer entityPlacer = getEntityPlacer(entity);
+
+            return new PlaceAction<Entity>(
+                () -> entityPlacer.getRequirements(entity, structureWorld, entityPos),
+                () -> entityPlacer.place(entity, structureWorld, entityPos),
+                entity,
+                entity.getType().getRegistryName(),
+                structureWorld,
+                entityPos);
+        });
     }
 
     /**
@@ -253,71 +439,112 @@ public class StagedPlacer extends RawPlacer implements Iterator<StagedPlacer.Pla
     }
 
     @Override
-    public PlaceAction next()
+    public PlaceAction<?> next()
     {
-        return runningIterator.next();
+        final PlaceAction<?> result = runningIterator.next();
+
+        if (!runningIterator.hasNext())
+        {
+            currentStage.endStage(this);
+        }
+
+        return result;
     }
 
-    public static class PlaceAction
+    @Override
+    public void fastConsume(final PlaceAction<?> placeAction)
+    {
+        runningIterator.fastConsume(placeAction);
+    }
+
+    public static class PlaceAction<T>
     {
         private final Supplier<List<ItemStack>> requirements;
         private final Runnable action;
+        private final T objectToPlace;
+        private final ResourceLocation objectRegistryName;
+        private final World world;
+        private final BlockPos pos;
 
-        private PlaceAction(final Supplier<List<ItemStack>> requirements, final Runnable action)
+        protected PlaceAction(
+            final Supplier<List<ItemStack>> requirements,
+            final Runnable action,
+            final T objectToPlace,
+            final ResourceLocation objectRegistryName,
+            final World world,
+            final BlockPos pos)
         {
             this.requirements = requirements;
             this.action = action;
+            this.objectToPlace = objectToPlace;
+            this.objectRegistryName = objectRegistryName;
+            this.world = world;
+            this.pos = pos;
         }
 
-        public List<ItemStack> getRequirement()
+        public Supplier<List<ItemStack>> getRequirements()
         {
-            return requirements.get();
+            return requirements;
         }
 
         public void perform()
         {
             action.run();
         }
+
+        public T getObjectToPlace()
+        {
+            return objectToPlace;
+        }
+
+        public ResourceLocation getObjectRegistryName()
+        {
+            return objectRegistryName;
+        }
+
+        public World getWorld()
+        {
+            return world;
+        }
+
+        public BlockPos getPos()
+        {
+            return pos;
+        }
     }
 
-    private static class ActionIterator<I, B> implements Iterator<PlaceAction>
+    protected static class ActionIterator<I> implements FastIterator<PlaceAction<?>>
     {
         private final Iterator<I> backingIterator;
-        private final Function<I, PlaceAction> iteratorTransformer;
-        private final StageData<?, B> currentStage;
-        private final B base;
+        private final Function<I, PlaceAction<?>> iteratorTransformer;
 
-        private ActionIterator(
-            final B base,
-            final StageData<?, B> currentStage,
-            final Iterator<I> backingIterator,
-            final Function<I, PlaceAction> iteratorTransformer)
+        protected ActionIterator(final Iterator<I> backingIterator, final Function<I, PlaceAction<?>> iteratorTransformer)
         {
             this.backingIterator = backingIterator;
             this.iteratorTransformer = iteratorTransformer;
-            this.currentStage = currentStage;
-            this.base = base;
         }
 
         @Override
         public boolean hasNext()
         {
-            if (!backingIterator.hasNext())
-            {
-                currentStage.endStage(base);
-            }
-            return true;
+            return backingIterator.hasNext();
         }
 
         @Override
-        public PlaceAction next()
+        public PlaceAction<?> next()
         {
-            if (!backingIterator.hasNext())
+            if (!hasNext())
             {
                 return null;
             }
 
             return iteratorTransformer.apply(backingIterator.next());
+        }
+
+        @Override
+        public void fastConsume(final PlaceAction<?> placeAction)
+        {
+            placeAction.perform();
         }
     }
 }

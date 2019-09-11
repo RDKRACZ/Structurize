@@ -17,6 +17,8 @@
   "structurize.config.buildtoolsurvivescrafting": "BuildTool Survives Crafting",
   "structurize.config.maxamountofrenderedevents.comment": "How many build previews can be rendered at one time.",
   "structurize.config.maxamountofrenderedevents": "Max Amount Of Rendered Events",
+  "structurize.config.structurepartialticks.comment": "Use partial ticks while rendering structure? Enabling this may decrease performance.",
+  "structurize.config.structurepartialticks": "Structure Rendering Partial Ticks",
   "structurize.config.toggleablelighttexture.comment": "Should texture of light (anyblock) placeholder be toggleable (visible/invisible states)?",
   "structurize.config.toggleablelighttexture": "Toggleable Light Placeholder Texture",
   "structurize.possetter.firstpos": "First pos set to x=%d y=%d z=%d",

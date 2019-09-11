@@ -45,6 +45,7 @@ public class ScanTool extends AbstractItemWithPosSelector
     {
         if (!worldIn.isRemote())
         {
+            final long time = System.nanoTime();
             final Path loc = Minecraft.getInstance().gameDir.toPath().resolve("structurize").resolve("tempschem.blueprint").toAbsolutePath();
             Instances.getLogger().info("Saving bp to: " + loc.toString());
             try
@@ -56,6 +57,7 @@ public class ScanTool extends AbstractItemWithPosSelector
             {
                 e.printStackTrace();
             }
+            Instances.getLogger().info("Finished saving in " + Long.toString(System.nanoTime() - time));
         }
         return ActionResultType.SUCCESS;
     }

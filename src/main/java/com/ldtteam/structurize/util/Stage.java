@@ -1,11 +1,10 @@
 package com.ldtteam.structurize.util;
 
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 
 /**
  * Generic stage enum interface
- * 
+ *
  * @param <T> StageData value
  * @param <U> base to run methods on
  */
@@ -32,7 +31,7 @@ public interface Stage<T, U>
 
     default StageData<T, U> createEmptyData()
     {
-        return createData(null);
+        return new StageData<>(this, null);
     }
 
     public static class StageData<T, U>

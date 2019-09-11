@@ -22,11 +22,6 @@ public abstract class BuildProvider extends ForgeRegistryEntry<BuildProvider>
 
     public abstract void build(final RawPlacer placer);
 
-    public static void oldInstantPlaceCaller(final EventInfoHolder<?> event)
-    {
-        InstantBuildProvider.place(event);
-    }
-
     public GenericConfiguration getConfiguration()
     {
         return configuration;

@@ -19,6 +19,11 @@ public class ClientConfiguration extends AbstractConfiguration
     public final ForgeConfigSpec.BooleanValue toggleableLightTexture;
 
     /**
+     * Use partial ticks while rendering structure? Enabling this may decrease performance
+     */
+    public final ForgeConfigSpec.BooleanValue structurePartialTicks;
+
+    /**
      * Builds client configuration.
      *
      * @param builder config builder
@@ -28,6 +33,7 @@ public class ClientConfiguration extends AbstractConfiguration
         createCategory(builder, "render");
         maxAmountOfRenderedEvents = defineInteger(builder, "maxamountofrenderedevents", 10, 1, Integer.MAX_VALUE);
         toggleableLightTexture = defineBoolean(builder, "toggleablelighttexture", true);
+        structurePartialTicks = defineBoolean(builder, "structurepartialticks", false);
         finishCategory(builder);
     }
 }

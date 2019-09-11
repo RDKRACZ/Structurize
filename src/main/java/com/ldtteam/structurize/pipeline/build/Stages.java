@@ -4,41 +4,43 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import com.ldtteam.structurize.util.Stage;
 import org.apache.commons.lang3.ObjectUtils.Null;
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.Tuple;
 
 public final class Stages
 {
-    public enum BlockStages implements Stage<Block, StagedPlacer>
+    public enum BlockStateStages implements Stage<BlockState, StagedPlacer>
     {
         FIX_FLOOR_WITH(StagedPlacer::fixFloorWith, StagedPlacer::nextStage),
         FIX_CEILING_WITH(StagedPlacer::fixCeilingWith, StagedPlacer::nextStage),
         FIX_FLUIDS_WITH(StagedPlacer::fixFluidsWith, StagedPlacer::nextStage),
         CLEAR_WITH(StagedPlacer::clearWith, StagedPlacer::nextStage);
 
-        private BiConsumer<StagedPlacer, StageData<Block, StagedPlacer>> method;
-        private BiConsumer<StagedPlacer, Stage<Block, StagedPlacer>> then;
+        private BiConsumer<StagedPlacer, StageData<BlockState, StagedPlacer>> method;
+        private BiConsumer<StagedPlacer, Stage<BlockState, StagedPlacer>> then;
 
-        private BlockStages(BiConsumer<StagedPlacer, StageData<Block, StagedPlacer>> method, BiConsumer<StagedPlacer, Stage<Block, StagedPlacer>> then)
+        private BlockStateStages(
+            BiConsumer<StagedPlacer, StageData<BlockState, StagedPlacer>> method,
+            BiConsumer<StagedPlacer, Stage<BlockState, StagedPlacer>> then)
         {
             this.method = method;
             this.then = then;
         }
 
         @Override
-        public BiConsumer<StagedPlacer, StageData<Block, StagedPlacer>> getRunMethod()
+        public BiConsumer<StagedPlacer, StageData<BlockState, StagedPlacer>> getRunMethod()
         {
             return method;
         }
 
         @Override
-        public BiConsumer<StagedPlacer, Stage<Block, StagedPlacer>> getThenMethod()
+        public BiConsumer<StagedPlacer, Stage<BlockState, StagedPlacer>> getThenMethod()
         {
             return then;
         }
 
         @Override
-        public StageData<Block, StagedPlacer> createEmptyData()
+        public StageData<BlockState, StagedPlacer> createEmptyData()
         {
             throw new IllegalStateException("Must have stageData set.");
         }
