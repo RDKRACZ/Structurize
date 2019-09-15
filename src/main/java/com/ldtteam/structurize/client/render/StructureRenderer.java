@@ -179,10 +179,7 @@ public class StructureRenderer
                 TileEntityRendererDispatcher.instance
                     .render(tileEntity, tileEntity.getPos().getX(), tileEntity.getPos().getY(), tileEntity.getPos().getZ(), partialTicks);
                 Minecraft.getInstance().gameRenderer.disableLightmap();
-                if (tileEntity.getType() == TileEntityType.BEACON || tileEntity.getType() == TileEntityType.END_GATEWAY)
-                {
-                    GlStateManager.disableFog();
-                }
+                GlStateManager.disableFog();
             });
             TileEntityRendererDispatcher.instance.drawBatch();
             TileEntityRendererDispatcher.instance.setWorld(previous);
@@ -192,6 +189,7 @@ public class StructureRenderer
             entities.forEach(entity -> {
                 Minecraft.getInstance().getRenderManager().renderEntity(entity, entity.posX, entity.posY, entity.posZ, entity.rotationYaw, partialTicks, true);
                 Minecraft.getInstance().gameRenderer.disableLightmap();
+                GlStateManager.disableFog();
             });
 
             // Draw normal blocks.

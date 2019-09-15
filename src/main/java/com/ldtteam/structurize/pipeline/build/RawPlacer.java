@@ -6,11 +6,13 @@ import java.util.Optional;
 import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.BlockStateComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.EntityComponentPlacer;
+import com.ldtteam.structurize.pipeline.build.ComponentPlacer.FluidStateComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.TileEntityComponentPlacer;
 import com.ldtteam.structurize.structure.util.StructureBB;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Tuple;
@@ -20,7 +22,10 @@ import net.minecraft.world.World;
 
 public class RawPlacer
 {
-    protected final List<BlockState> blockPalette;
+    protected final List<BlockState> structureBlockPalette;
+    /**
+     * Structure blocks 3d array, indexes: y|z|x.
+     */
     protected final short[][][] structureBlocks;
     protected final List<CompoundNBT> structureEntities;
     protected final Map<BlockPos, CompoundNBT> structureTileEntities;
@@ -29,7 +34,7 @@ public class RawPlacer
 
     protected RawPlacer(final RawPlacer placer)
     {
-        this.blockPalette = placer.blockPalette;
+        this.structureBlockPalette = placer.structureBlockPalette;
         this.structureBlocks = placer.structureBlocks;
         this.structureEntities = placer.structureEntities;
         this.structureTileEntities = placer.structureTileEntities;
@@ -39,7 +44,7 @@ public class RawPlacer
 
     public RawPlacer(final EventInfoHolder<?> event)
     {
-        blockPalette = event.getStructure().getBlockPalette();
+        structureBlockPalette = event.getStructure().getBlockPalette();
         structureBlocks = event.getStructure().getBlocks();
         structureEntities = event.getStructure().getEntities();
         structureTileEntities = event.getStructure().getTileEntities();
@@ -76,6 +81,11 @@ public class RawPlacer
     public static BlockStateComponentPlacer getBlockStatePlacer(final BlockState blockState)
     {
         return Instances.getComponentRegistries().getBlockStatePlacerRegistry().getValue(blockState.getBlock().getRegistryName());
+    }
+
+    public static FluidStateComponentPlacer getFluidStatePlacer(final IFluidState fluidState)
+    {
+        return Instances.getComponentRegistries().getFluidStatePlacerRegistry().getValue(fluidState.getFluid().getRegistryName());
     }
 
     public static TileEntityComponentPlacer getTileEntityPlacer(final TileEntity tileEntity)

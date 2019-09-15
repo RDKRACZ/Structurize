@@ -232,4 +232,15 @@ public class StructureBB
         minZ = -maxZ + 2 * center.getZ();
         maxZ = -oldMin + 2 * center.getZ();
     }
+
+    /**
+     * Adds anchor to given zerobased pos so it becomes real world pos.
+     *
+     * @param zeroBasedPos pos to transform
+     * @return real world pos
+     */
+    public BlockPos transformZeroBasedToReal(final BlockPos zeroBasedPos)
+    {
+        return getAnchor().add(zeroBasedPos);
+    }
 }

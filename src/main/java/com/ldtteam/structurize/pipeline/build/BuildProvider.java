@@ -1,6 +1,5 @@
 package com.ldtteam.structurize.pipeline.build;
 
-import com.ldtteam.structurize.pipeline.defaults.build.InstantBuildProvider;
 import com.ldtteam.structurize.util.GenericConfiguration;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 

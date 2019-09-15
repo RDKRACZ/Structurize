@@ -10,6 +10,7 @@ public class ModBlocks
 {
     public static final AnyblockSubstitution ANYBLOCK_SUBSTITUTION = new AnyblockSubstitution();
     public static final VariableSubstitution VARIABLE_SUBSTITUTION = new VariableSubstitution();
+    public static final FallingSupport FALLING_SUPPORT = new FallingSupport();
 
     /**
      * Private constructor to hide implicit public one.
@@ -28,6 +29,6 @@ public class ModBlocks
      */
     public static void registerBlocks(final IForgeRegistry<Block> registry)
     {
-        registry.registerAll(ANYBLOCK_SUBSTITUTION, VARIABLE_SUBSTITUTION);
+        registry.registerAll(ANYBLOCK_SUBSTITUTION, VARIABLE_SUBSTITUTION, FALLING_SUPPORT);
     }
 }

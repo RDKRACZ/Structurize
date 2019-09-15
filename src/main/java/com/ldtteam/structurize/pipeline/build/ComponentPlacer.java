@@ -4,6 +4,7 @@ import java.util.List;
 import com.ldtteam.structurize.Instances;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -133,6 +134,26 @@ public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>> extends ForgeRe
                 public void buildAndRegister()
                 {
                     Instances.getComponentRegistries().getBlockStatePlacerRegistry().register(new BlockStateComponentPlacer(this));
+                }
+            };
+        }
+    }
+
+    public static class FluidStateComponentPlacer extends ComponentPlacer<IFluidState, FluidStateComponentPlacer>
+    {
+        private FluidStateComponentPlacer(final Builder<IFluidState> builder)
+        {
+            super(builder.getRegistryName(), builder.getPlacer(), builder.getSubstitutions(), builder.getRequirements());
+        }
+
+        public static ComponentPlacer.Builder<IFluidState> newBuilder()
+        {
+            return new ComponentPlacer.Builder<IFluidState>()
+            {
+                @Override
+                public void buildAndRegister()
+                {
+                    Instances.getComponentRegistries().getFluidStatePlacerRegistry().register(new FluidStateComponentPlacer(this));
                 }
             };
         }

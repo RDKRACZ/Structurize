@@ -1,6 +1,7 @@
 package com.ldtteam.structurize.pipeline.build;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -12,17 +13,26 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.BlockStateComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.EntityComponentPlacer;
+import com.ldtteam.structurize.pipeline.build.ComponentPlacer.FluidStateComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.TileEntityComponentPlacer;
 import com.ldtteam.structurize.structure.util.StructureBB;
 import com.ldtteam.structurize.util.FastIterator;
+import com.ldtteam.structurize.util.ItemStackList;
 import com.ldtteam.structurize.util.Stage;
 import com.ldtteam.structurize.util.Stage.StageData;
 import org.apache.commons.lang3.ObjectUtils.Null;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.FallingBlock;
+import net.minecraft.block.FlowingFluidBlock;
+import net.minecraft.block.IWaterLoggable;
+import net.minecraft.block.WallBannerBlock;
+import net.minecraft.block.WallSignBlock;
 import net.minecraft.entity.Entity;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
@@ -56,23 +66,23 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
     /**
      * Places all solid blocks.
      */
-    public static final Stage<Boolean, StagedPlacer> PLACE_SOLID = Stages.BooleanStages.PLACE_SOLID;
+    public static final Stage<Null, StagedPlacer> PLACE_SOLID = Stages.NoDataStages.PLACE_SOLID;
     /**
      * Places all falling blocks.
      */
-    public static final Stage<Tuple<Boolean, Boolean>, StagedPlacer> PLACE_FALLING = Stages.DoubleBooleanStages.PLACE_FALLING;
+    public static final Stage<BlockState, StagedPlacer> PLACE_FALLING = Stages.BlockStateStages.PLACE_FALLING;
     /**
      * Places all non-solid blocks.
      */
-    public static final Stage<Boolean, StagedPlacer> PLACE_NON_SOLID = Stages.BooleanStages.PLACE_NON_SOLID;
+    public static final Stage<Null, StagedPlacer> PLACE_NON_SOLID = Stages.NoDataStages.PLACE_NON_SOLID;
     /**
      * Places all fluids.
      */
-    public static final Stage<Boolean, StagedPlacer> PLACE_FLUIDS = Stages.BooleanStages.PLACE_FLUIDS;
+    public static final Stage<Null, StagedPlacer> PLACE_FLUIDS = Stages.NoDataStages.PLACE_FLUIDS;
     /**
      * Places all tile entities.
      */
-    public static final Stage<Boolean, StagedPlacer> PLACE_TILE_ENTITIES = Stages.BooleanStages.PLACE_TILE_ENTITIES;
+    public static final Stage<Null, StagedPlacer> PLACE_TILE_ENTITIES = Stages.NoDataStages.PLACE_TILE_ENTITIES;
     /**
      * Clears remaining falling block supports from PLACE_FALLING stage.
      */
@@ -80,7 +90,7 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
     /**
      * Places all entities.
      */
-    public static final Stage<Boolean, StagedPlacer> PLACE_ENTITIES = Stages.BooleanStages.PLACE_ENTITIES;
+    public static final Stage<Null, StagedPlacer> PLACE_ENTITIES = Stages.NoDataStages.PLACE_ENTITIES;
     /**
      * Marks placer as ready for removal. No further actions can be executed after this stage.
      */
@@ -97,7 +107,9 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
     private final Iterator<StageData<?, StagedPlacer>> stages;
     private StageData<?, StagedPlacer> currentStage; // because linkedList node is not exposed...
     private final BiConsumer<Stage<?, StagedPlacer>, Stage<?, StagedPlacer>> onStageChangeListener;
-    private FastIterator<PlaceAction<?>> runningIterator;
+    private ActionIterator<?, ?> runningIterator;
+    // TODO: current mc version does not support anything else than water
+    private final Map<BlockPos, Tuple<BlockState, Boolean>> fluidloggedCache = new HashMap<>();
 
     public StagedPlacer(final RawPlacer placer)
     {
@@ -106,7 +118,9 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
 
     public StagedPlacer(final RawPlacer placer, final LinkedList<StageData<?, StagedPlacer>> stages)
     {
-        this(placer, stages, null);
+        this(placer, stages, (s, t) -> {
+            // Dummy onStageChangeListener
+        });
     }
 
     public StagedPlacer(
@@ -117,33 +131,35 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
         super(placer);
         this.stages = stages == null ? null : stages.iterator();
         this.onStageChangeListener = onStageChangeListener;
-        currentStage = this.stages.next();
-        currentStage.runStage(this);
+        nextStage(null);
     }
 
-    public static LinkedList<StageData<?, StagedPlacer>> createDefaultStages(final boolean requirements, final boolean supportFallingIfBottom)
+    public static LinkedList<StageData<?, StagedPlacer>> createDefaultStages(final boolean supportFallingIfBottom)
     {
         final LinkedList<StageData<?, StagedPlacer>> defStages = new LinkedList<>();
-        defStages.add(FIX_FLOOR_WITH.createData(Blocks.DIRT.getDefaultState()));
-        defStages.add(FIX_CEILING_WITH.createData(Blocks.STONE.getDefaultState()));
-        defStages.add(FIX_FLUIDS_WITH.createData(Blocks.GLASS.getDefaultState()));
+        defStages.add(FIX_FLOOR_WITH.createData(Blocks.AIR.getDefaultState()));
+        defStages.add(FIX_CEILING_WITH.createData(Blocks.AIR.getDefaultState()));
+        defStages.add(FIX_FLUIDS_WITH.createData(Blocks.AIR.getDefaultState()));
         defStages.add(CLEAR_WITH.createData(Blocks.AIR.getDefaultState()));
-        defStages.add(PLACE_SOLID.createData(requirements));
-        defStages.add(PLACE_FALLING.createData(new Tuple<>(requirements, supportFallingIfBottom)));
-        defStages.add(PLACE_NON_SOLID.createData(requirements));
-        defStages.add(PLACE_FLUIDS.createData(requirements));
-        defStages.add(PLACE_TILE_ENTITIES.createData(requirements));
+        defStages.add(PLACE_SOLID.createEmptyData());
+        defStages.add(PLACE_FALLING.createData(Blocks.STONE.getDefaultState()));
+        defStages.add(PLACE_NON_SOLID.createEmptyData());
+        defStages.add(PLACE_FLUIDS.createEmptyData());
+        defStages.add(PLACE_TILE_ENTITIES.createEmptyData());
         defStages.add(CLEAR_FALLING_SUPPORT.createEmptyData());
-        defStages.add(PLACE_ENTITIES.createData(requirements));
+        defStages.add(PLACE_ENTITIES.createEmptyData());
         defStages.add(END_STAGE.createEmptyData());
         return defStages;
     }
 
     public void nextStage(final Stage<?, StagedPlacer> previous)
     {
-        currentStage = stages.next();
-        onStageChangeListener.accept(previous, currentStage.getStage());
-        currentStage.runStage(this);
+        if (stages != null)
+        {
+            currentStage = stages.next();
+            onStageChangeListener.accept(previous, currentStage.getStage());
+            currentStage.runStage(this);
+        }
     }
 
     private Set<BlockPos> getNonSolidBlockPosIn(final StructureBB structureBB)
@@ -175,8 +191,8 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
 
         final BlockState fillBlock = stageData.getData();
         final BlockStateComponentPlacer blockStatePlacer = getBlockStatePlacer(fillBlock);
-        runningIterator = new ActionIterator<BlockPos>(nonSolidPosList.iterator(), pos -> {
-            return new PlaceAction<BlockState>(
+        runningIterator = new ActionIterator<BlockPos, BlockState>(nonSolidPosList.iterator(), pos -> {
+            return new PlaceAction<>(
                 () -> blockStatePlacer.getRequirements(fillBlock, structureWorld, pos),
                 () -> blockStatePlacer.place(fillBlock, structureWorld, pos),
                 fillBlock,
@@ -202,8 +218,8 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
 
         final BlockState fillBlock = stageData.getData();
         final BlockStateComponentPlacer blockStatePlacer = getBlockStatePlacer(fillBlock);
-        runningIterator = new ActionIterator<BlockPos>(nonSolidPosList.iterator(), pos -> {
-            return new PlaceAction<BlockState>(
+        runningIterator = new ActionIterator<BlockPos, BlockState>(nonSolidPosList.iterator(), pos -> {
+            return new PlaceAction<>(
                 () -> blockStatePlacer.getRequirements(fillBlock, structureWorld, pos),
                 () -> blockStatePlacer.place(fillBlock, structureWorld, pos),
                 fillBlock,
@@ -254,8 +270,8 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
 
         final BlockState fillBlock = stageData.getData();
         final BlockStateComponentPlacer blockStatePlacer = getBlockStatePlacer(fillBlock);
-        runningIterator = new ActionIterator<BlockPos>(fluidPosList.iterator(), pos -> {
-            return new PlaceAction<BlockState>(
+        runningIterator = new ActionIterator<BlockPos, BlockState>(fluidPosList.iterator(), pos -> {
+            return new PlaceAction<>(
                 () -> blockStatePlacer.getRequirements(fillBlock, structureWorld, pos),
                 () -> blockStatePlacer.place(fillBlock, structureWorld, pos),
                 fillBlock,
@@ -275,16 +291,18 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
         final List<List<BlockPos>> rowsToClear = new ArrayList<>();
         List<BlockPos> tempList = new ArrayList<>();
         final MutableBlockPos tempPos = new MutableBlockPos();
+        final BlockPos start = structurePosition.getAnchor();
+        final BlockPos end = structurePosition.getPeek();
 
-        for (int y = 0; y < structurePosition.getYSize(); y++)
+        for (int y = start.getY(); y <= end.getY(); y++)
         {
             tempPos.setY(y);
-            for (int x = 0; x < structurePosition.getXSize(); x++)
+            for (int z = start.getZ(); z <= end.getZ(); z++)
             {
-                tempPos.setX(x);
-                for (int z = 0; z < structurePosition.getZSize(); z++)
+                tempPos.setZ(z);
+                for (int x = start.getX(); x <= end.getX(); x++)
                 {
-                    tempPos.setZ(z);
+                    tempPos.setX(x);
                     if (!structureWorld.getBlockState(tempPos).equals(fillBlock))
                     {
                         tempList.add(tempPos.toImmutable());
@@ -306,14 +324,14 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
         }
 
         final BlockStateComponentPlacer blockStatePlacer = getBlockStatePlacer(fillBlock);
-        runningIterator = new ActionIterator<List<BlockPos>>(rowsToClear.iterator(), posList -> {
-            return new PlaceAction<BlockState>(() -> {
-                final List<ItemStack> result = new ArrayList<>();
+        runningIterator = new ActionIterator<List<BlockPos>, BlockState>(rowsToClear.iterator(), posList -> {
+            return new PlaceAction<>(() -> {
+                final ItemStackList result = new ItemStackList();
                 for (final BlockPos pos : posList)
                 {
-                    blockStatePlacer.getRequirements(fillBlock, structureWorld, pos);
+                    result.addAll(blockStatePlacer.getRequirements(fillBlock, structureWorld, pos));
                 }
-                return result;
+                return (ArrayList<ItemStack>) result;
             }, () -> {
                 for (final BlockPos pos : posList)
                 {
@@ -323,42 +341,261 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
         });
     }
 
+    private List<Tuple<BlockPos, BlockState>> searchStructureBlocksForIDs(final List<Short> blockStatesIDs)
+    {
+        final List<Tuple<BlockPos, BlockState>> result = new ArrayList<>();
+
+        if (blockStatesIDs.isEmpty())
+        {
+            return result;
+        }
+
+        for (int y = 0; y < structurePosition.getYSize(); y++)
+        {
+            for (int z = 0; z < structurePosition.getZSize(); z++)
+            {
+                for (int x = 0; x < structurePosition.getXSize(); x++)
+                {
+                    final short id = structureBlocks[y][z][x];
+                    if (blockStatesIDs.contains(id))
+                    {
+                        result.add(new Tuple<>(new BlockPos(x, y, z), structureBlockPalette.get(id)));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    private boolean isPlacementSolid(final BlockState blockState)
+    {
+        return blockState.getMaterial().isSolid() && !(blockState.getBlock() instanceof WallSignBlock || blockState.getBlock() instanceof WallBannerBlock);
+    }
+
     /**
      * Places all solid blocks.
      */
-    public void placeSolid(final StageData<Boolean, StagedPlacer> stageData)
+    public void placeSolid(final StageData<Null, StagedPlacer> stageData)
     {
-        stageData.endStage(this);
+        final List<Short> blockStatesIDs = new ArrayList<>();
+        for (short i = 0; i < structureBlockPalette.size(); i++)
+        {
+            if (isPlacementSolid(structureBlockPalette.get(i)) && !(structureBlockPalette.get(i).getBlock() instanceof FallingBlock))
+            {
+                blockStatesIDs.add(i);
+            }
+        }
+
+        if (blockStatesIDs.isEmpty())
+        {
+            stageData.endStage(this);
+            return;
+        }
+
+        final List<Tuple<BlockPos, BlockState>> solidBlocks = searchStructureBlocksForIDs(blockStatesIDs);
+
+        runningIterator = new ActionIterator<Tuple<BlockPos, BlockState>, BlockState>(solidBlocks.iterator(), entry -> {
+            final BlockState bs = entry.getB();
+            final BlockStateComponentPlacer blockStatePlacer = getBlockStatePlacer(bs);
+            final Boolean wasWaterlogged = bs.has(BlockStateProperties.WATERLOGGED) ? bs.get(BlockStateProperties.WATERLOGGED) : false;
+            final BlockPos realWorldPos = structurePosition.transformZeroBasedToReal(entry.getA());
+
+            final BlockState modifiedBlockState;
+            if (wasWaterlogged)
+            {
+                fluidloggedCache.put(entry.getA(), new Tuple<>(bs, wasWaterlogged));
+                modifiedBlockState = bs.with(BlockStateProperties.WATERLOGGED, false);
+            }
+            else
+            {
+                modifiedBlockState = bs;
+            }
+
+            return new PlaceAction<>(
+                () -> blockStatePlacer.getRequirements(modifiedBlockState, structureWorld, realWorldPos),
+                () -> blockStatePlacer.place(modifiedBlockState, structureWorld, realWorldPos),
+                modifiedBlockState,
+                modifiedBlockState.getBlock().getRegistryName(),
+                structureWorld,
+                realWorldPos);
+        });
     }
 
     /**
      * Places all falling blocks. first requirements second support if bottom
      */
-    public void placeFalling(final StageData<Tuple<Boolean, Boolean>, StagedPlacer> stageData)
+    public void placeFalling(final StageData<BlockState, StagedPlacer> stageData)
     {
-        stageData.endStage(this);
+        final List<Short> blockStatesIDs = new ArrayList<>();
+        for (short i = 0; i < structureBlockPalette.size(); i++)
+        {
+            if (isPlacementSolid(structureBlockPalette.get(i)) && structureBlockPalette.get(i).getBlock() instanceof FallingBlock)
+            {
+                blockStatesIDs.add(i);
+            }
+        }
+
+        if (blockStatesIDs.isEmpty())
+        {
+            stageData.endStage(this);
+            return;
+        }
+
+        final List<Tuple<BlockPos, BlockState>> fallingBlocks = searchStructureBlocksForIDs(blockStatesIDs);
+
+        runningIterator = new ActionIterator<Tuple<BlockPos, BlockState>, BlockState>(fallingBlocks.iterator(), entry -> {
+            final BlockState bs = entry.getB();
+            final BlockStateComponentPlacer blockStatePlacer = getBlockStatePlacer(bs);
+            final Boolean wasWaterlogged = bs.has(BlockStateProperties.WATERLOGGED) ? bs.get(BlockStateProperties.WATERLOGGED) : false;
+            final BlockPos realWorldPos = structurePosition.transformZeroBasedToReal(entry.getA());
+
+            final BlockState modifiedBlockState;
+            if (wasWaterlogged)
+            {
+                fluidloggedCache.put(entry.getA(), new Tuple<>(bs, wasWaterlogged));
+                modifiedBlockState = bs.with(BlockStateProperties.WATERLOGGED, false);
+            }
+            else
+            {
+                modifiedBlockState = bs;
+            }
+
+            return new PlaceAction<>(
+                () -> blockStatePlacer.getRequirements(modifiedBlockState, structureWorld, realWorldPos),
+                () -> blockStatePlacer.place(modifiedBlockState, structureWorld, realWorldPos),
+                modifiedBlockState,
+                modifiedBlockState.getBlock().getRegistryName(),
+                structureWorld,
+                realWorldPos);
+        });
     }
 
     /**
      * Places all non-solid blocks.
      */
-    public void placeNonSolid(final StageData<Boolean, StagedPlacer> stageData)
+    public void placeNonSolid(final StageData<Null, StagedPlacer> stageData)
     {
-        stageData.endStage(this);
+        final List<Short> blockStatesIDs = new ArrayList<>();
+        for (short i = 0; i < structureBlockPalette.size(); i++)
+        {
+            if (!isPlacementSolid(structureBlockPalette.get(i)))
+            {
+                blockStatesIDs.add(i);
+            }
+        }
+
+        if (blockStatesIDs.isEmpty())
+        {
+            stageData.endStage(this);
+            return;
+        }
+
+        final List<Tuple<BlockPos, BlockState>> nonSolidBlocks = searchStructureBlocksForIDs(blockStatesIDs);
+
+        runningIterator = new ActionIterator<Tuple<BlockPos, BlockState>, BlockState>(nonSolidBlocks.iterator(), entry -> {
+            final BlockState bs = entry.getB();
+            final BlockStateComponentPlacer blockStatePlacer = getBlockStatePlacer(bs);
+            final Boolean wasWaterlogged = bs.has(BlockStateProperties.WATERLOGGED) ? bs.get(BlockStateProperties.WATERLOGGED) : false;
+            final BlockPos realWorldPos = structurePosition.transformZeroBasedToReal(entry.getA());
+
+            final BlockState modifiedBlockState;
+            if (wasWaterlogged)
+            {
+                fluidloggedCache.put(entry.getA(), new Tuple<>(bs, wasWaterlogged));
+                modifiedBlockState = bs.with(BlockStateProperties.WATERLOGGED, false);
+            }
+            else
+            {
+                modifiedBlockState = bs;
+            }
+
+            return new PlaceAction<>(
+                () -> blockStatePlacer.getRequirements(modifiedBlockState, structureWorld, realWorldPos),
+                () -> blockStatePlacer.place(modifiedBlockState, structureWorld, realWorldPos),
+                modifiedBlockState,
+                modifiedBlockState.getBlock().getRegistryName(),
+                structureWorld,
+                realWorldPos);
+        });
     }
 
     /**
      * Places all fluids.
      */
-    public void placeFluids(final StageData<Boolean, StagedPlacer> stageData)
+    public void placeFluids(final StageData<Null, StagedPlacer> stageData)
     {
-        stageData.endStage(this);
+        final List<Short> blockStatesIDs = new ArrayList<>();
+        for (short i = 0; i < structureBlockPalette.size(); i++)
+        {
+            final BlockState bs = structureBlockPalette.get(i);
+            if (bs.getBlock() instanceof FlowingFluidBlock && !bs.getFluidState().isEmpty())
+            {
+                blockStatesIDs.add(i);
+            }
+        }
+
+        if (blockStatesIDs.isEmpty() && fluidloggedCache.isEmpty())
+        {
+            stageData.endStage(this);
+            return;
+        }
+
+        final ActionIterator<?, IFluidState> fluidloggedIterator =
+            new ActionIterator<Map.Entry<BlockPos, Tuple<BlockState, Boolean>>, IFluidState>(fluidloggedCache.entrySet().iterator(), entry -> {
+                final BlockState blockState = entry.getValue().getA();
+
+                if (!(blockState instanceof IWaterLoggable))
+                {
+                    return null;
+                }
+
+                final IFluidState fluidState = blockState.getFluidState();
+                final FluidStateComponentPlacer fluidStatePlacer = getFluidStatePlacer(fluidState);
+                final BlockPos realWorldPos = structurePosition.transformZeroBasedToReal(entry.getKey());
+
+                return new PlaceAction<>(() -> fluidStatePlacer.getRequirements(fluidState, structureWorld, realWorldPos), () -> new IWaterLoggable()
+                {
+                }.receiveFluid(structureWorld, realWorldPos, blockState, fluidState),
+                    fluidState,
+                    fluidState.getFluid().getRegistryName(),
+                    structureWorld,
+                    realWorldPos);
+            });
+
+        if (blockStatesIDs.isEmpty())
+        {
+            runningIterator = fluidloggedIterator;
+            return;
+        }
+
+        final List<Tuple<BlockPos, BlockState>> fluids = searchStructureBlocksForIDs(blockStatesIDs);
+
+        runningIterator = new ActionIterator<Tuple<BlockPos, BlockState>, IFluidState>(fluids.iterator(), entry -> {
+            final IFluidState fluidState = entry.getB().getFluidState();
+            final FluidStateComponentPlacer fluidStatePlacer = getFluidStatePlacer(fluidState);
+            final BlockPos realWorldPos = structurePosition.transformZeroBasedToReal(entry.getA());
+
+            return new PlaceAction<>(
+                () -> fluidStatePlacer.getRequirements(fluidState, structureWorld, realWorldPos),
+                () -> fluidStatePlacer.place(fluidState, structureWorld, realWorldPos),
+                fluidState,
+                fluidState.getFluid().getRegistryName(),
+                structureWorld,
+                realWorldPos);
+        })
+        {
+            @Override
+            protected ActionIterator<?, IFluidState> successor()
+            {
+                return fluidloggedCache.isEmpty() ? null : fluidloggedIterator;
+            }
+        };
     }
 
     /**
      * Places all tile entities.
      */
-    public void placeTileEntities(final StageData<Boolean, StagedPlacer> stageData)
+    public void placeTileEntities(final StageData<Null, StagedPlacer> stageData)
     {
         if (structureTileEntities.isEmpty())
         {
@@ -366,12 +603,12 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
             return;
         }
 
-        runningIterator = new ActionIterator<Map.Entry<BlockPos, CompoundNBT>>(structureTileEntities.entrySet().iterator(), entry -> {
+        runningIterator = new ActionIterator<Map.Entry<BlockPos, CompoundNBT>, TileEntity>(structureTileEntities.entrySet().iterator(), entry -> {
             final Tuple<TileEntity, BlockPos> transformedTe = transformDataToTileEntity(entry.getValue(), entry.getKey());
             final TileEntity te = transformedTe.getA();
             final TileEntityComponentPlacer tePlacer = getTileEntityPlacer(te);
 
-            return new PlaceAction<TileEntity>(
+            return new PlaceAction<>(
                 () -> tePlacer.getRequirements(te, structureWorld, transformedTe.getB()),
                 () -> tePlacer.place(te, structureWorld, transformedTe.getB()),
                 te,
@@ -392,7 +629,7 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
     /**
      * Places all entities.
      */
-    public void placeEntities(final StageData<Boolean, StagedPlacer> stageData)
+    public void placeEntities(final StageData<Null, StagedPlacer> stageData)
     {
         if (structureEntities.isEmpty())
         {
@@ -400,13 +637,13 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
             return;
         }
 
-        runningIterator = new ActionIterator<CompoundNBT>(structureEntities.iterator(), entityNBT -> {
-            final Tuple<Entity, Vec3d> transformedTe = transformDataToEntity(entityNBT);
-            final Entity entity = transformedTe.getA();
-            final BlockPos entityPos = new BlockPos(transformedTe.getB());
+        runningIterator = new ActionIterator<CompoundNBT, Entity>(structureEntities.iterator(), entityNBT -> {
+            final Tuple<Entity, Vec3d> transformedEntity = transformDataToEntity(entityNBT);
+            final Entity entity = transformedEntity.getA();
+            final BlockPos entityPos = new BlockPos(transformedEntity.getB());
             final EntityComponentPlacer entityPlacer = getEntityPlacer(entity);
 
-            return new PlaceAction<Entity>(
+            return new PlaceAction<>(
                 () -> entityPlacer.getRequirements(entity, structureWorld, entityPos),
                 () -> entityPlacer.place(entity, structureWorld, entityPos),
                 entity,
@@ -445,16 +682,27 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
 
         if (!runningIterator.hasNext())
         {
-            currentStage.endStage(this);
+            final ActionIterator<?, ?> newIterator = runningIterator.successor();
+
+            if (newIterator != null)
+            {
+                // Kinda hacky but we assume using ActionIterator#fastConsume() so the action returned by this method ends up there
+                runningIterator = newIterator;
+            }
+            else
+            {
+                currentStage.endStage(this);
+            }
         }
 
         return result;
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "rawtypes"}) // java is incompetent to generic properly
     public void fastConsume(final PlaceAction<?> placeAction)
     {
-        runningIterator.fastConsume(placeAction);
+        runningIterator.fastConsume((PlaceAction) placeAction);
     }
 
     public static class PlaceAction<T>
@@ -513,12 +761,12 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
         }
     }
 
-    protected static class ActionIterator<I> implements FastIterator<PlaceAction<?>>
+    protected static class ActionIterator<I, T> implements FastIterator<PlaceAction<T>>
     {
         private final Iterator<I> backingIterator;
-        private final Function<I, PlaceAction<?>> iteratorTransformer;
+        private final Function<I, PlaceAction<T>> iteratorTransformer;
 
-        protected ActionIterator(final Iterator<I> backingIterator, final Function<I, PlaceAction<?>> iteratorTransformer)
+        protected ActionIterator(final Iterator<I> backingIterator, final Function<I, PlaceAction<T>> iteratorTransformer)
         {
             this.backingIterator = backingIterator;
             this.iteratorTransformer = iteratorTransformer;
@@ -531,20 +779,25 @@ public class StagedPlacer extends RawPlacer implements FastIterator<StagedPlacer
         }
 
         @Override
-        public PlaceAction<?> next()
+        public PlaceAction<T> next()
         {
-            if (!hasNext())
+            PlaceAction<T> result = null;
+            while (result == null && hasNext())
             {
-                return null;
+                result = iteratorTransformer.apply(backingIterator.next());
             }
-
-            return iteratorTransformer.apply(backingIterator.next());
+            return result;
         }
 
         @Override
-        public void fastConsume(final PlaceAction<?> placeAction)
+        public void fastConsume(final PlaceAction<T> placeAction)
         {
             placeAction.perform();
+        }
+
+        protected ActionIterator<?, T> successor()
+        {
+            return null;
         }
     }
 }

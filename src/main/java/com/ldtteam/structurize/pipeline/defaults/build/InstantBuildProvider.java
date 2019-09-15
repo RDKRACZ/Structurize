@@ -27,10 +27,10 @@ public class InstantBuildProvider extends BuildProvider
     @Override
     public void build(final RawPlacer placerIn)
     {
-        final LinkedList<StageData<?, StagedPlacer>> stages = StagedPlacer.createDefaultStages(false, supportFallingIfBottom.getValue());
+        final LinkedList<StageData<?, StagedPlacer>> stages = StagedPlacer.createDefaultStages(supportFallingIfBottom.getValue());
         // stages.removeFirst(); // don't need the clean phase
         currentPlacer = new StagedPlacer(placerIn, stages, (prev, next) -> {
-            Instances.getLogger().info("Stage change: FROM {} | TO {}", prev.toString(), next.toString());
+            Instances.getLogger().info("Stage change: FROM {} | TO {}", prev == null ? "NULL" : prev.toString(), next == null ? "NULL" : next.toString());
             stageStop.set(true);
         });
     }

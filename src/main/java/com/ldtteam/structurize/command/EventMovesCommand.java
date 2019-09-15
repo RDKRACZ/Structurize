@@ -2,7 +2,6 @@ package com.ldtteam.structurize.command;
 
 import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.client.gui.WindowBuildTool;
-import com.ldtteam.structurize.pipeline.build.BuildProvider;
 import com.ldtteam.structurize.pipeline.build.RawPlacer;
 import com.ldtteam.structurize.pipeline.defaults.build.InstantBuildProvider;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -75,14 +74,28 @@ public class EventMovesCommand extends AbstractCommand
 
     private static int placeCurrent(final CommandContext<CommandSource> command) throws CommandSyntaxException
     {
-        new InstantBuildProvider().build(new RawPlacer(WindowBuildTool.getEvent()));
-        WindowBuildTool.closeAndCancel();
+        try
+        {
+            new InstantBuildProvider().build(new RawPlacer(WindowBuildTool.getEvent()));
+            WindowBuildTool.closeAndCancel();
+        }
+        catch (final Exception e)
+        {
+            e.printStackTrace();
+        }
         return 1;
     }
 
     private static int stageCurrentBP(final CommandContext<CommandSource> command) throws CommandSyntaxException
     {
-        InstantBuildProvider.runStage();
+        try
+        {
+            InstantBuildProvider.runStage();
+        }
+        catch (final Exception e)
+        {
+            e.printStackTrace();
+        }
         return 1;
     }
 }

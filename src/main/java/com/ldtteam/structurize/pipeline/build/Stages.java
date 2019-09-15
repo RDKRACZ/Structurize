@@ -14,7 +14,8 @@ public final class Stages
         FIX_FLOOR_WITH(StagedPlacer::fixFloorWith, StagedPlacer::nextStage),
         FIX_CEILING_WITH(StagedPlacer::fixCeilingWith, StagedPlacer::nextStage),
         FIX_FLUIDS_WITH(StagedPlacer::fixFluidsWith, StagedPlacer::nextStage),
-        CLEAR_WITH(StagedPlacer::clearWith, StagedPlacer::nextStage);
+        CLEAR_WITH(StagedPlacer::clearWith, StagedPlacer::nextStage),
+        PLACE_FALLING(StagedPlacer::placeFalling, StagedPlacer::nextStage);
 
         private BiConsumer<StagedPlacer, StageData<BlockState, StagedPlacer>> method;
         private BiConsumer<StagedPlacer, Stage<BlockState, StagedPlacer>> then;
@@ -46,78 +47,13 @@ public final class Stages
         }
     }
 
-    public enum BooleanStages implements Stage<Boolean, StagedPlacer>
+    public enum NoDataStages implements Stage<Null, StagedPlacer>
     {
         PLACE_SOLID(StagedPlacer::placeSolid, StagedPlacer::nextStage),
         PLACE_NON_SOLID(StagedPlacer::placeNonSolid, StagedPlacer::nextStage),
         PLACE_FLUIDS(StagedPlacer::placeFluids, StagedPlacer::nextStage),
         PLACE_TILE_ENTITIES(StagedPlacer::placeTileEntities, StagedPlacer::nextStage),
-        PLACE_ENTITIES(StagedPlacer::placeEntities, StagedPlacer::nextStage);
-
-        private BiConsumer<StagedPlacer, StageData<Boolean, StagedPlacer>> method;
-        private BiConsumer<StagedPlacer, Stage<Boolean, StagedPlacer>> then;
-
-        private BooleanStages(BiConsumer<StagedPlacer, StageData<Boolean, StagedPlacer>> method, BiConsumer<StagedPlacer, Stage<Boolean, StagedPlacer>> then)
-        {
-            this.method = method;
-            this.then = then;
-        }
-
-        @Override
-        public BiConsumer<StagedPlacer, StageData<Boolean, StagedPlacer>> getRunMethod()
-        {
-            return method;
-        }
-
-        @Override
-        public BiConsumer<StagedPlacer, Stage<Boolean, StagedPlacer>> getThenMethod()
-        {
-            return then;
-        }
-
-        @Override
-        public StageData<Boolean, StagedPlacer> createEmptyData()
-        {
-            throw new IllegalStateException("Must have stageData set.");
-        }
-    }
-
-    public enum DoubleBooleanStages implements Stage<Tuple<Boolean, Boolean>, StagedPlacer>
-    {
-        PLACE_FALLING(StagedPlacer::placeFalling, StagedPlacer::nextStage);
-
-        private BiConsumer<StagedPlacer, StageData<Tuple<Boolean, Boolean>, StagedPlacer>> method;
-        private BiConsumer<StagedPlacer, Stage<Tuple<Boolean, Boolean>, StagedPlacer>> then;
-
-        private DoubleBooleanStages(
-            BiConsumer<StagedPlacer, StageData<Tuple<Boolean, Boolean>, StagedPlacer>> method,
-            BiConsumer<StagedPlacer, Stage<Tuple<Boolean, Boolean>, StagedPlacer>> then)
-        {
-            this.method = method;
-            this.then = then;
-        }
-
-        @Override
-        public BiConsumer<StagedPlacer, StageData<Tuple<Boolean, Boolean>, StagedPlacer>> getRunMethod()
-        {
-            return method;
-        }
-
-        @Override
-        public BiConsumer<StagedPlacer, Stage<Tuple<Boolean, Boolean>, StagedPlacer>> getThenMethod()
-        {
-            return then;
-        }
-
-        @Override
-        public StageData<Tuple<Boolean, Boolean>, StagedPlacer> createEmptyData()
-        {
-            throw new IllegalStateException("Must have stageData set.");
-        }
-    }
-
-    public enum NoDataStages implements Stage<Null, StagedPlacer>
-    {
+        PLACE_ENTITIES(StagedPlacer::placeEntities, StagedPlacer::nextStage),
         CLEAR_FALLING_SUPPORT(StagedPlacer::clearFallingSupport, StagedPlacer::nextStage),
         END_STAGE(StagedPlacer::endStage, null),
         DUMMY_STAGE(null, null);

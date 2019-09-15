@@ -2,6 +2,7 @@ package com.ldtteam.structurize.pipeline;
 
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.BlockStateComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.EntityComponentPlacer;
+import com.ldtteam.structurize.pipeline.build.ComponentPlacer.FluidStateComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.TileEntityComponentPlacer;
 import com.ldtteam.structurize.pipeline.defaults.build.DefaultPlacers;
 import com.ldtteam.structurize.pipeline.defaults.scan.DefaultScanners;
@@ -21,6 +22,7 @@ public class ComponentRegistries
     private final IForgeRegistry<TileEntityComponentScanner> tileEntityScannerRegistry;
     private final IForgeRegistry<EntityComponentScanner> entityScannerRegistry;
     private final IForgeRegistry<BlockStateComponentPlacer> blockStatePlacerRegistry;
+    private final IForgeRegistry<FluidStateComponentPlacer> fluidStatePlacerRegistry;
     private final IForgeRegistry<TileEntityComponentPlacer> tileEntityPlacerRegistry;
     private final IForgeRegistry<EntityComponentPlacer> entityPlacerRegistry;
 
@@ -30,6 +32,7 @@ public class ComponentRegistries
         tileEntityScannerRegistry = buildRegistry(TileEntityComponentScanner.class, "tileentity_scanners").create();
         entityScannerRegistry = buildRegistry(EntityComponentScanner.class, "entity_scanners").create();
         blockStatePlacerRegistry = buildRegistry(BlockStateComponentPlacer.class, "blockstate_placers").create();
+        fluidStatePlacerRegistry = buildRegistry(FluidStateComponentPlacer.class, "fluidstate_placers").create();
         tileEntityPlacerRegistry = buildRegistry(TileEntityComponentPlacer.class, "tileentity_placers").create();
         entityPlacerRegistry = buildRegistry(EntityComponentPlacer.class, "entity_placers").create();
         freeze();
@@ -95,6 +98,11 @@ public class ComponentRegistries
     public IForgeRegistry<BlockStateComponentPlacer> getBlockStatePlacerRegistry()
     {
         return blockStatePlacerRegistry;
+    }
+
+    public IForgeRegistry<FluidStateComponentPlacer> getFluidStatePlacerRegistry()
+    {
+        return fluidStatePlacerRegistry;
     }
 
     public IForgeRegistry<TileEntityComponentPlacer> getTileEntityPlacerRegistry()
