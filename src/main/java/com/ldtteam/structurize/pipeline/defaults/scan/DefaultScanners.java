@@ -10,17 +10,17 @@ import net.minecraft.tileentity.TileEntity;
 
 public class DefaultScanners
 {
-    public static Builder<BlockState> getDefaultBlockStateScanner()
+    public static Builder<BlockState, BlockStateComponentScanner> getDefaultBlockStateScanner()
     {
         return BlockStateComponentScanner.newBuilder().setScanner((t, w, bp) -> t);
     }
 
-    public static Builder<TileEntity> getDefaultTileEntityScanner()
+    public static Builder<TileEntity, TileEntityComponentScanner> getDefaultTileEntityScanner()
     {
         return TileEntityComponentScanner.newBuilder().setScanner((t, w, bp) -> t);
     }
 
-    public static Builder<Entity> getDefaultEntityScanner()
+    public static Builder<Entity, EntityComponentScanner> getDefaultEntityScanner()
     {
         return EntityComponentScanner.newBuilder().setScanner((t, w, bp) -> t);
     }

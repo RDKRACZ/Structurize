@@ -18,6 +18,9 @@ import net.minecraftforge.registries.RegistryBuilder;
 
 public class ComponentRegistries
 {
+    private static final ResourceLocation DEFAULT_KEY = new ResourceLocation(GeneralConstants.MOD_ID, "default");
+    private static final String DEFAULT_KEY_STRING = DEFAULT_KEY.toString();
+
     private final IForgeRegistry<BlockStateComponentScanner> blockStateScannerRegistry;
     private final IForgeRegistry<TileEntityComponentScanner> tileEntityScannerRegistry;
     private final IForgeRegistry<EntityComponentScanner> entityScannerRegistry;
@@ -35,29 +38,50 @@ public class ComponentRegistries
         fluidStatePlacerRegistry = buildRegistry(FluidStateComponentPlacer.class, "fluidstate_placers").create();
         tileEntityPlacerRegistry = buildRegistry(TileEntityComponentPlacer.class, "tileentity_placers").create();
         entityPlacerRegistry = buildRegistry(EntityComponentPlacer.class, "entity_placers").create();
-        freeze();
     }
 
     protected static <T extends IForgeRegistryEntry<T>> RegistryBuilder<T> buildRegistry(final Class<T> clazz, final String name)
     {
         return new RegistryBuilder<T>().setName(new ResourceLocation(GeneralConstants.MOD_ID, name))
-            .setDefaultKey(new ResourceLocation(GeneralConstants.MOD_ID, "default"))
+            .setDefaultKey(DEFAULT_KEY)
             .disableSaving()
-            .allowModification()
             .setType(clazz)
             .setIDRange(0, Integer.MAX_VALUE - 1);
     }
 
-    public void registerDefaults()
+    public void registerDefaultBSS(final IForgeRegistry<BlockStateComponentScanner> registry)
     {
-        // TODO: switch to proper register events
-        final String defaultName = new ResourceLocation(GeneralConstants.MOD_ID, "default").toString();
-        DefaultScanners.getDefaultBlockStateScanner().setRegistryName(defaultName).buildAndRegister();
-        DefaultScanners.getDefaultTileEntityScanner().setRegistryName(defaultName).buildAndRegister();
-        DefaultScanners.getDefaultEntityScanner().setRegistryName(defaultName).buildAndRegister();
-        DefaultPlacers.getDefaultBlockStatePlacer().setRegistryName(defaultName).buildAndRegister();
-        DefaultPlacers.getDefaultTileEntityPlacer().setRegistryName(defaultName).buildAndRegister();
-        DefaultPlacers.getDefaultEntityPlacer().setRegistryName(defaultName).buildAndRegister();
+        DefaultScanners.getDefaultBlockStateScanner().setRegistryName(DEFAULT_KEY_STRING).buildAndRegister(registry);
+    }
+
+    public void registerDefaultTES(final IForgeRegistry<TileEntityComponentScanner> registry)
+    {
+        DefaultScanners.getDefaultTileEntityScanner().setRegistryName(DEFAULT_KEY_STRING).buildAndRegister(registry);
+    }
+
+    public void registerDefaultES(final IForgeRegistry<EntityComponentScanner> registry)
+    {
+        DefaultScanners.getDefaultEntityScanner().setRegistryName(DEFAULT_KEY_STRING).buildAndRegister(registry);
+    }
+
+    public void registerDefaultBSP(final IForgeRegistry<BlockStateComponentPlacer> registry)
+    {
+        DefaultPlacers.getDefaultBlockStatePlacer().setRegistryName(DEFAULT_KEY_STRING).buildAndRegister(registry);
+    }
+
+    public void registerDefaultFSP(final IForgeRegistry<FluidStateComponentPlacer> registry)
+    {
+        DefaultPlacers.getDefaultFluidStatePlacer().setRegistryName(DEFAULT_KEY_STRING).buildAndRegister(registry);
+    }
+
+    public void registerDefaultTEP(final IForgeRegistry<TileEntityComponentPlacer> registry)
+    {
+        DefaultPlacers.getDefaultTileEntityPlacer().setRegistryName(DEFAULT_KEY_STRING).buildAndRegister(registry);
+    }
+
+    public void registerDefaultEP(final IForgeRegistry<EntityComponentPlacer> registry)
+    {
+        DefaultPlacers.getDefaultEntityPlacer().setRegistryName(DEFAULT_KEY_STRING).buildAndRegister(registry);
     }
 
     public void unfreeze()
@@ -66,6 +90,7 @@ public class ComponentRegistries
         ((ForgeRegistry<TileEntityComponentScanner>) tileEntityScannerRegistry).unfreeze();
         ((ForgeRegistry<EntityComponentScanner>) entityScannerRegistry).unfreeze();
         ((ForgeRegistry<BlockStateComponentPlacer>) blockStatePlacerRegistry).unfreeze();
+        ((ForgeRegistry<FluidStateComponentPlacer>) fluidStatePlacerRegistry).unfreeze();
         ((ForgeRegistry<TileEntityComponentPlacer>) tileEntityPlacerRegistry).unfreeze();
         ((ForgeRegistry<EntityComponentPlacer>) entityPlacerRegistry).unfreeze();
     }
@@ -76,6 +101,7 @@ public class ComponentRegistries
         ((ForgeRegistry<TileEntityComponentScanner>) tileEntityScannerRegistry).freeze();
         ((ForgeRegistry<EntityComponentScanner>) entityScannerRegistry).freeze();
         ((ForgeRegistry<BlockStateComponentPlacer>) blockStatePlacerRegistry).freeze();
+        ((ForgeRegistry<FluidStateComponentPlacer>) fluidStatePlacerRegistry).freeze();
         ((ForgeRegistry<TileEntityComponentPlacer>) tileEntityPlacerRegistry).freeze();
         ((ForgeRegistry<EntityComponentPlacer>) entityPlacerRegistry).freeze();
     }

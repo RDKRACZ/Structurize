@@ -1,6 +1,5 @@
 package com.ldtteam.structurize.pipeline.scan;
 
-import com.ldtteam.structurize.Instances;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
@@ -8,6 +7,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class ComponentScanner<T, U extends ForgeRegistryEntry<U>> extends ForgeRegistryEntry<U>
 {
@@ -30,24 +30,24 @@ public class ComponentScanner<T, U extends ForgeRegistryEntry<U>> extends ForgeR
         T scan(T thing, World world, BlockPos pos);
     }
 
-    public abstract static class Builder<T>
+    public abstract static class Builder<T, U extends ComponentScanner<T, U>>
     {
         private Scanner<T> scanner;
         private String registryName;
 
-        public Builder<T> setScanner(final Scanner<T> scanner)
+        public Builder<T, U> setScanner(final Scanner<T> scanner)
         {
             this.scanner = scanner;
             return this;
         }
 
-        public Builder<T> setRegistryName(final String registryName)
+        public Builder<T, U> setRegistryName(final String registryName)
         {
             this.registryName = registryName;
             return this;
         }
 
-        public Builder<T> setRegistryName(final ResourceLocation registryName)
+        public Builder<T, U> setRegistryName(final ResourceLocation registryName)
         {
             this.registryName = registryName.toString();
             return this;
@@ -63,24 +63,24 @@ public class ComponentScanner<T, U extends ForgeRegistryEntry<U>> extends ForgeR
             return registryName;
         }
 
-        public abstract void buildAndRegister();
+        public abstract void buildAndRegister(final IForgeRegistry<U> registry);
     }
 
     public static class BlockStateComponentScanner extends ComponentScanner<BlockState, BlockStateComponentScanner>
     {
-        private BlockStateComponentScanner(final Builder<BlockState> builder)
+        private BlockStateComponentScanner(final Builder<BlockState, BlockStateComponentScanner> builder)
         {
             super(builder.getRegistryName(), builder.getScanner());
         }
 
-        public static ComponentScanner.Builder<BlockState> newBuilder()
+        public static ComponentScanner.Builder<BlockState, BlockStateComponentScanner> newBuilder()
         {
-            return new ComponentScanner.Builder<BlockState>()
+            return new ComponentScanner.Builder<BlockState, BlockStateComponentScanner>()
             {
                 @Override
-                public void buildAndRegister()
+                public void buildAndRegister(IForgeRegistry<BlockStateComponentScanner> registry)
                 {
-                    Instances.getComponentRegistries().getBlockStateScannerRegistry().register(new BlockStateComponentScanner(this));
+                    registry.register(new BlockStateComponentScanner(this));
                 }
             };
         }
@@ -88,19 +88,19 @@ public class ComponentScanner<T, U extends ForgeRegistryEntry<U>> extends ForgeR
 
     public static class TileEntityComponentScanner extends ComponentScanner<TileEntity, TileEntityComponentScanner>
     {
-        private TileEntityComponentScanner(final Builder<TileEntity> builder)
+        private TileEntityComponentScanner(final Builder<TileEntity, TileEntityComponentScanner> builder)
         {
             super(builder.getRegistryName(), builder.getScanner());
         }
 
-        public static ComponentScanner.Builder<TileEntity> newBuilder()
+        public static ComponentScanner.Builder<TileEntity, TileEntityComponentScanner> newBuilder()
         {
-            return new ComponentScanner.Builder<TileEntity>()
+            return new ComponentScanner.Builder<TileEntity, TileEntityComponentScanner>()
             {
                 @Override
-                public void buildAndRegister()
+                public void buildAndRegister(IForgeRegistry<TileEntityComponentScanner> registry)
                 {
-                    Instances.getComponentRegistries().getTileEntityScannerRegistry().register(new TileEntityComponentScanner(this));
+                    registry.register(new TileEntityComponentScanner(this));
                 }
             };
         }
@@ -108,19 +108,19 @@ public class ComponentScanner<T, U extends ForgeRegistryEntry<U>> extends ForgeR
 
     public static class EntityComponentScanner extends ComponentScanner<Entity, EntityComponentScanner>
     {
-        private EntityComponentScanner(final Builder<Entity> builder)
+        private EntityComponentScanner(final Builder<Entity, EntityComponentScanner> builder)
         {
             super(builder.getRegistryName(), builder.getScanner());
         }
 
-        public static ComponentScanner.Builder<Entity> newBuilder()
+        public static ComponentScanner.Builder<Entity, EntityComponentScanner> newBuilder()
         {
-            return new ComponentScanner.Builder<Entity>()
+            return new ComponentScanner.Builder<Entity, EntityComponentScanner>()
             {
                 @Override
-                public void buildAndRegister()
+                public void buildAndRegister(IForgeRegistry<EntityComponentScanner> registry)
                 {
-                    Instances.getComponentRegistries().getEntityScannerRegistry().register(new EntityComponentScanner(this));
+                    registry.register(new EntityComponentScanner(this));
                 }
             };
         }

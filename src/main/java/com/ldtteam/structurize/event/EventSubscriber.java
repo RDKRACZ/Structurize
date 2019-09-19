@@ -2,7 +2,11 @@ package com.ldtteam.structurize.event;
 
 import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.command.EntryPoint;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import com.ldtteam.structurize.world.ModDimensions;
+import com.ldtteam.structurize.world.schematic.PlayerEvents;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
@@ -34,6 +38,7 @@ public class EventSubscriber
     public static void onServerAboutToStart(final FMLServerAboutToStartEvent event)
     {
         Instances.getLogger().warn("FMLServerAboutToStartEvent");
+        ModDimensions.registerDimensionTypes();
     }
 
     /**
@@ -82,13 +87,27 @@ public class EventSubscriber
     }
 
     /**
-     * Called after world and before player's hand a gui overlays rendering.
+     * Called when player joins world.
      *
      * @param event event
      */
     @SubscribeEvent
-    public static void onRenderWorldLast(final RenderWorldLastEvent event)
+    public static void onPlayerLoggedIn(final PlayerLoggedInEvent event)
     {
-        Instances.getEventRenderer().renderActiveEvents(event.getContext(), event.getPartialTicks());
+        PlayerEvents.onPlayerJoinedSchematicWorldType(event.getPlayer());
+    }
+
+    /**
+     * Called when any entity is trying to change dimension.
+     *
+     * @param event event
+     */
+    @SubscribeEvent
+    public static void onEntityTravelToDimension(final EntityTravelToDimensionEvent event)
+    {
+        if (!PlayerEvents.canEntityTravelToDimension(event.getEntity(), event.getDimension()))
+        {
+            event.setCanceled(true);
+        }
     }
 }

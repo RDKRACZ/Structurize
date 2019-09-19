@@ -56,6 +56,8 @@ public class EventInfoHolder<T extends IStructureDataProvider>
         return result;
     }
 
+    // TODO: caliper event on shift right click on/off
+
     /**
      * Sends event to server where is accepted by selected buildProvider.
      * When accepted on server every player is notified to cancel this event clientside.

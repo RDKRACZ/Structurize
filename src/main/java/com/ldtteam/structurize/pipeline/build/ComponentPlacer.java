@@ -11,6 +11,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistryEntry;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>> extends ForgeRegistryEntry<U>
 {
@@ -59,38 +60,38 @@ public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>> extends ForgeRe
         List<ItemStack> getRequirements(T thing, World world, BlockPos pos);
     }
 
-    public abstract static class Builder<T>
+    public abstract static class Builder<T, U extends ComponentPlacer<T, U>>
     {
         private Placer<T> placer;
         private Substitutions<T> substitutions;
         private Requirements<T> requirements;
         private String registryName;
 
-        public Builder<T> setPlacer(final Placer<T> placer)
+        public Builder<T, U> setPlacer(final Placer<T> placer)
         {
             this.placer = placer;
             return this;
         }
 
-        public Builder<T> setSubstitutions(final Substitutions<T> substitutions)
+        public Builder<T, U> setSubstitutions(final Substitutions<T> substitutions)
         {
             this.substitutions = substitutions;
             return this;
         }
 
-        public Builder<T> setRequirements(final Requirements<T> requirements)
+        public Builder<T, U> setRequirements(final Requirements<T> requirements)
         {
             this.requirements = requirements;
             return this;
         }
 
-        public Builder<T> setRegistryName(final String registryName)
+        public Builder<T, U> setRegistryName(final String registryName)
         {
             this.registryName = registryName;
             return this;
         }
 
-        public Builder<T> setRegistryName(final ResourceLocation registryName)
+        public Builder<T, U> setRegistryName(final ResourceLocation registryName)
         {
             this.registryName = registryName.toString();
             return this;
@@ -116,24 +117,24 @@ public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>> extends ForgeRe
             return registryName;
         }
 
-        public abstract void buildAndRegister();
+        public abstract void buildAndRegister(final IForgeRegistry<U> registry);
     }
 
     public static class BlockStateComponentPlacer extends ComponentPlacer<BlockState, BlockStateComponentPlacer>
     {
-        private BlockStateComponentPlacer(final Builder<BlockState> builder)
+        private BlockStateComponentPlacer(final Builder<BlockState, BlockStateComponentPlacer> builder)
         {
             super(builder.getRegistryName(), builder.getPlacer(), builder.getSubstitutions(), builder.getRequirements());
         }
 
-        public static ComponentPlacer.Builder<BlockState> newBuilder()
+        public static ComponentPlacer.Builder<BlockState, BlockStateComponentPlacer> newBuilder()
         {
-            return new ComponentPlacer.Builder<BlockState>()
+            return new ComponentPlacer.Builder<BlockState, BlockStateComponentPlacer>()
             {
                 @Override
-                public void buildAndRegister()
+                public void buildAndRegister(IForgeRegistry<BlockStateComponentPlacer> registry)
                 {
-                    Instances.getComponentRegistries().getBlockStatePlacerRegistry().register(new BlockStateComponentPlacer(this));
+                    registry.register(new BlockStateComponentPlacer(this));
                 }
             };
         }
@@ -141,19 +142,19 @@ public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>> extends ForgeRe
 
     public static class FluidStateComponentPlacer extends ComponentPlacer<IFluidState, FluidStateComponentPlacer>
     {
-        private FluidStateComponentPlacer(final Builder<IFluidState> builder)
+        private FluidStateComponentPlacer(final Builder<IFluidState, FluidStateComponentPlacer> builder)
         {
             super(builder.getRegistryName(), builder.getPlacer(), builder.getSubstitutions(), builder.getRequirements());
         }
 
-        public static ComponentPlacer.Builder<IFluidState> newBuilder()
+        public static ComponentPlacer.Builder<IFluidState, FluidStateComponentPlacer> newBuilder()
         {
-            return new ComponentPlacer.Builder<IFluidState>()
+            return new ComponentPlacer.Builder<IFluidState, FluidStateComponentPlacer>()
             {
                 @Override
-                public void buildAndRegister()
+                public void buildAndRegister(IForgeRegistry<FluidStateComponentPlacer> registry)
                 {
-                    Instances.getComponentRegistries().getFluidStatePlacerRegistry().register(new FluidStateComponentPlacer(this));
+                    registry.register(new FluidStateComponentPlacer(this));
                 }
             };
         }
@@ -161,19 +162,19 @@ public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>> extends ForgeRe
 
     public static class TileEntityComponentPlacer extends ComponentPlacer<TileEntity, TileEntityComponentPlacer>
     {
-        private TileEntityComponentPlacer(final Builder<TileEntity> builder)
+        private TileEntityComponentPlacer(final Builder<TileEntity, TileEntityComponentPlacer> builder)
         {
             super(builder.getRegistryName(), builder.getPlacer(), builder.getSubstitutions(), builder.getRequirements());
         }
 
-        public static ComponentPlacer.Builder<TileEntity> newBuilder()
+        public static ComponentPlacer.Builder<TileEntity, TileEntityComponentPlacer> newBuilder()
         {
-            return new ComponentPlacer.Builder<TileEntity>()
+            return new ComponentPlacer.Builder<TileEntity, TileEntityComponentPlacer>()
             {
                 @Override
-                public void buildAndRegister()
+                public void buildAndRegister(IForgeRegistry<TileEntityComponentPlacer> registry)
                 {
-                    Instances.getComponentRegistries().getTileEntityPlacerRegistry().register(new TileEntityComponentPlacer(this));
+                    registry.register(new TileEntityComponentPlacer(this));
                 }
             };
         }
@@ -181,19 +182,19 @@ public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>> extends ForgeRe
 
     public static class EntityComponentPlacer extends ComponentPlacer<Entity, EntityComponentPlacer>
     {
-        private EntityComponentPlacer(final Builder<Entity> builder)
+        private EntityComponentPlacer(final Builder<Entity, EntityComponentPlacer> builder)
         {
             super(builder.getRegistryName(), builder.getPlacer(), builder.getSubstitutions(), builder.getRequirements());
         }
 
-        public static ComponentPlacer.Builder<Entity> newBuilder()
+        public static ComponentPlacer.Builder<Entity, EntityComponentPlacer> newBuilder()
         {
-            return new ComponentPlacer.Builder<Entity>()
+            return new ComponentPlacer.Builder<Entity, EntityComponentPlacer>()
             {
                 @Override
-                public void buildAndRegister()
+                public void buildAndRegister(IForgeRegistry<EntityComponentPlacer> registry)
                 {
-                    Instances.getComponentRegistries().getEntityPlacerRegistry().register(new EntityComponentPlacer(this));
+                    registry.register(new EntityComponentPlacer(this));
                 }
             };
         }

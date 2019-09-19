@@ -49,7 +49,7 @@ public class BuildTool extends Item
     public ActionResult<ItemStack> onItemRightClick(final World worldIn, final PlayerEntity playerIn, final Hand handIn)
     {
         final ItemStack itemstack = playerIn.getHeldItem(handIn);
-        if (!worldIn.isRemote())
+        if (worldIn.isRemote())
         {
             WindowBuildTool.open(playerIn.getPosition(), playerIn);
         }

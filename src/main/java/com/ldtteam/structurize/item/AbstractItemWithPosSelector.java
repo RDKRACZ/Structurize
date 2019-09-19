@@ -1,5 +1,6 @@
 package com.ldtteam.structurize.item;
 
+import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.util.LanguageHandler;
 import com.ldtteam.structurize.util.Utils;
 import net.minecraft.block.BlockState;
@@ -64,8 +65,13 @@ public abstract class AbstractItemWithPosSelector extends Item
     {
         final ItemStack itemstack = playerIn.getHeldItem(handIn);
         final CompoundNBT compound = itemstack.getOrCreateTag();
+        Instances.getLogger().info(worldIn.isRemote() + compound.getCompound(NBT_START_POS).toString() + compound.getCompound(NBT_END_POS).toString());
         return new ActionResult<>(
-            onAirRightClick(NBTUtil.readBlockPos(compound.getCompound(NBT_START_POS)), NBTUtil.readBlockPos(compound.getCompound(NBT_END_POS)), worldIn, playerIn),
+            onAirRightClick(
+                NBTUtil.readBlockPos(compound.getCompound(NBT_START_POS)),
+                NBTUtil.readBlockPos(compound.getCompound(NBT_END_POS)),
+                worldIn,
+                playerIn),
             itemstack);
     }
 
@@ -96,12 +102,8 @@ public abstract class AbstractItemWithPosSelector extends Item
     @Override
     public boolean canPlayerBreakBlockWhileHolding(final BlockState state, final World worldIn, final BlockPos pos, final PlayerEntity player)
     {
-        final ItemStack itemstack;
-        if (player.getHeldItemMainhand().getItem().equals(getRegisteredItemInstance()))
-        {
-            itemstack = player.getHeldItemMainhand();
-        }
-        else
+        ItemStack itemstack = player.getHeldItemMainhand();
+        if (!itemstack.getItem().equals(getRegisteredItemInstance()))
         {
             itemstack = player.getHeldItemOffhand();
         }

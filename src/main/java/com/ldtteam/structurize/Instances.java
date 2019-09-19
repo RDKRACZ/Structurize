@@ -6,6 +6,7 @@ import com.ldtteam.structurize.config.Configuration;
 import com.ldtteam.structurize.network.NetworkChannel;
 import com.ldtteam.structurize.pipeline.ComponentRegistries;
 import com.ldtteam.structurize.util.constants.GeneralConstants;
+import com.ldtteam.structurize.world.schematic.SchematicWorldType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import net.minecraftforge.api.distmarker.Dist;
@@ -24,6 +25,7 @@ public class Instances
     private static final OptifineCompat OPTIFINE_COMPAT;
     private static final EventRenderer EVENT_RENDERER;
     private static final ComponentRegistries COMPONENT_REGISTRIES;
+    private static final SchematicWorldType SCHEMATIC_WORLD_TYPE;
 
     static
     {
@@ -33,6 +35,7 @@ public class Instances
         OPTIFINE_COMPAT = DistExecutor.callWhenOn(Dist.CLIENT, () -> () -> new OptifineCompat());
         EVENT_RENDERER = DistExecutor.callWhenOn(Dist.CLIENT, () -> () -> new EventRenderer());
         COMPONENT_REGISTRIES = new ComponentRegistries();
+        SCHEMATIC_WORLD_TYPE = new SchematicWorldType();
     }
 
     /**
@@ -91,5 +94,13 @@ public class Instances
     public static ComponentRegistries getComponentRegistries()
     {
         return COMPONENT_REGISTRIES;
+    }
+
+    /**
+     * @return registered world type instance
+     */
+    public static SchematicWorldType getSchematicWorldType()
+    {
+        return SCHEMATIC_WORLD_TYPE;
     }
 }

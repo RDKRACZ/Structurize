@@ -5,8 +5,5 @@ import net.minecraft.item.Items;
 
 public class HangingEntityScanner
 {
-    public static void register()
-    {
-        ComponentScanner.EntityComponentScanner.newBuilder().setScanner(null).setRegistryName(Items.WHITE_BANNER.getRegistryName()).buildAndRegister();
-    }
+
 }
