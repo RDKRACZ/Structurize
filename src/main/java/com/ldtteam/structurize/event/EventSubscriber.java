@@ -4,7 +4,6 @@ import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.command.EntryPoint;
 import com.ldtteam.structurize.world.ModDimensions;
 import com.ldtteam.structurize.world.schematic.PlayerEvents;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

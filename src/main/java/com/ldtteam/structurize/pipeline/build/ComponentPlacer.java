@@ -1,7 +1,6 @@
 package com.ldtteam.structurize.pipeline.build;
 
 import java.util.List;
-import com.ldtteam.structurize.Instances;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.IFluidState;

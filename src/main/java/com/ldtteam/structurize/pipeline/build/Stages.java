@@ -52,7 +52,6 @@ public final class Stages
         PLACE_SOLID(StagedPlacer::placeSolid, StagedPlacer::nextStage),
         PLACE_NON_SOLID(StagedPlacer::placeNonSolid, StagedPlacer::nextStage),
         PLACE_FLUIDS(StagedPlacer::placeFluids, StagedPlacer::nextStage),
-        PLACE_TILE_ENTITIES(StagedPlacer::placeTileEntities, StagedPlacer::nextStage),
         PLACE_ENTITIES(StagedPlacer::placeEntities, StagedPlacer::nextStage),
         CLEAR_FALLING_SUPPORT(StagedPlacer::clearFallingSupport, StagedPlacer::nextStage),
         END_STAGE(StagedPlacer::endStage, null),

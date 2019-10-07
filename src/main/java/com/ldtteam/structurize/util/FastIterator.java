@@ -32,5 +32,5 @@ public interface FastIterator<E> extends Iterator<E>
         forNextRemaining(stopWhen, this::fastConsume);
     }
 
-    void fastConsume(final E placeAction);
+    void fastConsume(final E action);
 }
