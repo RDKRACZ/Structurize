@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.VertexBufferUploader;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
@@ -51,29 +52,33 @@ public class StructureTessellator
      */
     public void draw()
     {
+        preBlueprintDraw();
+
         GlStateManager.pushMatrix();
 
         this.buffer.bindBuffer();
 
-        preBlueprintDraw();
-
-        GlStateManager.bindTexture(Minecraft.getInstance().getTextureMap().getGlTextureId());
+        setupArrayPointers();
 
         this.buffer.drawArrays(GL_QUADS);
 
-        postBlueprintDraw();
+        GlStateManager.popMatrix();
 
         VertexBuffer.unbindBuffer();
 
-        GlStateManager.popMatrix();
+        GlStateManager.clearCurrentColor();
+
+        postBlueprintDraw();
     }
 
     private static void preBlueprintDraw()
     {
+        RenderHelper.disableStandardItemLighting();
+        Minecraft.getInstance().gameRenderer.disableLightmap();
+
         Instances.getOptifineCompat().preBlueprintDraw();
 
         GlStateManager.enableClientState(GL_VERTEX_ARRAY);
-
         GLX.glClientActiveTexture(GLX.GL_TEXTURE0);
         GlStateManager.enableClientState(GL_TEXTURE_COORD_ARRAY);
         GLX.glClientActiveTexture(GLX.GL_TEXTURE1);
@@ -81,6 +86,11 @@ public class StructureTessellator
         GLX.glClientActiveTexture(GLX.GL_TEXTURE0);
         GlStateManager.enableClientState(GL_COLOR_ARRAY);
 
+        GlStateManager.bindTexture(Minecraft.getInstance().getTextureMap().getGlTextureId());
+    }
+
+    private static void setupArrayPointers()
+    {
         // Optifine uses its one vertexformats.
         // It handles the setting of the pointers itself.
         if (Instances.getOptifineCompat().setupArrayPointers())
@@ -94,14 +104,10 @@ public class StructureTessellator
         GLX.glClientActiveTexture(GLX.GL_TEXTURE1);
         GlStateManager.texCoordPointer(LIGHT_TEX_COORD_COMPONENT_SIZE, GL_SHORT, VERTEX_SIZE, LIGHT_TEXT_COORD_COMPONENT_OFFSET);
         GLX.glClientActiveTexture(GLX.GL_TEXTURE0);
-
-        // GlStateManager.disableCull(); no need to disable cull
     }
 
     private void postBlueprintDraw()
     {
-        // GlStateManager.enableCull();
-
         for (final VertexFormatElement vertexformatelement : DefaultVertexFormats.BLOCK.getElements())
         {
             final VertexFormatElement.Usage vfeUsage = vertexformatelement.getUsage();

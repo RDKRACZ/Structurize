@@ -110,14 +110,14 @@ public class StructureRenderer
         {
             final BlockState bs = structureWorld.getBlockState(bp);
 
-            Minecraft.getInstance()
-                .getBlockRendererDispatcher()
-                .renderBlock(bs, bp, structureWorld, tess.getBuilder(), random, ModelDataManager.getModelData(structureWorld, bp));
-
             if (!bs.getFluidState().isEmpty())
             {
                 Minecraft.getInstance().getBlockRendererDispatcher().renderFluid(bp, structureWorld, tess.getBuilder(), bs.getFluidState());
             }
+
+            Minecraft.getInstance()
+                .getBlockRendererDispatcher()
+                .renderBlock(bs, bp, structureWorld, tess.getBuilder(), random, ModelDataManager.getModelData(structureWorld, bp));
         }
 
         tess.finishBuilding();

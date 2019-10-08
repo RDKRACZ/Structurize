@@ -76,7 +76,7 @@ public class ModItems
     private static class ModItemGroup extends ItemGroup
     {
         private Item icon;
-        private ItemStack latestItemStack;
+        private ItemStack latestItemStack = ItemStack.EMPTY;
 
         /**
          * Create default creative tab.

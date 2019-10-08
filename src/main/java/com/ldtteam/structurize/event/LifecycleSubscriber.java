@@ -3,6 +3,7 @@ package com.ldtteam.structurize.event;
 import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.block.ModBlocks;
 import com.ldtteam.structurize.item.ModItems;
+import com.ldtteam.structurize.pipeline.build.BuildProvider;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.BlockStateComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.EntityComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.FluidStateComponentPlacer;
@@ -74,6 +75,19 @@ public class LifecycleSubscriber
     {
         Instances.getLogger().warn("RegistryEvent.Register<ModDimension>");
         ModDimensions.registerModDimensions(event.getRegistry());
+    }
+
+    /**
+     * Called when BP are supposed to be registered.
+     *
+     * @param event event
+     */
+
+    @SubscribeEvent
+    public static void onBPRegistry(final RegistryEvent.Register<BuildProvider> event)
+    {
+        Instances.getLogger().warn("RegistryEvent.Register<BP>");
+        Instances.getComponentRegistries().registerDefaultBP(event.getRegistry());
     }
 
     /**
