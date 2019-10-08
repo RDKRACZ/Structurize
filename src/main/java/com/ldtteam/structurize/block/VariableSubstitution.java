@@ -15,7 +15,8 @@ public class VariableSubstitution extends Block
      */
     public VariableSubstitution()
     {
-        this(Properties.create(new Material(MaterialColor.WOOD, false, true, true, true, true, false, false, PushReaction.BLOCK)).hardnessAndResistance(1.0F));
+        this(Properties.create(new Material(MaterialColor.WOOD, false, true, true, true, true, false, false, PushReaction.BLOCK))
+            .hardnessAndResistance(1.0F));
     }
 
     /**

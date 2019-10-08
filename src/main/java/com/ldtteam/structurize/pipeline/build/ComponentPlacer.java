@@ -12,13 +12,22 @@ import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>> extends ForgeRegistryEntry<U>
+/**
+ * Used for placing various placeables.
+ * 
+ * @param <T> placeable
+ * @param <U> extending class
+ */
+public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>>extends ForgeRegistryEntry<U>
 {
     private final Placer<T> placer;
     private final Substitutions<T> substitutions;
     private final Requirements<T> requirements;
 
-    private ComponentPlacer(final String registryName, final Placer<T> placer, final Substitutions<T> substitutions, final Requirements<T> requirements)
+    private ComponentPlacer(final String registryName,
+        final Placer<T> placer,
+        final Substitutions<T> substitutions,
+        final Requirements<T> requirements)
     {
         this.placer = placer;
         this.substitutions = substitutions;
@@ -26,16 +35,43 @@ public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>> extends ForgeRe
         super.setRegistryName(registryName);
     }
 
+    /**
+     * Perform world IO placing.
+     *
+     * @param  thing                placeable
+     * @param  world                structure world
+     * @param  pos                  affected world pos
+     * @param  triggerPlayerActions false if placement should not cause special events, aka ghost placing
+     * @return                      true if succeeded, false otherwise
+     */
     public boolean place(final T thing, final World world, final BlockPos pos, final boolean triggerPlayerActions)
     {
         return placer.place(thing, world, pos, triggerPlayerActions);
     }
 
+    /**
+     * List of possible substitutions, not implemented yet, remove? replace? probably method for querying tag replacements, dunno.
+     * TODO: list of things instead RLs?
+     *
+     * @param  thing placeable
+     * @param  world structure world
+     * @param  pos   affected world pos
+     * @return
+     */
     public List<ResourceLocation> getSubstitutions(final T thing, final World world, final BlockPos pos)
     {
         return substitutions.getSubstitutions(thing, world, pos);
     }
 
+    /**
+     * List of requirements that would normal player have to pay for placing given placeable.
+     * 
+     * @param  thing                placeable
+     * @param  world                structure world
+     * @param  pos                  affected world pos
+     * @param  triggerPlayerActions false if placement of exactly same thing should not cause special events, aka ghost placing
+     * @return                      list of requirements for placing
+     */
     public List<ItemStack> getRequirements(final T thing, final World world, final BlockPos pos, final boolean triggerPlayerActions)
     {
         return requirements.getRequirements(thing, world, pos, triggerPlayerActions);
@@ -66,18 +102,30 @@ public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>> extends ForgeRe
         private Requirements<T> requirements;
         private String registryName;
 
+        /**
+         * @param  placer {@link ComponentPlacer#place()}
+         * @return        this
+         */
         public Builder<T, U> setPlacer(final Placer<T> placer)
         {
             this.placer = placer;
             return this;
         }
 
+        /**
+         * @param  substitutions {@link ComponentPlacer#getSubstitutions()}
+         * @return               this
+         */
         public Builder<T, U> setSubstitutions(final Substitutions<T> substitutions)
         {
             this.substitutions = substitutions;
             return this;
         }
 
+        /**
+         * @param  requirements {@link ComponentPlacer#getRequirements()}
+         * @return              this
+         */
         public Builder<T, U> setRequirements(final Requirements<T> requirements)
         {
             this.requirements = requirements;
@@ -116,6 +164,9 @@ public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>> extends ForgeRe
             return registryName;
         }
 
+        /**
+         * @param registry use appropriate events for registring
+         */
         public abstract void buildAndRegister(final IForgeRegistry<U> registry);
     }
 

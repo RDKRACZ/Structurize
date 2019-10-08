@@ -20,6 +20,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+/**
+ * Event data holder for build providers.
+ * Holds prepared structure.
+ */
 public class RawPlacer
 {
     protected final List<BlockState> structureBlockPalette;
@@ -52,6 +56,13 @@ public class RawPlacer
         structureWorld = event.getWorld();
     }
 
+    /**
+     * Prepares TileEntity for world placing.
+     *
+     * @param  teCompound TileEntity data
+     * @param  tePos      structure pos
+     * @return            constructed TileEntity and REAL world pos
+     */
     public Tuple<TileEntity, BlockPos> transformDataToTileEntity(final CompoundNBT teCompound, final BlockPos tePos)
     {
         final BlockPos worldPos = structurePosition.getAnchor().add(tePos);
@@ -63,6 +74,12 @@ public class RawPlacer
         return new Tuple<TileEntity, BlockPos>(te, worldPos);
     }
 
+    /**
+     * Prepares Entity for world placing.
+     * 
+     * @param  entityCompound entity data
+     * @return                constructed Entity and REAL world pos
+     */
     public Tuple<Entity, Vec3d> transformDataToEntity(final CompoundNBT entityCompound)
     {
         final Optional<EntityType<?>> type = EntityType.readEntityType(entityCompound);

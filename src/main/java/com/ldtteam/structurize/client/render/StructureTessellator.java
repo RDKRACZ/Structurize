@@ -11,6 +11,9 @@ import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import static org.lwjgl.opengl.GL11.*;
 
+/**
+ * Structure block tessellator
+ */
 public class StructureTessellator
 {
     private enum State
@@ -160,7 +163,7 @@ public class StructureTessellator
     {
         if (state != State.BUILDING)
         {
-            throw new IllegalStateException("Tessellator already build before");
+            throw new IllegalStateException("Tessellator already built before");
         }
         this.builder.finishDrawing();
         state = State.READY;
@@ -177,11 +180,6 @@ public class StructureTessellator
             this.vboUploader.draw(this.builder);
             state = State.BUILT;
         }
-    }
-
-    public VertexBuffer getBuffer()
-    {
-        return buffer;
     }
 
     public boolean isBuilt()

@@ -8,7 +8,6 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
-import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 
 /**
@@ -42,7 +41,7 @@ public class StructureChunk extends Chunk
 
     @Nullable
     @Override
-    public TileEntity getTileEntity(@NotNull final BlockPos pos, final CreateEntityType creationMode)
+    public TileEntity getTileEntity(final BlockPos pos, final CreateEntityType creationMode)
     {
         return world.getTileEntity(pos);
     }

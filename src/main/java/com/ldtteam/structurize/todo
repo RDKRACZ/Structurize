@@ -1,0 +1,19 @@
+just for sure:
+
+make sure things that should survive world save/load actually do survive
+
+make sure rotation and mirroring is the same in every possible context across every possible pipeline¨
+
+=== plan ===
+pipeline for scanning
+entry point for both pipelines, check registry things are done properly
+pipeline sync/save&load layers (placer percentage progress)
+pipeline server/client spliting (should be almost done in previous point)
+structurize world and schematic file management
+online repository
+
+=== features not in plan ===
+better placeholders and components testing
+BPs configurations + gui
+box events, caliper box, things like that
+move deco blocks into standalone mod, allow for chisel things etc. (vanilla?)

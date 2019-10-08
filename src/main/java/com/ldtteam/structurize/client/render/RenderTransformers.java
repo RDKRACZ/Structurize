@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import org.jetbrains.annotations.NotNull;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 
@@ -33,9 +32,8 @@ public class RenderTransformers
      * @param transformPredicate predicate to check if this transformer needs to be applied.
      * @param transformHandler   transformer
      */
-    public static void addBlockStateTransformer(
-        @NotNull final Predicate<BlockState> transformPredicate,
-        @NotNull final Function<BlockState, BlockState> transformHandler)
+    public static void addBlockStateTransformer(final Predicate<BlockState> transformPredicate,
+        final Function<BlockState, BlockState> transformHandler)
     {
         blockStateTransformers.put(transformPredicate, transformHandler);
     }
@@ -46,9 +44,8 @@ public class RenderTransformers
      * @param transformPredicate predicate to check if this transformer needs to be applied.
      * @param transformHandler   transformer
      */
-    public static void addTileEntityTransformer(
-        @NotNull final Predicate<CompoundNBT> transformPredicate,
-        @NotNull final Function<CompoundNBT, CompoundNBT> transformHandler)
+    public static void addTileEntityTransformer(final Predicate<CompoundNBT> transformPredicate,
+        final Function<CompoundNBT, CompoundNBT> transformHandler)
     {
         tileEntityTransformers.put(transformPredicate, transformHandler);
     }
@@ -59,9 +56,8 @@ public class RenderTransformers
      * @param transformPredicate predicate to check if this transformer needs to be applied.
      * @param transformHandler   transformer
      */
-    public static void addEntityTransformer(
-        @NotNull final Predicate<CompoundNBT> transformPredicate,
-        @NotNull final Function<CompoundNBT, CompoundNBT> transformHandler)
+    public static void addEntityTransformer(final Predicate<CompoundNBT> transformPredicate,
+        final Function<CompoundNBT, CompoundNBT> transformHandler)
     {
         entityTransformers.put(transformPredicate, transformHandler);
     }
@@ -69,10 +65,10 @@ public class RenderTransformers
     /**
      * Process blockState. Checks transformers and applies first one found.
      *
-     * @param blockState blockState to transform
-     * @return transformed blockState
+     * @param  blockState blockState to transform
+     * @return            transformed blockState
      */
-    public static BlockState transformBlockState(@NotNull final BlockState blockState)
+    public static BlockState transformBlockState(final BlockState blockState)
     {
         if (blockStateTransformers.isEmpty())
         {
@@ -91,10 +87,10 @@ public class RenderTransformers
     /**
      * Process tileEntity. Checks transformers and applies first one found.
      *
-     * @param tileEntity tileEntity to transform
-     * @return transformed tileEntity
+     * @param  tileEntity tileEntity to transform
+     * @return            transformed tileEntity
      */
-    public static CompoundNBT transformTileEntity(@NotNull final CompoundNBT tileEntity)
+    public static CompoundNBT transformTileEntity(final CompoundNBT tileEntity)
     {
         if (tileEntityTransformers.isEmpty())
         {
@@ -113,10 +109,10 @@ public class RenderTransformers
     /**
      * Process entity. Checks transformers and applies first one found.
      *
-     * @param entity entity to transform
-     * @return transformed entity
+     * @param  entity entity to transform
+     * @return        transformed entity
      */
-    public static CompoundNBT transformEntity(@NotNull final CompoundNBT entity)
+    public static CompoundNBT transformEntity(final CompoundNBT entity)
     {
         if (entityTransformers.isEmpty())
         {

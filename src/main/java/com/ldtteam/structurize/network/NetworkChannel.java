@@ -30,7 +30,7 @@ public class NetworkChannel
     /**
      * Creates a new instance of network channel.
      *
-     * @param channelName unique channel name
+     * @param  channelName              unique channel name
      * @throws IllegalArgumentException if channelName already exists
      */
     public NetworkChannel(final String channelName)
@@ -132,7 +132,7 @@ public class NetworkChannel
      *
      * @param msg message to send
      * @param pos target position and radius
-     * @see TargetPoint
+     * @see       TargetPoint
      */
     public void sendToPosition(final IMessage msg, final TargetPoint pos)
     {

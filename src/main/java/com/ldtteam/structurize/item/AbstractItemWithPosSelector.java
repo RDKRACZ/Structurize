@@ -1,6 +1,5 @@
 package com.ldtteam.structurize.item;
 
-import com.ldtteam.structurize.Instances;
 import com.ldtteam.structurize.util.LanguageHandler;
 import com.ldtteam.structurize.util.Utils;
 import net.minecraft.block.BlockState;
@@ -39,11 +38,11 @@ public abstract class AbstractItemWithPosSelector extends Item
     /**
      * Is called when player air-right-clicks with item.
      *
-     * @param start    first pos
-     * @param end      second pos
-     * @param worldIn  event world
-     * @param playerIn event player
-     * @return event result, typically success
+     * @param  start    first pos
+     * @param  end      second pos
+     * @param  worldIn  event world
+     * @param  playerIn event player
+     * @return          event result, typically success
      */
     public abstract ActionResultType onAirRightClick(BlockPos start, BlockPos end, World worldIn, PlayerEntity playerIn);
 
@@ -65,10 +64,8 @@ public abstract class AbstractItemWithPosSelector extends Item
     {
         final ItemStack itemstack = playerIn.getHeldItem(handIn);
         final CompoundNBT compound = itemstack.getOrCreateTag();
-        Instances.getLogger().info(worldIn.isRemote() + compound.getCompound(NBT_START_POS).toString() + compound.getCompound(NBT_END_POS).toString());
         return new ActionResult<>(
-            onAirRightClick(
-                NBTUtil.readBlockPos(compound.getCompound(NBT_START_POS)),
+            onAirRightClick(NBTUtil.readBlockPos(compound.getCompound(NBT_START_POS)),
                 NBTUtil.readBlockPos(compound.getCompound(NBT_END_POS)),
                 worldIn,
                 playerIn),

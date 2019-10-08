@@ -15,6 +15,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+/**
+ * Various classes used in StagedPlacer.
+ */
 public class StagedPlacerUtils
 {
     public static class BsWithTePlaceAction extends PlaceAction<BlockStateWithTileEntity>
@@ -92,31 +95,49 @@ public class StagedPlacerUtils
             this.pos = pos;
         }
 
+        /**
+         * List of requirements that would normal player have to pay for placing given placeable.
+         */
         public Supplier<List<ItemStack>> getRequirements()
         {
             return requirements;
         }
 
+        /**
+         * Perform world IO placing.
+         */
         public void perform()
         {
             action.run();
         }
 
+        /**
+         * Returns BlockState,FluidState,TileEntity,Entity, modifying this modifies result of requirements and perform methods
+         */
         public T getObjectToPlace()
         {
             return objectToPlace;
         }
 
+        /**
+         * objectToPlace registry name
+         */
         public ResourceLocation getObjectRegistryName()
         {
             return objectRegistryName;
         }
 
+        /**
+         * target world reference
+         */
         public World getWorld()
         {
             return world;
         }
 
+        /**
+         * target world block pos reference
+         */
         public BlockPos getPos()
         {
             return pos;

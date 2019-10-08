@@ -14,7 +14,7 @@ import static com.ldtteam.structurize.block.ModBlocks.*;
  */
 public class ModItems
 {
-    private static final ModItemGroup CREATIVE_TAB = new ModItemGroup();
+    public static final ModItemGroup CREATIVE_TAB = new ModItemGroup();
 
     public static final BuildTool BUILD_TOOL = new BuildTool(CREATIVE_TAB);
     public static final ScanTool SCAN_TOOL = new ScanTool(CREATIVE_TAB);
@@ -50,8 +50,8 @@ public class ModItems
     /**
      * Creates blockitem from given block.
      *
-     * @param block already registered block
-     * @return new BlockItem
+     * @param  block already registered block
+     * @return       new BlockItem
      */
     private static BlockItem newBI(final Block block)
     {
@@ -61,9 +61,9 @@ public class ModItems
     /**
      * Creates blockitem from given block and item group.
      *
-     * @param block     already registered block
-     * @param itemGroup creative tab
-     * @return new BlockItem
+     * @param  block     already registered block
+     * @param  itemGroup creative tab
+     * @return           new BlockItem
      */
     private static BlockItem newBI(final Block block, final ItemGroup itemGroup)
     {
@@ -76,6 +76,7 @@ public class ModItems
     private static class ModItemGroup extends ItemGroup
     {
         private Item icon;
+        private ItemStack latestItemStack;
 
         /**
          * Create default creative tab.
@@ -88,17 +89,21 @@ public class ModItems
         /**
          * Sets tab icon.
          *
-         * @param icon tab icon
+         * @param  iconIn tab icon
+         * @return        this
          */
-        private void setIcon(final Item icon)
+        public ModItemGroup setIcon(final Item iconIn)
         {
-            this.icon = icon;
+            icon = iconIn;
+            latestItemStack.setCount(0);
+            return this;
         }
 
         @Override
         public ItemStack createIcon()
         {
-            return new ItemStack(icon);
+            latestItemStack = new ItemStack(icon);
+            return latestItemStack;
         }
     }
 }

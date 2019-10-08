@@ -75,8 +75,7 @@ public class Blueprint
      * @param tileEntities the tileEntities.
      * @param requiredMods the required mods.
      */
-    protected Blueprint(
-        final StructureBB structBB,
+    protected Blueprint(final StructureBB structBB,
         final List<BlockState> palette,
         final short[][][] structure,
         final List<CompoundNBT> tileEntities,
@@ -96,8 +95,7 @@ public class Blueprint
      * @param tileEntities the tileEntities.
      * @param requiredMods the required mods.
      */
-    protected Blueprint(
-        final short sizeX,
+    protected Blueprint(final short sizeX,
         final short sizeY,
         final short sizeZ,
         final List<BlockState> palette,
@@ -221,8 +219,8 @@ public class Blueprint
     }
 
     /**
-     * @param entitiesIn an array of serialized TileEntities (the Pos tag need to be localized to coordinates within the structure)
-     * @return this object.
+     * @param  entitiesIn an array of serialized TileEntities (the Pos tag need to be localized to coordinates within the structure)
+     * @return            this object.
      */
     public Blueprint setEntities(final List<CompoundNBT> entitiesIn)
     {
@@ -249,8 +247,8 @@ public class Blueprint
     /**
      * Sets the name of the Structure.
      *
-     * @param nameIn the name to set.
-     * @return this object.
+     * @param  nameIn the name to set.
+     * @return        this object.
      */
     public Blueprint setName(final String nameIn)
     {
@@ -269,8 +267,8 @@ public class Blueprint
     /**
      * Sets an Array of all architects for this structure.
      *
-     * @param architectsIn an array of architects.
-     * @return this blueprint.
+     * @param  architectsIn an array of architects.
+     * @return              this blueprint.
      */
     public Blueprint setArchitects(final List<String> architectsIn)
     {
@@ -290,8 +288,8 @@ public class Blueprint
     /**
      * Sets the missing mods.
      *
-     * @param missingModsIn the missing mods list.
-     * @return this object.
+     * @param  missingModsIn the missing mods list.
+     * @return               this object.
      */
     public Blueprint setMissingMods(final List<String> missingModsIn)
     {
@@ -378,9 +376,9 @@ public class Blueprint
     /**
      * Calculate the transformed size from a blockpos.
      *
-     * @param pos      the pos to transform
-     * @param rotation the rotation to apply.
-     * @return the resulting size.
+     * @param  pos      the pos to transform
+     * @param  rotation the rotation to apply.
+     * @return          the resulting size.
      */
     public static BlockPos transformedSize(final BlockPos pos, final Rotation rotation)
     {
@@ -397,12 +395,12 @@ public class Blueprint
     /**
      * Transforms a blockpos with mirror and rotation.
      *
-     * @param x        the x input.
-     * @param y        the y input.
-     * @param z        the z input.
-     * @param mirror   the mirror.
-     * @param rotation the rotation.
-     * @return the resulting position.
+     * @param  x        the x input.
+     * @param  y        the y input.
+     * @param  z        the z input.
+     * @param  mirror   the mirror.
+     * @param  rotation the rotation.
+     * @return          the resulting position.
      */
     public static BlockPos transformedBlockPos(final int x, final int y, final int z, final Mirror mirror, final Rotation rotation)
     {
@@ -427,15 +425,14 @@ public class Blueprint
     /**
      * Transform an entity and rotate it.
      *
-     * @param entityInfo the entity nbt.
-     * @param world      the world.
-     * @param pos        the position.
-     * @param rotation   the wanted rotation.
-     * @param mirror     the mirror.
-     * @return the updated nbt.
+     * @param  entityInfo the entity nbt.
+     * @param  world      the world.
+     * @param  pos        the position.
+     * @param  rotation   the wanted rotation.
+     * @param  mirror     the mirror.
+     * @return            the updated nbt.
      */
-    private CompoundNBT transformEntityInfoWithSettings(
-        final CompoundNBT entityInfo,
+    private CompoundNBT transformEntityInfoWithSettings(final CompoundNBT entityInfo,
         final World world,
         final BlockPos pos,
         final Rotation rotation,
@@ -452,7 +449,8 @@ public class Blueprint
             if (finalEntity instanceof HangingEntity)
             {
                 final BlockPos currentPos = ((HangingEntity) finalEntity).getHangingPosition();
-                final BlockPos entityPos = Blueprint.transformedBlockPos(currentPos.getX(), currentPos.getY(), currentPos.getZ(), mirror, rotation).add(pos);
+                final BlockPos entityPos =
+                    Blueprint.transformedBlockPos(currentPos.getX(), currentPos.getY(), currentPos.getZ(), mirror, rotation).add(pos);
 
                 finalEntity.posX = entityVec.x;
                 finalEntity.posY = entityVec.y;
@@ -474,10 +472,10 @@ public class Blueprint
     /**
      * Transform a Vec3d with rotation and mirror.
      *
-     * @param rotation the rotation.
-     * @param mirror   the mirror.
-     * @param vec      the vec to transform.
-     * @return the result.
+     * @param  rotation the rotation.
+     * @param  mirror   the mirror.
+     * @param  vec      the vec to transform.
+     * @return          the result.
      */
     private static Vec3d transformedVec3d(final Rotation rotation, final Mirror mirror, final Vec3d vec)
     {

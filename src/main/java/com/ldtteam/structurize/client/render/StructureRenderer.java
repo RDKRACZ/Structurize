@@ -102,8 +102,7 @@ public class StructureRenderer
         tess.startBuilding();
 
         final Random random = new Random();
-        final BlockPos structEnd = new BlockPos(
-            structureWorld.getStructure().getXsize() - 1,
+        final BlockPos structEnd = new BlockPos(structureWorld.getStructure().getXsize() - 1,
             structureWorld.getStructure().getYsize() - 1,
             structureWorld.getStructure().getZsize() - 1);
 
@@ -186,7 +185,9 @@ public class StructureRenderer
 
             // Draw entities
             entities.forEach(entity -> {
-                Minecraft.getInstance().getRenderManager().renderEntity(entity, entity.posX, entity.posY, entity.posZ, entity.rotationYaw, partialTicks, true);
+                Minecraft.getInstance()
+                    .getRenderManager()
+                    .renderEntity(entity, entity.posX, entity.posY, entity.posZ, entity.rotationYaw, partialTicks, true);
                 Minecraft.getInstance().gameRenderer.disableLightmap();
                 GlStateManager.disableFog();
             });
@@ -209,7 +210,8 @@ public class StructureRenderer
     private List<TileEntity> instantiateTileEntities()
     {
         final List<TileEntity> result = new ArrayList<>();
-        final BlockPos end = new BlockPos(event.getStructure().getXsize() - 1, event.getStructure().getYsize() - 1, event.getStructure().getZsize() - 1);
+        final BlockPos end =
+            new BlockPos(event.getStructure().getXsize() - 1, event.getStructure().getYsize() - 1, event.getStructure().getZsize() - 1);
 
         for (final BlockPos bp : new CubePosIterator(BlockPos.ZERO, end))
         {
@@ -242,8 +244,8 @@ public class StructureRenderer
     /**
      * Creates new Entity from given nbt data.
      *
-     * @param entityData entity nbt data
-     * @return entity if success, null otherwise
+     * @param  entityData entity nbt data
+     * @return            entity if success, null otherwise
      */
     @Nullable
     private Entity constructEntity(@Nullable final CompoundNBT entityData)

@@ -10,10 +10,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 /**
- * Holds necessary informations of structrure placement event.
+ * Holds necessary information of structure placement event.
  * Created when any building tool is opened.
- * Passed into BuildProvider after placement data is confirmed by player.
- * Destroyed when BuildProvider finished its job.
+ * Passed into BuildProvider after placement is confirmed by player.
+ * Destroyed when being passed to BuildProvider.
  *
  * @param <T> DataStructureProvider type
  */
@@ -44,15 +44,17 @@ public class EventInfoHolder<T extends IStructureDataProvider>
     /**
      * Creates blueprint event.
      *
-     * @param anchorPos position where should structure begin
-     * @param world     world of player
-     * @return new blueprint event
+     * @param  anchorPos position where should structure begin
+     * @param  world     world of player
+     * @return           new blueprint event
      */
     public static EventInfoHolder<BlueprintStructureDataProvider> createBlueprintEvent(final BlockPos anchorPos, final World world)
     {
-        final EventInfoHolder<BlueprintStructureDataProvider> result = new EventInfoHolder<>(BlueprintStructureDataProvider.create(), anchorPos, world);
+        final EventInfoHolder<BlueprintStructureDataProvider> result =
+            new EventInfoHolder<>(BlueprintStructureDataProvider.create(), anchorPos, world);
         result.getStructure().setEvent(result);
-        result.getStructure().setStructurePath(Minecraft.getInstance().gameDir.toPath().resolve("structurize").resolve("tempschem.blueprint").toAbsolutePath());
+        result.getStructure()
+            .setStructurePath(Minecraft.getInstance().gameDir.toPath().resolve("structurize").resolve("tempschem.blueprint").toAbsolutePath());
         return result;
     }
 
@@ -66,7 +68,7 @@ public class EventInfoHolder<T extends IStructureDataProvider>
      */
     public void passToBuildProvider(final UUID playerUUID)
     {
-
+        // TODO: this and that
     }
 
     /**

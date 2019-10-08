@@ -52,8 +52,7 @@ public class StructureWorld extends World implements IBlockReader
      */
     public StructureWorld(final EventInfoHolder<?> event)
     {
-        super(
-            Minecraft.getInstance().world.getWorldInfo(),
+        super(Minecraft.getInstance().world.getWorldInfo(),
             Minecraft.getInstance().world.dimension.getType(),
             new BiFunction<World, Dimension, AbstractChunkProvider>()
             {
@@ -180,8 +179,7 @@ public class StructureWorld extends World implements IBlockReader
     }
 
     @Override
-    public void playSound(
-        @Nullable final PlayerEntity player,
+    public void playSound(@Nullable final PlayerEntity player,
         final double x,
         final double y,
         final double z,
@@ -190,19 +188,16 @@ public class StructureWorld extends World implements IBlockReader
         final float volume,
         final float pitch)
     {
-
     }
 
     @Override
-    public void playMovingSound(
-        @Nullable final PlayerEntity player,
+    public void playMovingSound(@Nullable final PlayerEntity player,
         final Entity entity,
         final SoundEvent eventIn,
         final SoundCategory category,
         final float volume,
         final float pitch)
     {
-
     }
 
     @Override
@@ -232,9 +227,11 @@ public class StructureWorld extends World implements IBlockReader
     }
 
     @Override
-    public void notifyBlockUpdate(@NotNull final BlockPos pos, @NotNull final BlockState oldState, @NotNull final BlockState newState, final int flags)
+    public void notifyBlockUpdate(@NotNull final BlockPos pos,
+        @NotNull final BlockState oldState,
+        @NotNull final BlockState newState,
+        final int flags)
     {
-
     }
 
     @NotNull
@@ -261,7 +258,6 @@ public class StructureWorld extends World implements IBlockReader
     @Override
     public void playEvent(@Nullable final PlayerEntity player, final int type, final BlockPos pos, final int data)
     {
-
     }
 
     @Nullable
@@ -274,7 +270,6 @@ public class StructureWorld extends World implements IBlockReader
     @Override
     public void registerMapData(@NotNull final MapData mapDataIn)
     {
-
     }
 
     @Override
@@ -286,7 +281,6 @@ public class StructureWorld extends World implements IBlockReader
     @Override
     public void sendBlockBreakProgress(final int breakerId, @NotNull final BlockPos pos, final int progress)
     {
-
     }
 
     @NotNull

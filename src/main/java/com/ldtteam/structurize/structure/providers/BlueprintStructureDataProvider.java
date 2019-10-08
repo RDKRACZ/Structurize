@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import com.ldtteam.structurize.structure.blueprint.Blueprint;
 import com.ldtteam.structurize.structure.blueprint.BlueprintUtils;
-import com.ldtteam.structurize.block.IAnchorBlock;
 import com.ldtteam.structurize.pipeline.build.EventInfoHolder;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
@@ -19,15 +18,16 @@ import net.minecraft.util.math.BlockPos;
  */
 public class BlueprintStructureDataProvider implements IStructureDataProvider
 {
+    private EventInfoHolder<BlueprintStructureDataProvider> event;
+
     private Blueprint blueprint;
     private Path blueprintPath;
-    private EventInfoHolder<BlueprintStructureDataProvider> event;
+
     private BlockPos mirrorRotationAnchor = null;
     private Map<BlockPos, CompoundNBT> transformedTEs = null;
 
     private BlueprintStructureDataProvider()
-    {
-    }
+    {}
 
     /**
      * Creates new structure provider.
@@ -77,23 +77,25 @@ public class BlueprintStructureDataProvider implements IStructureDataProvider
     {
         if (mirrorRotationAnchor == null)
         {
-            short index = 0;
-            for (final BlockState bs : getBlockPalette())
-            {
-                if (bs.getBlock() instanceof IAnchorBlock)
-                {
-                    break;
-                }
-                index++;
-            }
-            for (final BlockPos pos : event.getPosition().getZeroBasedPosIterator())
-            {
-                if (getBlocks()[pos.getY()][pos.getZ()][pos.getX()] == index)
-                {
-                    mirrorRotationAnchor = pos;
-                    break;
-                }
-            }
+            /*
+             * short index = 0;
+             * for (final BlockState bs : getBlockPalette())
+             * {
+             * if (bs.getBlock() instanceof IAnchorBlock)
+             * {
+             * break;
+             * }
+             * index++;
+             * }
+             * for (final BlockPos pos : event.getPosition().getZeroBasedPosIterator())
+             * {
+             * if (getBlocks()[pos.getY()][pos.getZ()][pos.getX()] == index)
+             * {
+             * mirrorRotationAnchor = pos;
+             * break;
+             * }
+             * }
+             */
             if (mirrorRotationAnchor == null)
             {
                 mirrorRotationAnchor = new BlockPos(getXsize() / 2, getYsize() / 2, getZsize() / 2);

@@ -8,7 +8,6 @@ import net.minecraftforge.common.ForgeConfigSpec;
  */
 public class CommonConfiguration extends AbstractConfiguration
 {
-
     /**
      * Builds common configuration.
      *

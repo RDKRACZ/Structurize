@@ -76,7 +76,7 @@ public class OptifineCompat
      */
     private void setupReflectedMethodReferences() throws ClassNotFoundException, NoSuchMethodException, NoSuchFieldException
     {
-        final Class<?> configClass = Class.forName("Config");
+        final Class<?> configClass = Class.forName("net.optifine.Config");
         final Class<?> shaderRenderClass = Class.forName("net.optifine.shaders.ShadersRender");
         final Class<?> sVertexBuilderClass = Class.forName("net.optifine.shaders.SVertexBuilder");
         final Class<?> shadersClass = Class.forName("net.optifine.shaders.Shaders");

@@ -33,8 +33,8 @@ public class EventRenderer
     /**
      * Adds active event for rendering. Use
      *
-     * @param event new event
-     * @return whether addition succeeded or not
+     * @param  event new event
+     * @return       whether addition succeeded or not
      */
     public boolean addActiveEvent(final EventInfoHolder<?> event)
     {
@@ -97,7 +97,8 @@ public class EventRenderer
     /**
      * Renders event onto player's screen.
      *
-     * @param event event to render
+     * @param event        event to render
+     * @param partialTicks render time between two logic ticks
      */
     private void renderEvent(final EventInfoHolder<?> event, final float partialTicks)
     {
@@ -110,6 +111,7 @@ public class EventRenderer
 
     /**
      * Renders white structure BB.
+     * TODO: create special renderer and add ground level entrance face etc.
      *
      * @param event event to render
      * @param view  screen view

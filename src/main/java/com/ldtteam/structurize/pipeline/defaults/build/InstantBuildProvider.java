@@ -22,7 +22,7 @@ public class InstantBuildProvider extends BuildProvider
     }
 
     @Override
-    public void build(final RawPlacer placerIn)
+    public void build(final RawPlacer placerIn, final boolean worldLoad)
     {
         final LinkedList<StageData<?, StagedPlacer>> stages = StagedPlacer.createDefaultStages(placeInsteadUsePlaceholders.getValue());
         // stages.removeFirst(); // don't need the clean phase

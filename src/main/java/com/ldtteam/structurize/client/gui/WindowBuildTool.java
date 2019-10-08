@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 
 /**
  * Window for {@link BuildTool}
+ * TODO: guis :)
  */
 public class WindowBuildTool
 {

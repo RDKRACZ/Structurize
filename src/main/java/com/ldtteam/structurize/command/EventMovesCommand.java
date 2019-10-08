@@ -11,13 +11,17 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.arguments.BlockPosArgument;
 import net.minecraft.util.math.BlockPos;
 
+/**
+ * Temporary util class
+ */
 public class EventMovesCommand extends AbstractCommand
 {
     private static final String POS_ARG = "movepos";
 
     protected static LiteralArgumentBuilder<CommandSource> build()
     {
-        return newLiteral("renderEvents").then(newLiteral("moveCurrent").then(newArgument(POS_ARG, BlockPosArgument.blockPos()).executes(s -> move(s))))
+        return newLiteral("renderEvents")
+            .then(newLiteral("moveCurrent").then(newArgument(POS_ARG, BlockPosArgument.blockPos()).executes(s -> move(s))))
             .then(newLiteral("rotateCWcurrent").executes(s -> rotateCW(s)))
             .then(newLiteral("rotateCCWcurrent").executes(s -> rotateCCW(s)))
             .then(newLiteral("mirrorXCurrent").executes(s -> mirrorX(s)))
@@ -76,7 +80,7 @@ public class EventMovesCommand extends AbstractCommand
     {
         try
         {
-            new InstantBuildProvider().build(new RawPlacer(WindowBuildTool.getEvent()));
+            new InstantBuildProvider().build(new RawPlacer(WindowBuildTool.getEvent()), false);
             WindowBuildTool.closeAndCancel();
         }
         catch (final Exception e)

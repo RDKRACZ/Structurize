@@ -61,9 +61,9 @@ public class Caliper extends AbstractItemWithPosSelector
     /**
      * Builds chat message.
      *
-     * @param start pos
-     * @param end   pos
-     * @return chat message string
+     * @param  start pos
+     * @param  end   pos
+     * @return       chat message string
      */
     private String buildPlayerMessage(final BlockPos start, final BlockPos end)
     {
@@ -120,5 +120,4 @@ public class Caliper extends AbstractItemWithPosSelector
         }
         return msg.toString();
     }
-
 }

@@ -1,10 +1,12 @@
 package com.ldtteam.structurize.pipeline;
 
+import com.ldtteam.structurize.pipeline.build.BuildProvider;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.BlockStateComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.EntityComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.FluidStateComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.TileEntityComponentPlacer;
 import com.ldtteam.structurize.pipeline.defaults.build.DefaultPlacers;
+import com.ldtteam.structurize.pipeline.defaults.build.InstantBuildProvider;
 import com.ldtteam.structurize.pipeline.defaults.scan.DefaultScanners;
 import com.ldtteam.structurize.pipeline.scan.ComponentScanner.BlockStateComponentScanner;
 import com.ldtteam.structurize.pipeline.scan.ComponentScanner.EntityComponentScanner;
@@ -28,6 +30,7 @@ public class ComponentRegistries
     private final IForgeRegistry<FluidStateComponentPlacer> fluidStatePlacerRegistry;
     private final IForgeRegistry<TileEntityComponentPlacer> tileEntityPlacerRegistry;
     private final IForgeRegistry<EntityComponentPlacer> entityPlacerRegistry;
+    private final IForgeRegistry<BuildProvider> buildProviderRegistry;
 
     public ComponentRegistries()
     {
@@ -38,6 +41,7 @@ public class ComponentRegistries
         fluidStatePlacerRegistry = buildRegistry(FluidStateComponentPlacer.class, "fluidstate_placers").create();
         tileEntityPlacerRegistry = buildRegistry(TileEntityComponentPlacer.class, "tileentity_placers").create();
         entityPlacerRegistry = buildRegistry(EntityComponentPlacer.class, "entity_placers").create();
+        buildProviderRegistry = buildRegistry(BuildProvider.class, "build_providers").create();
     }
 
     protected static <T extends IForgeRegistryEntry<T>> RegistryBuilder<T> buildRegistry(final Class<T> clazz, final String name)
@@ -84,6 +88,11 @@ public class ComponentRegistries
         DefaultPlacers.getDefaultEntityPlacer().setRegistryName(DEFAULT_KEY_STRING).buildAndRegister(registry);
     }
 
+    public void registerDefaultBP(final IForgeRegistry<BuildProvider> registry)
+    {
+        registry.registerAll(new InstantBuildProvider().setRegistryName(DEFAULT_KEY_STRING));
+    }
+
     public void unfreeze()
     {
         ((ForgeRegistry<BlockStateComponentScanner>) blockStateScannerRegistry).unfreeze();
@@ -93,6 +102,7 @@ public class ComponentRegistries
         ((ForgeRegistry<FluidStateComponentPlacer>) fluidStatePlacerRegistry).unfreeze();
         ((ForgeRegistry<TileEntityComponentPlacer>) tileEntityPlacerRegistry).unfreeze();
         ((ForgeRegistry<EntityComponentPlacer>) entityPlacerRegistry).unfreeze();
+        ((ForgeRegistry<BuildProvider>) buildProviderRegistry).unfreeze();
     }
 
     public void freeze()
@@ -104,6 +114,7 @@ public class ComponentRegistries
         ((ForgeRegistry<FluidStateComponentPlacer>) fluidStatePlacerRegistry).freeze();
         ((ForgeRegistry<TileEntityComponentPlacer>) tileEntityPlacerRegistry).freeze();
         ((ForgeRegistry<EntityComponentPlacer>) entityPlacerRegistry).freeze();
+        ((ForgeRegistry<BuildProvider>) buildProviderRegistry).freeze();
     }
 
     public IForgeRegistry<BlockStateComponentScanner> getBlockStateScannerRegistry()
@@ -139,5 +150,10 @@ public class ComponentRegistries
     public IForgeRegistry<EntityComponentPlacer> getEntityPlacerRegistry()
     {
         return entityPlacerRegistry;
+    }
+
+    public IForgeRegistry<BuildProvider> getBuildProviderRegistry()
+    {
+        return buildProviderRegistry;
     }
 }

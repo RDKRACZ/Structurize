@@ -188,6 +188,7 @@ public class LifecycleSubscriber
     public static void onClientInit(final FMLClientSetupEvent event)
     {
         Instances.getLogger().warn("FMLClientSetupEvent");
+        Instances.getOptifineCompat().intialize();
     }
 
     /**

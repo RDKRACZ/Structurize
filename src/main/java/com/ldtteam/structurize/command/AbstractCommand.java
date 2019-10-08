@@ -29,8 +29,8 @@ public abstract class AbstractCommand
     /**
      * Creates new subcommand, used for subcommands and type picking.
      *
-     * @param name subcommand name
-     * @return new node builder
+     * @param  name subcommand name
+     * @return      new node builder
      */
     protected static LiteralArgumentBuilder<CommandSource> newLiteral(final String name)
     {
@@ -40,10 +40,10 @@ public abstract class AbstractCommand
     /**
      * Creates new command argument, used for collection selector, number picker etc.
      *
-     * @param <T>  argument class type
-     * @param name argument name, aka description/alias, but it's also id key to get argument value from command during execution
-     * @param type argument type, see net.minecraft.command.arguments
-     * @return new node builder
+     * @param  <T>  argument class type
+     * @param  name argument name, aka description/alias, but it's also id key to get argument value from command during execution
+     * @param  type argument type, see net.minecraft.command.arguments
+     * @return      new node builder
      */
     protected static <T> RequiredArgumentBuilder<CommandSource, T> newArgument(final String name, final ArgumentType<T> type)
     {
@@ -68,7 +68,8 @@ public abstract class AbstractCommand
      */
     public static void throwSyntaxException(final String key, final Object... format) throws CommandSyntaxException
     {
-        throw new CommandSyntaxException(new StructurizeCommandExceptionType(), new LiteralMessage(LanguageHandler.translateKeyWithFormat(key, format)));
+        throw new CommandSyntaxException(new StructurizeCommandExceptionType(),
+            new LiteralMessage(LanguageHandler.translateKeyWithFormat(key, format)));
     }
 
     /**
@@ -115,8 +116,8 @@ public abstract class AbstractCommand
         /**
          * Adds new tree as leaf into this tree.
          *
-         * @param tree new tree to add
-         * @return this
+         * @param  tree new tree to add
+         * @return      this
          */
         protected CommandTree addNode(final CommandTree tree)
         {
@@ -127,8 +128,8 @@ public abstract class AbstractCommand
         /**
          * Adds new command as leaf into this tree.
          *
-         * @param command new commnad to add
-         * @return this
+         * @param  command new commnad to add
+         * @return         this
          */
         protected CommandTree addNode(final LiteralArgumentBuilder<CommandSource> command)
         {

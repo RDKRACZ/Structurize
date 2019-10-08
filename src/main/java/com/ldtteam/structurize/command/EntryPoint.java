@@ -22,7 +22,6 @@ public class EntryPoint extends AbstractCommand
      * mc execute command
      * client sided commands are not possible now (as of 25-06-2019)
      */
-
     /**
      * Private constructor to hide implicit public one.
      */

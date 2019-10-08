@@ -10,20 +10,19 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 
 /**
- * Anyblock substitution block class
+ * Falling block support used when building to prevent falling blocks moving until everything is placed
  */
 public class FallingSupport extends Block
 {
     /**
-     * Creates default anyblock substitution block.
+     * Creates default falling support block.
      */
     public FallingSupport()
     {
-        this(
-            Properties.create(new Material(MaterialColor.WOOD, false, true, true, true, true, false, false, PushReaction.BLOCK))
-                .doesNotBlockMovement()
-                .noDrops()
-                .hardnessAndResistance(Float.MAX_VALUE));
+        this(Properties.create(new Material(MaterialColor.WOOD, false, true, true, true, true, false, false, PushReaction.BLOCK))
+            .doesNotBlockMovement()
+            .noDrops()
+            .hardnessAndResistance(Float.MAX_VALUE));
     }
 
     /**

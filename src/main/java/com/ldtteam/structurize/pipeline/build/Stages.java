@@ -7,6 +7,9 @@ import org.apache.commons.lang3.ObjectUtils.Null;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Tuple;
 
+/**
+ * StagedPlacer stages
+ */
 public final class Stages
 {
     public enum BlockStateBooleanStages implements Stage<Tuple<BlockState, Boolean>, StagedPlacer>
@@ -86,8 +89,8 @@ public final class Stages
 
     public enum NoDataStages implements Stage<Null, StagedPlacer>
     {
-        END_STAGE(StagedPlacer::endStage, null),
-        DUMMY_STAGE(null, null);
+        END_STAGE(StagedPlacer::endStage, (base, stage) -> {}),
+        DUMMY_STAGE((base, stageData) -> {}, (base, stage) -> {});
 
         private BiConsumer<StagedPlacer, StageData<Null, StagedPlacer>> method;
         private BiConsumer<StagedPlacer, Stage<Null, StagedPlacer>> then;

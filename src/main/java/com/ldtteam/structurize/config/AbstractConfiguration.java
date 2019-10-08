@@ -12,11 +12,13 @@ import net.minecraftforge.common.ForgeConfigSpec.EnumValue;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 import net.minecraftforge.common.ForgeConfigSpec.LongValue;
 
+/**
+ * Helper methods for creating configurations
+ */
 public abstract class AbstractConfiguration
 {
     protected void createCategory(final Builder builder, final String key)
     {
-        // TODO: missing name, translation not allowed for now
         builder.comment(LanguageHandler.translateKey(commentTKey(key))).push(key);
     }
 
@@ -81,8 +83,7 @@ public abstract class AbstractConfiguration
         return buildBase(builder, key).defineInRange(key, defaultValue, min, max);
     }
 
-    protected static <T> ConfigValue<List<? extends T>> defineList(
-        final Builder builder,
+    protected static <T> ConfigValue<List<? extends T>> defineList(final Builder builder,
         final String key,
         final List<? extends T> defaultValue,
         final Predicate<Object> elementValidator)
