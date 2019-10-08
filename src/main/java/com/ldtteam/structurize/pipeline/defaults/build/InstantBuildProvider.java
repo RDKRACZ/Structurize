@@ -12,7 +12,6 @@ import com.ldtteam.structurize.util.Stage.StageData;
 public class InstantBuildProvider extends BuildProvider
 {
     private final BooleanConfigValue placeInsteadUsePlaceholders;
-    private final BooleanConfigValue supportFallingIfBottom;
     private static final AtomicBoolean stageStop = new AtomicBoolean(false);
     private static StagedPlacer currentPlacer;
 
@@ -20,17 +19,16 @@ public class InstantBuildProvider extends BuildProvider
     {
         super("default");
         placeInsteadUsePlaceholders = getConfiguration().newBooleanValue().setDefaultValue(false).setNameKey("").setDescriptionKey("").build();
-        supportFallingIfBottom = getConfiguration().newBooleanValue().setDefaultValue(false).setNameKey("").setDescriptionKey("").build();
     }
 
-    // TODO: placeInsteadUsePlaceholders
     @Override
     public void build(final RawPlacer placerIn)
     {
-        final LinkedList<StageData<?, StagedPlacer>> stages = StagedPlacer.createDefaultStages(supportFallingIfBottom.getValue());
+        final LinkedList<StageData<?, StagedPlacer>> stages = StagedPlacer.createDefaultStages(placeInsteadUsePlaceholders.getValue());
         // stages.removeFirst(); // don't need the clean phase
         currentPlacer = new StagedPlacer(placerIn, stages, (prev, next) -> {
-            Instances.getLogger().info("Stage change: FROM {} | TO {}", prev == null ? "NULL" : prev.toString(), next == null ? "NULL" : next.toString());
+            Instances.getLogger()
+                .info("Stage change: FROM {} | TO {}", prev == null ? "NULL" : prev.toString(), next == null ? "NULL" : next.toString());
             stageStop.set(true);
         });
     }
@@ -38,6 +36,7 @@ public class InstantBuildProvider extends BuildProvider
     public static void runStage()
     {
         stageStop.set(false);
-        currentPlacer.forNextRemaining(() -> stageStop.get());
+        // TODO: hook action counter, probably lower level???
+        currentPlacer.forNextRemaining(stageStop::get);
     }
 }

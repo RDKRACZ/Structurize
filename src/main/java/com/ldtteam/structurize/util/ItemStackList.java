@@ -8,6 +8,8 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 public class ItemStackList extends ArrayList<ItemStack>
 {
+    private static final long serialVersionUID = -3168341588367712020L;
+
     @Override
     public boolean add(final ItemStack itemStack)
     {

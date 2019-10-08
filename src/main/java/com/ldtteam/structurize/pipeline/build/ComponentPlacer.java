@@ -26,9 +26,9 @@ public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>> extends ForgeRe
         super.setRegistryName(registryName);
     }
 
-    public boolean place(final T thing, final World world, final BlockPos pos)
+    public boolean place(final T thing, final World world, final BlockPos pos, final boolean triggerPlayerActions)
     {
-        return placer.place(thing, world, pos);
+        return placer.place(thing, world, pos, triggerPlayerActions);
     }
 
     public List<ResourceLocation> getSubstitutions(final T thing, final World world, final BlockPos pos)
@@ -36,15 +36,15 @@ public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>> extends ForgeRe
         return substitutions.getSubstitutions(thing, world, pos);
     }
 
-    public List<ItemStack> getRequirements(final T thing, final World world, final BlockPos pos)
+    public List<ItemStack> getRequirements(final T thing, final World world, final BlockPos pos, final boolean triggerPlayerActions)
     {
-        return requirements.getRequirements(thing, world, pos);
+        return requirements.getRequirements(thing, world, pos, triggerPlayerActions);
     }
 
     @FunctionalInterface
     public interface Placer<T>
     {
-        boolean place(T thing, World world, BlockPos pos);
+        boolean place(T thing, World world, BlockPos pos, boolean triggerPlayerActions);
     }
 
     @FunctionalInterface
@@ -56,7 +56,7 @@ public class ComponentPlacer<T, U extends ForgeRegistryEntry<U>> extends ForgeRe
     @FunctionalInterface
     public interface Requirements<T>
     {
-        List<ItemStack> getRequirements(T thing, World world, BlockPos pos);
+        List<ItemStack> getRequirements(T thing, World world, BlockPos pos, boolean triggerPlayerActions);
     }
 
     public abstract static class Builder<T, U extends ComponentPlacer<T, U>>

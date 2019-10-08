@@ -31,9 +31,9 @@ public class ClientConfiguration extends AbstractConfiguration
     protected ClientConfiguration(final ForgeConfigSpec.Builder builder)
     {
         createCategory(builder, "render");
-        maxAmountOfRenderedEvents = defineInteger(builder, "maxamountofrenderedevents", 10, 1, Integer.MAX_VALUE);
-        toggleableLightTexture = defineBoolean(builder, "toggleablelighttexture", true);
-        structurePartialTicks = defineBoolean(builder, "structurepartialticks", false);
+        maxAmountOfRenderedEvents = defineInteger(builder, "maxAmountOfRenderedEvents", 10, 1, Integer.MAX_VALUE);
+        toggleableLightTexture = defineBoolean(builder, "toggleableLightTexture", true);
+        structurePartialTicks = defineBoolean(builder, "structurePartialTicks", false);
         finishCategory(builder);
     }
 }

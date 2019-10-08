@@ -37,10 +37,9 @@ public class AnyblockSubstitution extends Block
      */
     public AnyblockSubstitution()
     {
-        this(
-            Properties.create(new Material(MaterialColor.WOOD, false, true, true, true, true, false, false, PushReaction.BLOCK))
-                .doesNotBlockMovement()
-                .hardnessAndResistance(1.0F));
+        this(Properties.create(new Material(MaterialColor.WOOD, false, true, true, true, true, false, false, PushReaction.BLOCK))
+            .doesNotBlockMovement()
+            .hardnessAndResistance(1.0F));
     }
 
     /**
@@ -88,6 +87,7 @@ public class AnyblockSubstitution extends Block
                     ((ClientWorld) worldIn).markSurroundingsForRerender(center.getX(), center.getY(), center.getZ());
                     Instances.getEventRenderer().recompileTessellators();
                 }
+
                 return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getHeldItem(handIn));
             }
         }.setRegistryName(this.getRegistryName());
