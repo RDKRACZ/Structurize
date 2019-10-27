@@ -8,20 +8,20 @@ import com.ldtteam.structurize.pipeline.build.ComponentPlacer.Builder;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.EntityComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.FluidStateComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.TileEntityComponentPlacer;
-import com.ldtteam.structurize.util.constants.MinecraftConstants;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.Constants.BlockFlags;
 
 public class DefaultPlacers
 {
     public static Builder<BlockState, BlockStateComponentPlacer> getDefaultBlockStatePlacer()
     {
         return BlockStateComponentPlacer.newBuilder().setPlacer((thing, world, pos, playerActions) -> {
-            if (world.getBlockState(pos).equals(thing) || world.setBlockState(pos, thing, MinecraftConstants.BLOCK_PLACEMENT_UPDATE_FLAGS))
+            if (world.getBlockState(pos).equals(thing) || world.setBlockState(pos, thing, BlockFlags.DEFAULT))
             {
                 return true;
             }
@@ -39,21 +39,19 @@ public class DefaultPlacers
                 return true;
             }
             final BlockState blockState = thing.getBlockState();
-            if (world.getBlockState(pos).equals(blockState) || world.setBlockState(pos, blockState, MinecraftConstants.BLOCK_PLACEMENT_UPDATE_FLAGS))
+            if (world.getBlockState(pos).equals(blockState) || world.setBlockState(pos, blockState, BlockFlags.DEFAULT))
             {
                 return true;
             }
             return false;
         })
-            .setRequirements(
-                (thing, world, pos, playerActions) -> thing.isSource() ? Arrays.asList(new ItemStack(thing.getFluid().getFilledBucket())) : new ArrayList<>())
-            .setSubstitutions((t, w, bp) -> new ArrayList<>());
+            .setRequirements((thing, world, pos, playerActions) -> thing.isSource() ? Arrays.asList(new ItemStack(thing.getFluid().getFilledBucket())) : new ArrayList<>()).setSubstitutions((t, w, bp) -> new ArrayList<>());
     }
 
     public static Builder<TileEntity, TileEntityComponentPlacer> getDefaultTileEntityPlacer()
     {
         return TileEntityComponentPlacer.newBuilder().setPlacer((thing, world, pos, playerActions) -> {
-            if (!world.getTileEntity(pos).equals(thing))
+            if (!thing.equals(world.getTileEntity(pos)))
             {
                 world.setTileEntity(pos, thing);
             }

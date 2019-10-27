@@ -12,13 +12,23 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
+apply plugin: 'idea'
 
 version = mod_ver
 group = mod_class_group // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = mod_id
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+
+sourceSets
+{
+    api {
+        java {
+            srcDir 'src/api/java'
+        }
+        compileClasspath += configurations.getByName("minecraft")
+    }
+}
 
 minecraft {
     // The mappings can be changed at any time, and must be in the following format.
@@ -100,6 +110,9 @@ dependencies {
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
+    from sourceSets.api.output
+    from sourceSets.main.output
+
     manifest {
         attributes([
             "Specification-Title": mod_id,
@@ -111,6 +124,11 @@ jar {
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
+}
+
+task apiJar(type: Jar) {
+    from sourceSets.api.output
+    classifier 'api'
 }
 
 // Example configuration to allow publishing using the maven-publish task

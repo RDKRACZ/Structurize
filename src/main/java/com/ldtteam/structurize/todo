@@ -5,6 +5,7 @@ make sure things that should survive world save/load actually do survive
 make sure rotation and mirroring is the same in every possible context across every possible pipeline¨
 
 === plan ===
+events - prepared
 pipeline for scanning
 entry point for both pipelines, check registry things are done properly
 pipeline sync/save&load layers (placer percentage progress)
@@ -15,5 +16,5 @@ online repository
 === features not in plan ===
 better placeholders and components testing
 BPs configurations + gui
-box events, caliper box, things like that
+box events, caliper box, things like that -> events plan point
 move deco blocks into standalone mod, allow for chisel things etc. (vanilla?)

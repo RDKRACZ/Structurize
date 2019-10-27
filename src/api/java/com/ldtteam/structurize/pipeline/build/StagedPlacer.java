@@ -19,7 +19,7 @@ import com.ldtteam.structurize.pipeline.build.StagedPlacerUtils.ActionIterator;
 import com.ldtteam.structurize.pipeline.build.StagedPlacerUtils.BsWithTePlaceAction;
 import com.ldtteam.structurize.pipeline.build.StagedPlacerUtils.DummyPlaceAction;
 import com.ldtteam.structurize.pipeline.build.StagedPlacerUtils.PlaceAction;
-import com.ldtteam.structurize.structure.util.StructureBB;
+import com.ldtteam.structurize.structure.StructureBB;
 import com.ldtteam.structurize.util.BlockStateWithTileEntity;
 import com.ldtteam.structurize.util.FastIterator;
 import com.ldtteam.structurize.util.ItemStackList;

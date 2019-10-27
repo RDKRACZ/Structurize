@@ -2,7 +2,7 @@ package com.ldtteam.structurize.pipeline.build;
 
 import java.util.UUID;
 import com.ldtteam.structurize.client.render.StructureRenderer;
-import com.ldtteam.structurize.structure.util.StructureBB;
+import com.ldtteam.structurize.structure.StructureBB;
 import com.ldtteam.structurize.structure.providers.BlueprintStructureDataProvider;
 import com.ldtteam.structurize.structure.providers.IStructureDataProvider;
 import net.minecraft.client.Minecraft;
@@ -17,6 +17,7 @@ import net.minecraft.world.World;
  *
  * @param <T> DataStructureProvider type
  */
+@Deprecated
 public class EventInfoHolder<T extends IStructureDataProvider>
 {
     private final UUID eventId = UUID.randomUUID();

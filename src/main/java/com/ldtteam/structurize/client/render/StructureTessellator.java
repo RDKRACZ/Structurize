@@ -75,6 +75,7 @@ public class StructureTessellator
     {
         RenderHelper.disableStandardItemLighting();
         Minecraft.getInstance().gameRenderer.disableLightmap();
+        GlStateManager.enableCull();
 
         Instances.getOptifineCompat().preBlueprintDraw();
 

@@ -22,8 +22,7 @@ public final class Stages
         private BiConsumer<StagedPlacer, StageData<Tuple<BlockState, Boolean>, StagedPlacer>> method;
         private BiConsumer<StagedPlacer, Stage<Tuple<BlockState, Boolean>, StagedPlacer>> then;
 
-        private BlockStateBooleanStages(
-            BiConsumer<StagedPlacer, StageData<Tuple<BlockState, Boolean>, StagedPlacer>> method,
+        private BlockStateBooleanStages(BiConsumer<StagedPlacer, StageData<Tuple<BlockState, Boolean>, StagedPlacer>> method,
             BiConsumer<StagedPlacer, Stage<Tuple<BlockState, Boolean>, StagedPlacer>> then)
         {
             this.method = method;
@@ -60,8 +59,7 @@ public final class Stages
         private BiConsumer<StagedPlacer, StageData<Boolean, StagedPlacer>> method;
         private BiConsumer<StagedPlacer, Stage<Boolean, StagedPlacer>> then;
 
-        private BooleanStages(
-            BiConsumer<StagedPlacer, StageData<Boolean, StagedPlacer>> method,
+        private BooleanStages(BiConsumer<StagedPlacer, StageData<Boolean, StagedPlacer>> method,
             BiConsumer<StagedPlacer, Stage<Boolean, StagedPlacer>> then)
         {
             this.method = method;
@@ -81,9 +79,9 @@ public final class Stages
         }
 
         @Override
-        public StageData<Boolean, StagedPlacer> createData(final Boolean data)
+        public StageData<Boolean, StagedPlacer> createEmptyData()
         {
-            throw new IllegalStateException("Can not have stageData set.");
+            throw new IllegalStateException("Must have stageData set.");
         }
     }
 
@@ -127,8 +125,7 @@ public final class Stages
         private BiConsumer<StagedPlacer, StageData<Supplier<Runnable>, StagedPlacer>> method;
         private BiConsumer<StagedPlacer, Stage<Supplier<Runnable>, StagedPlacer>> then;
 
-        private CustomStage(
-            BiConsumer<StagedPlacer, StageData<Supplier<Runnable>, StagedPlacer>> method,
+        private CustomStage(BiConsumer<StagedPlacer, StageData<Supplier<Runnable>, StagedPlacer>> method,
             BiConsumer<StagedPlacer, Stage<Supplier<Runnable>, StagedPlacer>> then)
         {
             this.method = method;

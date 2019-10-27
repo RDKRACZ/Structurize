@@ -1,4 +1,4 @@
-package com.ldtteam.structurize.structure.util;
+package com.ldtteam.structurize.structure;
 
 import com.ldtteam.structurize.util.CubePosIterator;
 import org.jetbrains.annotations.NotNull;
@@ -236,8 +236,8 @@ public class StructureBB
     /**
      * Adds anchor to given zerobased pos so it becomes real world pos.
      *
-     * @param zeroBasedPos pos to transform
-     * @return real world pos
+     * @param  zeroBasedPos pos to transform
+     * @return              real world pos
      */
     public BlockPos transformZeroBasedToReal(final BlockPos zeroBasedPos)
     {

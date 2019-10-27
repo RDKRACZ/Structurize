@@ -8,7 +8,8 @@ import com.ldtteam.structurize.pipeline.build.ComponentPlacer.BlockStateComponen
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.EntityComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.FluidStateComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.TileEntityComponentPlacer;
-import com.ldtteam.structurize.structure.util.StructureBB;
+import com.ldtteam.structurize.structure.StructureBB;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -24,6 +25,7 @@ import net.minecraft.world.World;
  * Event data holder for build providers.
  * Holds prepared structure.
  */
+@Deprecated
 public class RawPlacer
 {
     protected final List<BlockState> structureBlockPalette;
