@@ -1,6 +1,6 @@
 package com.ldtteam.structurize.world.schematic;
 
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.world.ModDimensions;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -41,7 +41,7 @@ public class PlayerEvents
 
     private static boolean isSchematicWorldType(final Entity entity)
     {
-        return entity.getEntityWorld().getWorldType() == Instances.getSchematicWorldType();
+        return entity.getEntityWorld().getWorldType() == Structurize.getSchematicWorldType();
     }
 
     private static boolean canEntityTeleport(final Entity entity)

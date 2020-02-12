@@ -3,7 +3,7 @@ package com.ldtteam.structurize.item;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.structure.blueprint.BlueprintUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
@@ -47,18 +47,17 @@ public class ScanTool extends AbstractItemWithPosSelector
         {
             final long time = System.nanoTime();
             final Path loc = Minecraft.getInstance().gameDir.toPath().resolve("structurize").resolve("tempschem.blueprint").toAbsolutePath();
-            Instances.getLogger().info("Saving bp to: " + loc.toString());
+            Structurize.getLogger().info("Saving bp to: " + loc.toString());
             try
             {
                 Files.createDirectories(loc.getParent());
-                BlueprintUtils.writeToStream(loc,
-                    BlueprintUtils.createBlueprint(worldIn, start, end, Long.toString(System.currentTimeMillis()), null));
+                BlueprintUtils.writeToStream(loc, BlueprintUtils.createBlueprint(worldIn, start, end, Long.toString(System.currentTimeMillis()), null));
             }
             catch (final IOException e)
             {
                 e.printStackTrace();
             }
-            Instances.getLogger().info("Finished saving in " + Long.toString(System.nanoTime() - time));
+            Structurize.getLogger().info("Finished saving in " + Long.toString(System.nanoTime() - time));
         }
         return ActionResultType.SUCCESS;
     }

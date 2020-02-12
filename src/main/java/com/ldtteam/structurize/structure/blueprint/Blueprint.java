@@ -1,10 +1,9 @@
 package com.ldtteam.structurize.structure.blueprint;
 
+import static com.ldtteam.structurize.util.constant.MathConstants.NINETY_DEGREES;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.ldtteam.structurize.structure.StructureBB;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.HangingEntity;
@@ -16,7 +15,6 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import static com.ldtteam.structurize.util.constants.MathConstants.NINETY_DEGREES;
 
 /**
  * The blueprint class which contains the file format for the schematics.
@@ -83,7 +81,13 @@ public class Blueprint
         final List<CompoundNBT> tileEntities,
         final List<String> requiredMods)
     {
-        this((short) structBB.getXSize(), (short) structBB.getYSize(), (short) structBB.getZSize(), palette, structure, tileEntities, requiredMods);
+        this((short) structBB.getXSize(),
+            (short) structBB.getYSize(),
+            (short) structBB.getZSize(),
+            palette,
+            structure,
+            tileEntities,
+            requiredMods);
     }
 
     /**
@@ -221,8 +225,8 @@ public class Blueprint
     }
 
     /**
-     * @param  entitiesIn an array of serialized TileEntities (the Pos tag need to be localized to coordinates within the structure)
-     * @return            this object.
+     * @param entitiesIn an array of serialized TileEntities (the Pos tag need to be localized to coordinates within the structure)
+     * @return this object.
      */
     public Blueprint setEntities(final List<CompoundNBT> entitiesIn)
     {
@@ -249,8 +253,8 @@ public class Blueprint
     /**
      * Sets the name of the Structure.
      *
-     * @param  nameIn the name to set.
-     * @return        this object.
+     * @param nameIn the name to set.
+     * @return this object.
      */
     public Blueprint setName(final String nameIn)
     {
@@ -269,8 +273,8 @@ public class Blueprint
     /**
      * Sets an Array of all architects for this structure.
      *
-     * @param  architectsIn an array of architects.
-     * @return              this blueprint.
+     * @param architectsIn an array of architects.
+     * @return this blueprint.
      */
     public Blueprint setArchitects(final List<String> architectsIn)
     {
@@ -290,8 +294,8 @@ public class Blueprint
     /**
      * Sets the missing mods.
      *
-     * @param  missingModsIn the missing mods list.
-     * @return               this object.
+     * @param missingModsIn the missing mods list.
+     * @return this object.
      */
     public Blueprint setMissingMods(final List<String> missingModsIn)
     {
@@ -361,7 +365,8 @@ public class Blueprint
         {
             if (te != null)
             {
-                final BlockPos pos = transformedBlockPos(te.getInt("x"), te.getInt("y"), te.getInt("z"), mirror, rotation).add(minX, minY, minZ);
+                final BlockPos pos = transformedBlockPos(te.getInt("x"), te.getInt("y"), te.getInt("z"), mirror, rotation)
+                    .add(minX, minY, minZ);
                 te.putInt("x", pos.getX());
                 te.putInt("y", pos.getY());
                 te.putInt("z", pos.getZ());
@@ -378,9 +383,9 @@ public class Blueprint
     /**
      * Calculate the transformed size from a blockpos.
      *
-     * @param  pos      the pos to transform
-     * @param  rotation the rotation to apply.
-     * @return          the resulting size.
+     * @param pos      the pos to transform
+     * @param rotation the rotation to apply.
+     * @return the resulting size.
      */
     public static BlockPos transformedSize(final BlockPos pos, final Rotation rotation)
     {
@@ -389,6 +394,7 @@ public class Blueprint
             case COUNTERCLOCKWISE_90:
             case CLOCKWISE_90:
                 return new BlockPos(pos.getZ(), pos.getY(), pos.getX());
+
             default:
                 return pos;
         }
@@ -397,12 +403,12 @@ public class Blueprint
     /**
      * Transforms a blockpos with mirror and rotation.
      *
-     * @param  x        the x input.
-     * @param  y        the y input.
-     * @param  z        the z input.
-     * @param  mirror   the mirror.
-     * @param  rotation the rotation.
-     * @return          the resulting position.
+     * @param x        the x input.
+     * @param y        the y input.
+     * @param z        the z input.
+     * @param mirror   the mirror.
+     * @param rotation the rotation.
+     * @return the resulting position.
      */
     public static BlockPos transformedBlockPos(final int x, final int y, final int z, final Mirror mirror, final Rotation rotation)
     {
@@ -413,9 +419,11 @@ public class Blueprint
             case LEFT_RIGHT:
                 result = new BlockPos(x, y, -z);
                 break;
+
             case FRONT_BACK:
                 result = new BlockPos(-x, y, z);
                 break;
+
             default:
                 result = new BlockPos(x, y, z);
                 break;
@@ -427,12 +435,12 @@ public class Blueprint
     /**
      * Transform an entity and rotate it.
      *
-     * @param  entityInfo the entity nbt.
-     * @param  world      the world.
-     * @param  pos        the position.
-     * @param  rotation   the wanted rotation.
-     * @param  mirror     the mirror.
-     * @return            the updated nbt.
+     * @param entityInfo the entity nbt.
+     * @param world      the world.
+     * @param pos        the position.
+     * @param rotation   the wanted rotation.
+     * @param mirror     the mirror.
+     * @return the updated nbt.
      */
     private CompoundNBT transformEntityInfoWithSettings(final CompoundNBT entityInfo,
         final World world,
@@ -445,14 +453,15 @@ public class Blueprint
         {
             final Vec3d entityVec = Blueprint.transformedVec3d(rotation, mirror, finalEntity.getPositionVector()).add(new Vec3d(pos));
             finalEntity.prevRotationYaw = (float) (finalEntity.getMirroredYaw(mirror) - NINETY_DEGREES);
-            final double rotationYaw =
-                finalEntity.getMirroredYaw(mirror) + ((double) finalEntity.getMirroredYaw(mirror) - (double) finalEntity.getRotatedYaw(rotation));
+            final double rotationYaw = finalEntity.getMirroredYaw(mirror)
+                + ((double) finalEntity.getMirroredYaw(mirror) - (double) finalEntity.getRotatedYaw(rotation));
 
             if (finalEntity instanceof HangingEntity)
             {
                 final BlockPos currentPos = ((HangingEntity) finalEntity).getHangingPosition();
-                final BlockPos entityPos =
-                    Blueprint.transformedBlockPos(currentPos.getX(), currentPos.getY(), currentPos.getZ(), mirror, rotation).add(pos);
+                final BlockPos entityPos = Blueprint
+                    .transformedBlockPos(currentPos.getX(), currentPos.getY(), currentPos.getZ(), mirror, rotation)
+                    .add(pos);
 
                 finalEntity.posX = entityVec.x;
                 finalEntity.posY = entityVec.y;
@@ -474,10 +483,10 @@ public class Blueprint
     /**
      * Transform a Vec3d with rotation and mirror.
      *
-     * @param  rotation the rotation.
-     * @param  mirror   the mirror.
-     * @param  vec      the vec to transform.
-     * @return          the result.
+     * @param rotation the rotation.
+     * @param mirror   the mirror.
+     * @param vec      the vec to transform.
+     * @return the result.
      */
     private static Vec3d transformedVec3d(final Rotation rotation, final Mirror mirror, final Vec3d vec)
     {
@@ -490,9 +499,11 @@ public class Blueprint
             case LEFT_RIGHT:
                 zCoord = 1.0D - zCoord;
                 break;
+
             case FRONT_BACK:
                 xCoord = 1.0D - xCoord;
                 break;
+
             default:
                 flag = false;
         }
@@ -501,10 +512,13 @@ public class Blueprint
         {
             case COUNTERCLOCKWISE_90:
                 return new Vec3d(zCoord, vec.y, 1.0D - xCoord);
+
             case CLOCKWISE_90:
                 return new Vec3d(1.0D - zCoord, vec.y, xCoord);
+
             case CLOCKWISE_180:
                 return new Vec3d(1.0D - xCoord, vec.y, 1.0D - zCoord);
+
             default:
                 return flag ? new Vec3d(xCoord, vec.y, zCoord) : vec;
         }

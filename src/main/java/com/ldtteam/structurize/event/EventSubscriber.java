@@ -1,6 +1,6 @@
 package com.ldtteam.structurize.event;
 
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.command.EntryPoint;
 import com.ldtteam.structurize.world.ModDimensions;
 import com.ldtteam.structurize.world.schematic.PlayerEvents;
@@ -36,7 +36,7 @@ public class EventSubscriber
     @SubscribeEvent
     public static void onServerAboutToStart(final FMLServerAboutToStartEvent event)
     {
-        Instances.getLogger().warn("FMLServerAboutToStartEvent");
+        Structurize.getLogger().warn("FMLServerAboutToStartEvent");
         ModDimensions.registerDimensionTypes();
     }
 
@@ -48,7 +48,7 @@ public class EventSubscriber
     @SubscribeEvent
     public static void onServerStarting(final FMLServerStartingEvent event)
     {
-        Instances.getLogger().warn("FMLServerStartingEvent");
+        Structurize.getLogger().warn("FMLServerStartingEvent");
         EntryPoint.register(event.getCommandDispatcher());
     }
 
@@ -60,7 +60,7 @@ public class EventSubscriber
     @SubscribeEvent
     public static void onServerStarted(final FMLServerStartedEvent event)
     {
-        Instances.getLogger().warn("FMLServerStartedEvent");
+        Structurize.getLogger().warn("FMLServerStartedEvent");
     }
 
     /**
@@ -71,7 +71,7 @@ public class EventSubscriber
     @SubscribeEvent
     public static void onServerStopping(final FMLServerStoppingEvent event)
     {
-        Instances.getLogger().warn("FMLServerStoppingEvent");
+        Structurize.getLogger().warn("FMLServerStoppingEvent");
     }
 
     /**
@@ -82,7 +82,7 @@ public class EventSubscriber
     @SubscribeEvent
     public static void onServerStopped(final FMLServerStoppedEvent event)
     {
-        Instances.getLogger().warn("FMLServerStoppedEvent");
+        Structurize.getLogger().warn("FMLServerStoppedEvent");
     }
 
     /**

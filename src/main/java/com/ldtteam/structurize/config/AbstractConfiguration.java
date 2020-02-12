@@ -3,7 +3,8 @@ package com.ldtteam.structurize.config;
 import java.util.List;
 import java.util.function.Predicate;
 import com.ldtteam.structurize.util.LanguageHandler;
-import com.ldtteam.structurize.util.constants.GeneralConstants;
+import com.ldtteam.structurize.util.constant.GeneralConstants;
+
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.Builder;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;

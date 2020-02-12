@@ -1,5 +1,6 @@
 package com.ldtteam.structurize.structure.blueprint;
 
+import static com.ldtteam.structurize.util.constant.MathConstants.CHUNK_BLOCK_SIZE;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,9 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.ldtteam.structurize.structure.StructureBB;
-
 import org.apache.logging.log4j.LogManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -29,10 +28,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.ModList;
-import static com.ldtteam.structurize.util.constants.MathConstants.CHUNK_BLOCK_SIZE;
 
 /**
- * @see   <a href="http://dark-roleplay.net/other/blueprint_format.php">Blueprint V1 Specification</a>
+ * @see <a href="http://dark-roleplay.net/other/blueprint_format.php">Blueprint V1 Specification</a>
  * @since 0.1.0
  *        State: not completed
  *        TODO: replace this class
@@ -52,10 +50,10 @@ public class BlueprintUtils
     /**
      * Generates a Blueprint objects from the world.
      *
-     * @param  world The World that is used for the Blueprint
-     * @param  start The Position of the Blueprint
-     * @param  end   The End Position of the Blueprint
-     * @return       the generated Blueprint
+     * @param world The World that is used for the Blueprint
+     * @param start The Position of the Blueprint
+     * @param end   The End Position of the Blueprint
+     * @return the generated Blueprint
      */
     public static Blueprint createBlueprint(final World world, final BlockPos start, final BlockPos end)
     {
@@ -65,12 +63,12 @@ public class BlueprintUtils
     /**
      * Generates a Blueprint objects from the world.
      *
-     * @param  world      The World that is used for the Blueprint
-     * @param  start      The Position of the Blueprint
-     * @param  end        The End Position of the Blueprint
-     * @param  name       a Name for the Structure
-     * @param  architects an Array of Architects for the structure
-     * @return            the generated Blueprint
+     * @param world      The World that is used for the Blueprint
+     * @param start      The Position of the Blueprint
+     * @param end        The End Position of the Blueprint
+     * @param name       a Name for the Structure
+     * @param architects an Array of Architects for the structure
+     * @return the generated Blueprint
      */
     public static Blueprint createBlueprint(final World world,
         final BlockPos start,
@@ -104,7 +102,8 @@ public class BlueprintUtils
             }
             else if (!ModList.get().isLoaded(modName))
             {
-                structure[posInStruct.getY()][posInStruct.getZ()][posInStruct.getX()] = (short) pallete.indexOf(Blocks.AIR.getDefaultState());
+                structure[posInStruct.getY()][posInStruct.getZ()][posInStruct.getX()] = (short) pallete
+                    .indexOf(Blocks.AIR.getDefaultState());
                 continue;
             }
 
@@ -165,8 +164,8 @@ public class BlueprintUtils
     /**
      * Serializes a given Blueprint to an CompoundNBT.
      *
-     * @param  schem The Blueprint to serialize
-     * @return       An CompoundNBT containing the Blueprint Data
+     * @param schem The Blueprint to serialize
+     * @return An CompoundNBT containing the Blueprint Data
      */
     public static CompoundNBT writeBlueprintToNBT(final Blueprint schem)
     {
@@ -239,8 +238,8 @@ public class BlueprintUtils
      * Deserializes a Blueprint form the Given CompoundNBT.
      * //param fixer the data fixer.
      *
-     * @param  nbtTag The CompoundNBT containing the Blueprint Data
-     * @return        A desserialized Blueprint
+     * @param nbtTag The CompoundNBT containing the Blueprint Data
+     * @return A desserialized Blueprint
      */
     public static Blueprint readBlueprintFromNBT(final CompoundNBT nbtTag) // , final DataFixer fixer)
     {
@@ -292,8 +291,9 @@ public class BlueprintUtils
                 entities.add(entitiesTag.getCompound(i));
             }
 
-            final Blueprint schem =
-                new Blueprint(sizeX, sizeY, sizeZ, palette, blocks, tileEntities, requiredMods).setMissingMods(missingMods).setEntities(entities);
+            final Blueprint schem = new Blueprint(sizeX, sizeY, sizeZ, palette, blocks, tileEntities, requiredMods)
+                .setMissingMods(missingMods)
+                .setEntities(entities);
 
             if (tag.contains("name"))
             {
@@ -354,8 +354,8 @@ public class BlueprintUtils
     /**
      * Attempts to read a Blueprint from a Path.
      *
-     * @param  location The Path to read from
-     * @return          null when failed, blueprint otherwise
+     * @param location The Path to read from
+     * @return null when failed, blueprint otherwise
      */
     public static Blueprint readFromStream(final Path location)
     {
@@ -373,8 +373,8 @@ public class BlueprintUtils
     /**
      * Attempts to read a Blueprint from an Input Stream.
      *
-     * @param  is The Input Stream to read from
-     * @return    null when failed, blueprint otherwise
+     * @param is The Input Stream to read from
+     * @return null when failed, blueprint otherwise
      */
     public static Blueprint readFromStream(final InputStream is)
     {
@@ -392,11 +392,11 @@ public class BlueprintUtils
     /**
      * Converts a 3 Dimensional short Array to a one Dimensional int Array.
      *
-     * @param  multDimArray 3 Dimensional short Array
-     * @param  sizeX        Sturcture size on the X-Axis
-     * @param  sizeY        Sturcture size on the Y-Axis
-     * @param  sizeZ        Sturcture size on the Z-Axis
-     * @return              An 1 Dimensional int array
+     * @param multDimArray 3 Dimensional short Array
+     * @param sizeX        Sturcture size on the X-Axis
+     * @param sizeY        Sturcture size on the Y-Axis
+     * @param sizeZ        Sturcture size on the Z-Axis
+     * @return An 1 Dimensional int array
      */
     private static int[] convertBlocksToSaveData(final short[][][] multDimArray, final short sizeX, final short sizeY, final short sizeZ)
     {
@@ -436,11 +436,11 @@ public class BlueprintUtils
     /**
      * Converts a 1 Dimensional int Array to a 3 Dimensional short Array.
      *
-     * @param  ints  1 Dimensioanl int Array
-     * @param  sizeX Sturcture size on the X-Axis
-     * @param  sizeY Sturcture size on the Y-Axis
-     * @param  sizeZ Sturcture size on the Z-Axis
-     * @return       An 3 Dimensional short array
+     * @param ints  1 Dimensioanl int Array
+     * @param sizeX Sturcture size on the X-Axis
+     * @param sizeY Sturcture size on the Y-Axis
+     * @param sizeZ Sturcture size on the Z-Axis
+     * @return An 3 Dimensional short array
      */
     private static short[][][] convertSaveDataToBlocks(final int[] ints, final short sizeX, final short sizeY, final short sizeZ)
     {

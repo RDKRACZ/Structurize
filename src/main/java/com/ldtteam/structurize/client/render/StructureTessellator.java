@@ -1,6 +1,6 @@
 package com.ldtteam.structurize.client.render;
 
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.Structurize;
 import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
@@ -77,7 +77,7 @@ public class StructureTessellator
         Minecraft.getInstance().gameRenderer.disableLightmap();
         GlStateManager.enableCull();
 
-        Instances.getOptifineCompat().preBlueprintDraw();
+        Structurize.getOptifineCompat().preBlueprintDraw();
 
         GlStateManager.enableClientState(GL_VERTEX_ARRAY);
         GLX.glClientActiveTexture(GLX.GL_TEXTURE0);
@@ -94,7 +94,7 @@ public class StructureTessellator
     {
         // Optifine uses its one vertexformats.
         // It handles the setting of the pointers itself.
-        if (Instances.getOptifineCompat().setupArrayPointers())
+        if (Structurize.getOptifineCompat().setupArrayPointers())
         {
             return;
         }
@@ -135,7 +135,7 @@ public class StructureTessellator
         }
 
         // Disable the pointers again.
-        Instances.getOptifineCompat().postBlueprintDraw();
+        Structurize.getOptifineCompat().postBlueprintDraw();
     }
 
     /**
@@ -183,7 +183,7 @@ public class StructureTessellator
             // Tell optifine that we are loading a new instance into the GPU.
             // This ensures that normals are calculated so that we know in which direction a face is facing. (Aka what is outside and what
             // inside)
-            Instances.getOptifineCompat().beforeBuilderUpload(this);
+            Structurize.getOptifineCompat().beforeBuilderUpload(this);
             this.vboUploader.draw(this.builder);
             state = State.BUILT;
         }

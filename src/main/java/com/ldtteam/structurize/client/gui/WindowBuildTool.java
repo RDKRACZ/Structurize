@@ -1,6 +1,6 @@
 package com.ldtteam.structurize.client.gui;
 
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.item.BuildTool;
 import com.ldtteam.structurize.pipeline.build.EventInfoHolder;
 import com.ldtteam.structurize.structure.providers.BlueprintStructureDataProvider;
@@ -18,7 +18,7 @@ public class WindowBuildTool
     public static void open(final BlockPos targetedPos, final PlayerEntity player)
     {
         eventReference = EventInfoHolder.createBlueprintEvent(targetedPos, player.getEntityWorld());
-        Instances.getEventRenderer().addActiveEvent(eventReference);
+        Structurize.getEventRenderer().addActiveEvent(eventReference);
         // TODO: allow multi events (required gui for maintaining), notify player if max events reached
     }
 

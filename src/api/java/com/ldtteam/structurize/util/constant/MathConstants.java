@@ -1,4 +1,4 @@
-package com.ldtteam.structurize.util.constants;
+package com.ldtteam.structurize.util.constant;
 
 /**
  * Class for storing general constants

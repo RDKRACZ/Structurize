@@ -1,6 +1,6 @@
 package com.ldtteam.structurize.util;
 
-import com.ldtteam.structurize.util.constants.GeneralConstants;
+import com.ldtteam.structurize.util.constant.GeneralConstants;
 import net.minecraft.util.ResourceLocation;
 
 /**

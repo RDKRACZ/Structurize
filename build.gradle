@@ -4,6 +4,7 @@ buildscript {
         maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
+        flatDir { dirs 'libs' }
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: forge_gradle_ver, changing: true
@@ -26,7 +27,23 @@ sourceSets
         java {
             srcDir 'src/api/java'
         }
+        resources {
+            srcDir 'src/api/resources'
+        }
         compileClasspath += configurations.getByName("minecraft")
+    }
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+        compileClasspath += sourceSets.api.output
+    }
+    test {
+        compileClasspath += sourceSets.api.output
+        compileClasspath += sourceSets.main.output
     }
 }
 

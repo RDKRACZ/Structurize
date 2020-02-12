@@ -1,7 +1,7 @@
 package com.ldtteam.structurize.block;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.Structurize;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -62,7 +62,7 @@ public class AnyblockSubstitution extends Block
     @Override
     public BlockRenderType getRenderType(final BlockState state)
     {
-        return SHOULD_RENDER_BLOCK_TEXTURE.get() || !Instances.getConfig().getClient().toggleableLightTexture.get()
+        return SHOULD_RENDER_BLOCK_TEXTURE.get() || !Structurize.getConfig().getClient().toggleableLightTexture.get()
             ? BlockRenderType.MODEL
             : BlockRenderType.INVISIBLE;
     }
@@ -80,12 +80,12 @@ public class AnyblockSubstitution extends Block
             @Override
             public ActionResult<ItemStack> onItemRightClick(final World worldIn, final PlayerEntity playerIn, final Hand handIn)
             {
-                if (worldIn.isRemote() && Instances.getConfig().getClient().toggleableLightTexture.get())
+                if (worldIn.isRemote() && Structurize.getConfig().getClient().toggleableLightTexture.get())
                 {
                     SHOULD_RENDER_BLOCK_TEXTURE.set(!SHOULD_RENDER_BLOCK_TEXTURE.get());
                     final SectionPos center = SectionPos.from(playerIn.getPosition());
                     ((ClientWorld) worldIn).markSurroundingsForRerender(center.getX(), center.getY(), center.getZ());
-                    Instances.getEventRenderer().recompileTessellators();
+                    Structurize.getEventRenderer().recompileTessellators();
                 }
 
                 return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getHeldItem(handIn));

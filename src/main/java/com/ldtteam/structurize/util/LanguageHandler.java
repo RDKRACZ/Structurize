@@ -12,8 +12,8 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.LanguageMap;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.translation.LanguageMap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 
@@ -125,8 +125,8 @@ public final class LanguageHandler
             {
                 is = Thread.currentThread().getContextClassLoader().getResourceAsStream(String.format(fileLoc, defaultLocale));
             }
-            languageMap = new Gson().fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), new TypeToken<Map<String, String>>(){
-            }.getType());
+            languageMap = new Gson().fromJson(new InputStreamReader(is, StandardCharsets.UTF_8), new TypeToken<Map<String, String>>()
+            {}.getType());
         }
 
         private static LanguageCache getInstance()

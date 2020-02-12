@@ -1,6 +1,5 @@
 package com.ldtteam.structurize.item;
 
-import com.ldtteam.structurize.util.constants.GeneralConstants;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -8,6 +7,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.registries.IForgeRegistry;
 import static com.ldtteam.structurize.block.ModBlocks.*;
+import com.ldtteam.structurize.util.constant.GeneralConstants;
 
 /**
  * Utils for mod items init
@@ -50,8 +50,8 @@ public class ModItems
     /**
      * Creates blockitem from given block.
      *
-     * @param  block already registered block
-     * @return       new BlockItem
+     * @param block already registered block
+     * @return new BlockItem
      */
     private static BlockItem newBI(final Block block)
     {
@@ -61,9 +61,9 @@ public class ModItems
     /**
      * Creates blockitem from given block and item group.
      *
-     * @param  block     already registered block
-     * @param  itemGroup creative tab
-     * @return           new BlockItem
+     * @param block     already registered block
+     * @param itemGroup creative tab
+     * @return new BlockItem
      */
     private static BlockItem newBI(final Block block, final ItemGroup itemGroup)
     {
@@ -89,8 +89,8 @@ public class ModItems
         /**
          * Sets tab icon.
          *
-         * @param  iconIn tab icon
-         * @return        this
+         * @param iconIn tab icon
+         * @return this
          */
         public ModItemGroup setIcon(final Item iconIn)
         {

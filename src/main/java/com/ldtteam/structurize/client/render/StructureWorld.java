@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.pipeline.build.EventInfoHolder;
 import com.ldtteam.structurize.structure.providers.IStructureDataProvider;
 import org.jetbrains.annotations.NotNull;
@@ -52,7 +52,8 @@ public class StructureWorld extends World implements IBlockReader
      */
     public StructureWorld(final EventInfoHolder<?> event)
     {
-        super(Minecraft.getInstance().world.getWorldInfo(),
+        super(
+            Minecraft.getInstance().world.getWorldInfo(),
             Minecraft.getInstance().world.dimension.getType(),
             new BiFunction<World, Dimension, AbstractChunkProvider>()
             {
@@ -140,7 +141,7 @@ public class StructureWorld extends World implements IBlockReader
         }
         catch (final Exception ex)
         {
-            Instances.getLogger().error("Could not create tile entity: " + entityId + " with nbt: " + teData.toString(), ex);
+            Structurize.getLogger().error("Could not create tile entity: " + entityId + " with nbt: " + teData.toString(), ex);
         }
         return null;
         // cache removed, should be back? hell no, causing lags as hell
@@ -179,7 +180,8 @@ public class StructureWorld extends World implements IBlockReader
     }
 
     @Override
-    public void playSound(@Nullable final PlayerEntity player,
+    public void playSound(
+        @Nullable final PlayerEntity player,
         final double x,
         final double y,
         final double z,
@@ -191,7 +193,8 @@ public class StructureWorld extends World implements IBlockReader
     }
 
     @Override
-    public void playMovingSound(@Nullable final PlayerEntity player,
+    public void playMovingSound(
+        @Nullable final PlayerEntity player,
         final Entity entity,
         final SoundEvent eventIn,
         final SoundCategory category,
@@ -227,10 +230,7 @@ public class StructureWorld extends World implements IBlockReader
     }
 
     @Override
-    public void notifyBlockUpdate(@NotNull final BlockPos pos,
-        @NotNull final BlockState oldState,
-        @NotNull final BlockState newState,
-        final int flags)
+    public void notifyBlockUpdate(@NotNull final BlockPos pos, @NotNull final BlockState oldState, @NotNull final BlockState newState, final int flags)
     {
     }
 

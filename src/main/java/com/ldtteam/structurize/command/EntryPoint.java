@@ -1,6 +1,6 @@
 package com.ldtteam.structurize.command;
 
-import com.ldtteam.structurize.util.constants.GeneralConstants;
+import com.ldtteam.structurize.util.constant.GeneralConstants;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
 

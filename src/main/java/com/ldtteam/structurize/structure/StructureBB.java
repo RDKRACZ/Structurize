@@ -10,7 +10,7 @@ import net.minecraft.util.math.BlockPos;
  * Structure bounding box.
  * Anchor has every coord smaller or same than peek blockpos.
  */
-public class StructureBB
+public class StructureBB implements IStructureBB
 {
     private int minX;
     private int minY;
@@ -35,106 +35,40 @@ public class StructureBB
         maxZ = Math.max(start.getZ(), end.getZ());
     }
 
-    /**
-     * Anchor has every coord smaller or same than peek.
-     * Smallest possible blockpos of BB.
-     *
-     * @return anchor blockpos
-     */
+    @Override
     public BlockPos getAnchor()
     {
         return new BlockPos(minX, minY, minZ);
     }
 
-    /**
-     * Peek has every coord bigger or same than anchor.
-     * Biggest possible blockpos of BB.
-     *
-     * @return peek blockpos
-     */
+    @Override
     public BlockPos getPeek()
     {
         return new BlockPos(maxX, maxY, maxZ);
     }
 
-    /**
-     * Zero based peek is blockpos made from sizes.
-     *
-     * @return zero based peek blockpos
-     */
-    public BlockPos getZeroBasedPeek()
-    {
-        return new BlockPos(getXSize() - 1, getYSize() - 1, getZSize() - 1);
-    }
-
-    /**
-     * Always possitive or zero x size.
-     *
-     * @return X width
-     */
+    @Override
     public int getXSize()
     {
         return maxX - minX + 1;
     }
 
-    /**
-     * Always possitive or zero y size.
-     *
-     * @return Y height
-     */
+    @Override
     public int getYSize()
     {
         return maxY - minY + 1;
     }
 
-    /**
-     * Always possitive or zero z size.
-     *
-     * @return Z width
-     */
+    @Override
     public int getZSize()
     {
         return maxZ - minZ + 1;
     }
 
-    /**
-     * Converts to MC AABB.
-     *
-     * @return AABB
-     */
+    @Override
     public AxisAlignedBB toAABB()
     {
         return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
-    }
-
-    /**
-     * Converts to MC AABB using current sizes.
-     *
-     * @return AABB
-     */
-    public AxisAlignedBB toZeroBasedAABB()
-    {
-        return new AxisAlignedBB(0, 0, 0, getXSize(), getYSize(), getZSize());
-    }
-
-    /**
-     * Creates new pos iterator from anchor to peek using y|z|x iteration order (x iterates first).
-     *
-     * @return pos iterator
-     */
-    public Iterable<BlockPos> getPosIterator()
-    {
-        return new CubePosIterator(getAnchor(), getPeek());
-    }
-
-    /**
-     * Creates new pos iterator from 0,0,0 to zero based peek using y|z|x iteration order (x iterates first).
-     *
-     * @return pos iterator
-     */
-    public Iterable<BlockPos> getZeroBasedPosIterator()
-    {
-        return new CubePosIterator(BlockPos.ZERO, getZeroBasedPeek());
     }
 
     /**
@@ -186,7 +120,13 @@ public class StructureBB
         rotate(center, Rotation.COUNTERCLOCKWISE_90);
     }
 
-    private void rotate(@NotNull final BlockPos center, final Rotation rotation)
+    /**
+     * Rotates using given rotation around given center.
+     *
+     * @param center   real world pos to rotate around
+     * @param rotation rotation type
+     */
+    public void rotate(@NotNull final BlockPos center, final Rotation rotation)
     {
         BlockPos min = getAnchor();
         BlockPos max = getPeek();
@@ -231,16 +171,5 @@ public class StructureBB
         final int oldMin = minZ;
         minZ = -maxZ + 2 * center.getZ();
         maxZ = -oldMin + 2 * center.getZ();
-    }
-
-    /**
-     * Adds anchor to given zerobased pos so it becomes real world pos.
-     *
-     * @param  zeroBasedPos pos to transform
-     * @return              real world pos
-     */
-    public BlockPos transformZeroBasedToReal(final BlockPos zeroBasedPos)
-    {
-        return getAnchor().add(zeroBasedPos);
     }
 }

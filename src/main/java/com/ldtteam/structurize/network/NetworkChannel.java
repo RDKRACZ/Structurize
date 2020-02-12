@@ -1,7 +1,7 @@
 package com.ldtteam.structurize.network;
 
 import java.util.function.Supplier;
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.network.messages.IMessage;
 import com.ldtteam.structurize.util.Utils;
 import net.minecraft.entity.Entity;
@@ -30,7 +30,7 @@ public class NetworkChannel
     /**
      * Creates a new instance of network channel.
      *
-     * @param  channelName              unique channel name
+     * @param channelName unique channel name
      * @throws IllegalArgumentException if channelName already exists
      */
     public NetworkChannel(final String channelName)
@@ -68,7 +68,7 @@ public class NetworkChannel
             ctx.setPacketHandled(true);
             if (msg.getExecutionSide() != null && packetOrigin.equals(msg.getExecutionSide()))
             {
-                Instances.getLogger().warn("Receving {} at wrong side!", msg.getClass().getName());
+                Structurize.getLogger().warn("Receving {} at wrong side!", msg.getClass().getName());
                 return;
             }
             // boolean param MUST equals true if packet arrived at logical server
@@ -132,7 +132,7 @@ public class NetworkChannel
      *
      * @param msg message to send
      * @param pos target position and radius
-     * @see       TargetPoint
+     * @see TargetPoint
      */
     public void sendToPosition(final IMessage msg, final TargetPoint pos)
     {

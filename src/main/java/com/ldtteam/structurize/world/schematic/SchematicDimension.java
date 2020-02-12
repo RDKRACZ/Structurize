@@ -1,6 +1,6 @@
 package com.ldtteam.structurize.world.schematic;
 
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.world.ModDimensions;
 import com.mojang.datafixers.Dynamic;
 import net.minecraft.client.audio.MusicTicker.MusicType;
@@ -47,9 +47,9 @@ public class SchematicDimension extends OverworldDimension
     public ChunkGenerator<? extends GenerationSettings> createChunkGenerator()
     {
         final WorldType worldtype = world.getWorldInfo().getGenerator();
-        if (worldtype != Instances.getSchematicWorldType())
+        if (worldtype != Structurize.getSchematicWorldType())
         {
-            Instances.getLogger().warn("Creating schematic dimension in non schematic world type! Things may break.");
+            Structurize.getLogger().warn("Creating schematic dimension in non schematic world type! Things may break.");
         }
         final FlatGenerationSettings flatgenerationsettings =
             FlatGenerationSettings.createFlatGenerator(new Dynamic<>(NBTDynamicOps.INSTANCE, world.getWorldInfo().getGeneratorOptions()));

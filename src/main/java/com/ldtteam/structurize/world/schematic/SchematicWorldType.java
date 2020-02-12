@@ -1,7 +1,7 @@
 package com.ldtteam.structurize.world.schematic;
 
 import java.util.Random;
-import com.ldtteam.structurize.util.constants.GeneralConstants;
+import com.ldtteam.structurize.util.constant.GeneralConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.CreateFlatWorldScreen;
 import net.minecraft.client.gui.screen.CreateWorldScreen;

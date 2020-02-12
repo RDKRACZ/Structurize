@@ -3,7 +3,7 @@ package com.ldtteam.structurize.pipeline.build;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.BlockStateComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.EntityComponentPlacer;
 import com.ldtteam.structurize.pipeline.build.ComponentPlacer.FluidStateComponentPlacer;
@@ -61,9 +61,9 @@ public class RawPlacer
     /**
      * Prepares TileEntity for world placing.
      *
-     * @param  teCompound TileEntity data
-     * @param  tePos      structure pos
-     * @return            constructed TileEntity and REAL world pos
+     * @param teCompound TileEntity data
+     * @param tePos      structure pos
+     * @return constructed TileEntity and REAL world pos
      */
     public Tuple<TileEntity, BlockPos> transformDataToTileEntity(final CompoundNBT teCompound, final BlockPos tePos)
     {
@@ -79,15 +79,15 @@ public class RawPlacer
     /**
      * Prepares Entity for world placing.
      * 
-     * @param  entityCompound entity data
-     * @return                constructed Entity and REAL world pos
+     * @param entityCompound entity data
+     * @return constructed Entity and REAL world pos
      */
     public Tuple<Entity, Vec3d> transformDataToEntity(final CompoundNBT entityCompound)
     {
         final Optional<EntityType<?>> type = EntityType.readEntityType(entityCompound);
         if (!type.isPresent())
         {
-            Instances.getLogger().warn("Can't find entity type.");
+            Structurize.getLogger().warn("Can't find entity type.");
             return null;
         }
         final Entity entity = type.get().create(structureWorld);
@@ -99,21 +99,21 @@ public class RawPlacer
 
     public static BlockStateComponentPlacer getBlockStatePlacer(final BlockState blockState)
     {
-        return Instances.getComponentRegistries().getBlockStatePlacerRegistry().getValue(blockState.getBlock().getRegistryName());
+        return Structurize.getComponentRegistries().getBlockStatePlacerRegistry().getValue(blockState.getBlock().getRegistryName());
     }
 
     public static FluidStateComponentPlacer getFluidStatePlacer(final IFluidState fluidState)
     {
-        return Instances.getComponentRegistries().getFluidStatePlacerRegistry().getValue(fluidState.getFluid().getRegistryName());
+        return Structurize.getComponentRegistries().getFluidStatePlacerRegistry().getValue(fluidState.getFluid().getRegistryName());
     }
 
     public static TileEntityComponentPlacer getTileEntityPlacer(final TileEntity tileEntity)
     {
-        return Instances.getComponentRegistries().getTileEntityPlacerRegistry().getValue(tileEntity.getType().getRegistryName());
+        return Structurize.getComponentRegistries().getTileEntityPlacerRegistry().getValue(tileEntity.getType().getRegistryName());
     }
 
     public static EntityComponentPlacer getEntityPlacer(final Entity entity)
     {
-        return Instances.getComponentRegistries().getEntityPlacerRegistry().getValue(entity.getType().getRegistryName());
+        return Structurize.getComponentRegistries().getEntityPlacerRegistry().getValue(entity.getType().getRegistryName());
     }
 }

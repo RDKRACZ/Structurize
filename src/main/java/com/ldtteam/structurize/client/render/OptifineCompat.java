@@ -1,6 +1,6 @@
 package com.ldtteam.structurize.client.render;
 
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.Structurize;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.api.distmarker.Dist;
@@ -47,22 +47,22 @@ public class OptifineCompat
         {
             setupReflectedMethodReferences();
 
-            Instances.getLogger().info("Optifine found. Enabling compat.");
+            Structurize.getLogger().info("Optifine found. Enabling compat.");
             enableOptifine = true;
         }
         catch (final ClassNotFoundException e)
         {
-            Instances.getLogger().info("Optifine not found. Disabling compat.");
+            Structurize.getLogger().info("Optifine not found. Disabling compat.");
             enableOptifine = false;
         }
         catch (final NoSuchMethodException e)
         {
-            Instances.getLogger().error("Optifine found. But could not access related methods.", e);
+            Structurize.getLogger().error("Optifine found. But could not access related methods.", e);
             enableOptifine = false;
         }
         catch (final NoSuchFieldException e)
         {
-            Instances.getLogger().error("Optifine found. But could not access related fields", e);
+            Structurize.getLogger().error("Optifine found. But could not access related fields", e);
             enableOptifine = false;
         }
     }
@@ -222,7 +222,7 @@ public class OptifineCompat
         {
             if ((Boolean) isShadersEnabledMethod.invoke(null))
             {
-                Instances.getLogger().info("Recalculating normals in Optifine mode.");
+                Structurize.getLogger().info("Recalculating normals in Optifine mode.");
                 calcNormalForLayerMethod.invoke(null, tessellator.getBuilder());
             }
         }
@@ -244,8 +244,8 @@ public class OptifineCompat
      */
     private void shutdown(final String invokeOrAccess, final Exception e)
     {
-        Instances.getLogger().error("Failed to {} Optifine related rendering methods. Disabling Optifine Compat.", invokeOrAccess);
-        Instances.getLogger().error("", e);
+        Structurize.getLogger().error("Failed to {} Optifine related rendering methods. Disabling Optifine Compat.", invokeOrAccess);
+        Structurize.getLogger().error("", e);
         enableOptifine = false;
     }
 }

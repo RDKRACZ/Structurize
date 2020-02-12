@@ -2,7 +2,7 @@ package com.ldtteam.structurize.pipeline.defaults.build;
 
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicBoolean;
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.pipeline.build.BuildProvider;
 import com.ldtteam.structurize.pipeline.build.RawPlacer;
 import com.ldtteam.structurize.pipeline.build.StagedPlacer;
@@ -27,8 +27,7 @@ public class InstantBuildProvider extends BuildProvider
         final LinkedList<StageData<?, StagedPlacer>> stages = StagedPlacer.createDefaultStages(placeInsteadUsePlaceholders.getValue());
         // stages.removeFirst(); // don't need the clean phase
         currentPlacer = new StagedPlacer(placerIn, stages, (prev, next) -> {
-            Instances.getLogger()
-                .info("Stage change: FROM {} | TO {}", prev == null ? "NULL" : prev.toString(), next == null ? "NULL" : next.toString());
+            Structurize.getLogger().info("Stage change: FROM {} | TO {}", prev == null ? "NULL" : prev.toString(), next == null ? "NULL" : next.toString());
             stageStop.set(true);
         });
     }

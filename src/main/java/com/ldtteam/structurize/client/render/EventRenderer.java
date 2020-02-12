@@ -3,7 +3,7 @@ package com.ldtteam.structurize.client.render;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.pipeline.build.EventInfoHolder;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
@@ -33,14 +33,14 @@ public class EventRenderer
     /**
      * Adds active event for rendering. Use
      *
-     * @param  event new event
-     * @return       whether addition succeeded or not
+     * @param event new event
+     * @return whether addition succeeded or not
      */
     public boolean addActiveEvent(final EventInfoHolder<?> event)
     {
         if (!event.isCanceled())
         {
-            if (activeEvents.size() < Instances.getConfig().getClient().maxAmountOfRenderedEvents.get())
+            if (activeEvents.size() < Structurize.getConfig().getClient().maxAmountOfRenderedEvents.get())
             {
                 activeEvents.add(event);
                 return true;
@@ -77,7 +77,7 @@ public class EventRenderer
     public void renderActiveEvents(final WorldRenderer worldRenderer, final float partialTicks)
     {
         // TODO: should we not render remaining events if we cause tick lag?
-        final float modifiedPartialTicks = Instances.getConfig().getClient().structurePartialTicks.get() ? partialTicks : FALLBACK_PARTIAL_TICKS;
+        final float modifiedPartialTicks = Structurize.getConfig().getClient().structurePartialTicks.get() ? partialTicks : FALLBACK_PARTIAL_TICKS;
         final Iterator<EventInfoHolder<?>> iterator = activeEvents.iterator();
         while (iterator.hasNext())
         {

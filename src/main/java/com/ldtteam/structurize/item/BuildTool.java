@@ -1,6 +1,6 @@
 package com.ldtteam.structurize.item;
 
-import com.ldtteam.structurize.Instances;
+import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.client.gui.WindowBuildTool;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -97,6 +97,6 @@ public class BuildTool extends Item
     @Override
     public boolean hasContainerItem(final ItemStack itemStack)
     {
-        return !itemStack.isEmpty() && Instances.getConfig().getServer().buildToolSurvivesCrafting.get();
+        return !itemStack.isEmpty() && Structurize.getConfig().getServer().buildToolSurvivesCrafting.get();
     }
 }
