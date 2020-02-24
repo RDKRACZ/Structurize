@@ -3,8 +3,7 @@ package com.ldtteam.structurize.pipeline.build;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import com.ldtteam.structurize.Structurize;
-import com.ldtteam.structurize.structure.StructureBB;
+import com.ldtteam.structurize.structure.IStructureBB;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -29,7 +28,7 @@ public class RawPlacer
     protected final short[][][] structureBlocks;
     protected final List<CompoundNBT> structureEntities;
     protected final Map<BlockPos, CompoundNBT> structureTileEntities;
-    protected final StructureBB structurePosition;
+    protected final IStructureBB structurePosition;
     protected final World structureWorld;
 
     protected RawPlacer(final RawPlacer placer)
@@ -42,15 +41,17 @@ public class RawPlacer
         this.structureWorld = placer.structureWorld;
     }
 
-    public RawPlacer(final EventInfoHolder<?> event)
-    {
-        structureBlockPalette = event.getStructure().getBlockPalette();
-        structureBlocks = event.getStructure().getBlocks();
-        structureEntities = event.getStructure().getEntities();
-        structureTileEntities = event.getStructure().getTileEntities();
-        structurePosition = event.getPosition();
-        structureWorld = event.getWorld();
-    }
+    /*
+     * public RawPlacer(final EventInfoHolder<?> event)
+     * {
+     * structureBlockPalette = event.getStructure().getBlockPalette();
+     * structureBlocks = event.getStructure().getBlocks();
+     * structureEntities = event.getStructure().getEntities();
+     * structureTileEntities = event.getStructure().getTileEntities();
+     * structurePosition = event.getPosition();
+     * structureWorld = event.getWorld();
+     * }
+     */
 
     /**
      * Prepares TileEntity for world placing.
@@ -80,7 +81,7 @@ public class RawPlacer
         final Optional<EntityType<?>> type = EntityType.readEntityType(entityCompound);
         if (!type.isPresent())
         {
-            Structurize.getLogger().warn("Can't find entity type.");
+            // Structurize.getLogger().warn("Can't find entity type.");
             return null;
         }
         final Entity entity = type.get().create(structureWorld);
@@ -92,11 +93,11 @@ public class RawPlacer
 
     public static BlockInfoPlacer getBlockStatePlacer(final BlockState blockState)
     {
-        return Structurize.getComponentRegistries().getBlockInfoPlacerRegistry().getValue(blockState.getBlock().getRegistryName());
+        return null; // Structurize.getComponentRegistries().getBlockInfoPlacerRegistry().getValue(blockState.getBlock().getRegistryName());
     }
 
     public static EntityPlacer getEntityPlacer(final Entity entity)
     {
-        return Structurize.getComponentRegistries().getEntityPlacerRegistry().getValue(entity.getType().getRegistryName());
+        return null; // Structurize.getComponentRegistries().getEntityPlacerRegistry().getValue(entity.getType().getRegistryName());
     }
 }

@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import net.minecraft.util.math.BlockPos;
+import com.ldtteam.structurize.util.CubePosIterator;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CubePosIteratorTest

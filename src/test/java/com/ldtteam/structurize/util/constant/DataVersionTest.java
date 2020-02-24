@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+import com.ldtteam.structurize.util.constant.DataVersion;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataVersionTest

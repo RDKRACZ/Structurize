@@ -11,6 +11,7 @@ import com.ldtteam.structurize.pipeline.scan.EntityScanner;
 import com.ldtteam.structurize.util.LanguageHandler;
 import com.ldtteam.structurize.world.ModDimensions;
 import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
@@ -107,7 +108,7 @@ public class LifecycleSubscriber
      */
 
     @SubscribeEvent
-    public static void onESRegistry(final RegistryEvent.Register<EntityScanner<?>> event)
+    public static void onESRegistry(final RegistryEvent.Register<EntityScanner<Entity>> event)
     {
         Structurize.getLogger().warn("RegistryEvent.Register<ES>");
         Structurize.getComponentRegistries().registerDefaultES(event.getRegistry());
@@ -133,7 +134,7 @@ public class LifecycleSubscriber
      */
 
     @SubscribeEvent
-    public static void onEPRegistry(final RegistryEvent.Register<EntityPlacer<?>> event)
+    public static void onEPRegistry(final RegistryEvent.Register<EntityPlacer<Entity>> event)
     {
         Structurize.getLogger().warn("RegistryEvent.Register<EP>");
         Structurize.getComponentRegistries().registerDefaultEP(event.getRegistry());

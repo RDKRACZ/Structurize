@@ -8,6 +8,7 @@ import com.ldtteam.structurize.pipeline.defaults.scan.DefaultScanners;
 import com.ldtteam.structurize.pipeline.scan.BlockInfoScanner;
 import com.ldtteam.structurize.pipeline.scan.EntityScanner;
 import com.ldtteam.structurize.util.constant.Constants;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -19,9 +20,9 @@ public class ComponentRegistries
     private static final String DEFAULT_KEY_STRING = DEFAULT_KEY.toString();
 
     private final IForgeRegistry<BlockInfoScanner> blockInfoScannerRegistry;
-    private final IForgeRegistry<EntityScanner<?>> entityScannerRegistry;
+    private final IForgeRegistry<EntityScanner<Entity>> entityScannerRegistry;
     private final IForgeRegistry<BlockInfoPlacer> blockInfoPlacerRegistry;
-    private final IForgeRegistry<EntityPlacer<?>> entityPlacerRegistry;
+    private final IForgeRegistry<EntityPlacer<Entity>> entityPlacerRegistry;
     private final IForgeRegistry<BuildProvider> buildProviderRegistry;
 
     public ComponentRegistries()
@@ -47,7 +48,7 @@ public class ComponentRegistries
         registry.register(DefaultScanners.getDefaultBlockInfoScanner().setRegistryName(DEFAULT_KEY_STRING));
     }
 
-    public void registerDefaultES(final IForgeRegistry<EntityScanner<?>> registry)
+    public void registerDefaultES(final IForgeRegistry<EntityScanner<Entity>> registry)
     {
         registry.register(DefaultScanners.getDefaultEntityScanner().setRegistryName(DEFAULT_KEY_STRING));
     }
@@ -57,7 +58,7 @@ public class ComponentRegistries
         registry.register(DefaultPlacers.getDefaultBlockInfoPlacer().setRegistryName(DEFAULT_KEY_STRING));
     }
 
-    public void registerDefaultEP(final IForgeRegistry<EntityPlacer<?>> registry)
+    public void registerDefaultEP(final IForgeRegistry<EntityPlacer<Entity>> registry)
     {
         registry.register(DefaultPlacers.getDefaultEntityPlacer().setRegistryName(DEFAULT_KEY_STRING));
     }
@@ -72,7 +73,7 @@ public class ComponentRegistries
         return blockInfoScannerRegistry;
     }
 
-    public IForgeRegistry<EntityScanner<?>> getEntityScannerRegistry()
+    public IForgeRegistry<EntityScanner<Entity>> getEntityScannerRegistry()
     {
         return entityScannerRegistry;
     }
@@ -82,7 +83,7 @@ public class ComponentRegistries
         return blockInfoPlacerRegistry;
     }
 
-    public IForgeRegistry<EntityPlacer<?>> getEntityPlacerRegistry()
+    public IForgeRegistry<EntityPlacer<Entity>> getEntityPlacerRegistry()
     {
         return entityPlacerRegistry;
     }

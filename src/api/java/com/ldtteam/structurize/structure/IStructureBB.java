@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
  * Structure bounding box.
  * Anchor has every coord smaller or same than peek blockpos.
  */
-interface IStructureBB
+public interface IStructureBB
 {
     /**
      * Anchor has every coord smaller or same than peek.

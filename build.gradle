@@ -30,6 +30,12 @@ archivesBaseName = mod_id
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
+configurations.all {
+    resolutionStrategy {
+        force 'com.google.guava:guava:21.0'
+    }
+}
+
 sourceSets
 {
     api {
@@ -129,6 +135,8 @@ dependencies {
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+    apiImplementation com_intel_annotations
 
     implementation com_intel_annotations
     implementation com_ldtte_blockout
