@@ -1,7 +1,7 @@
 package com.ldtteam.structurize.world.schematic;
 
 import java.util.Random;
-import com.ldtteam.structurize.util.constant.GeneralConstants;
+import com.ldtteam.structurize.util.constant.Constants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.CreateFlatWorldScreen;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
@@ -19,7 +19,7 @@ public class SchematicWorldType extends WorldType
      */
     public SchematicWorldType()
     {
-        super(GeneralConstants.MOD_ID);
+        super(Constants.MOD_ID);
         setCustomOptions(true);
         enableInfoNotice();
     }

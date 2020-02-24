@@ -2,7 +2,6 @@ package com.ldtteam.structurize.structure;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import com.ldtteam.structurize.util.constant.DataVersion;
 import net.minecraft.util.Direction;
 
@@ -34,20 +33,15 @@ public class Attribute<T>
      */
     public static final Attribute<Short> GROUND_LEVEL = new Attribute<>(3, "Ground level", Short.class, Short.valueOf((short) 0));
     /**
-     * Author system identifier.
-     * Null if structure was not uploaded on or created for structure server
-     */
-    public static final Attribute<UUID> AUTHOR_UUID = new Attribute<>(4, "account identifier", UUID.class, null);
-    /**
      * Schematic system identifier.
      * Null if structure was not uploaded on or created for structure server
      */
-    public static final Attribute<UUID> SCHEMATIC_UUID = new Attribute<>(5, "schematic identifier", UUID.class, null);
+    public static final Attribute<StructureId> SCHEMATIC_UUID = new Attribute<>(4, "schematic identifier", StructureId.class, null);
     /**
      * Minecraft data version.
      * Default is data version of this running Minecraft instance
      */
-    public static final Attribute<DataVersion> DATA_VERSION = new Attribute<>(6,
+    public static final Attribute<DataVersion> DATA_VERSION = new Attribute<>(5,
         "Minecraft version",
         DataVersion.class,
         DataVersion.CURRENT);
@@ -56,7 +50,7 @@ public class Attribute<T>
      * Default is empty list
      * TODO: add mod dependency class, equals modId + version equals or newer
      */
-    public static final Attribute<List> REQUIRED_MODS = new Attribute<List>(7, "Required mods", List.class, new ArrayList<>());
+    public static final Attribute<List> REQUIRED_MODS = new Attribute<List>(6, "Required mods", List.class, new ArrayList<>());
 
     /**
      * Collection of all attributes

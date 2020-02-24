@@ -1,6 +1,6 @@
 package com.ldtteam.structurize.command;
 
-import com.ldtteam.structurize.util.constant.GeneralConstants;
+import com.ldtteam.structurize.util.constant.Constants;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
 
@@ -39,7 +39,7 @@ public class EntryPoint extends AbstractCommand
      */
     public static void register(final CommandDispatcher<CommandSource> dispatcher)
     {
-        final CommandTree structurizeRoot = new CommandTree(GeneralConstants.MOD_ID).addNode(EventMovesCommand.build());
+        final CommandTree structurizeRoot = new CommandTree(Constants.MOD_ID).addNode(EventMovesCommand.build());
 
         dispatcher.register(structurizeRoot.build());
     }

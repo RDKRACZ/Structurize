@@ -1,128 +1,128 @@
 package com.ldtteam.structurize.client.render;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import com.ldtteam.structurize.Structurize;
-import com.ldtteam.structurize.pipeline.build.EventInfoHolder;
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.Minecraft;
+import java.util.function.Supplier;
+import com.ldtteam.structurize.structure.Structure;
+import com.ldtteam.structurize.structure.StructureBB;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.BlockPos;
 
 /**
- * Static class for rendering active events.
+ * Renderer holder for attaching few renderers into one.
  */
-public class EventRenderer
+public class EventRenderer implements IRenderer
 {
-    private static final float FALLBACK_PARTIAL_TICKS = 0.5f;
+    private final List<Object> renderPipeline;
 
-    private final List<EventInfoHolder<?>> activeEvents = new ArrayList<>();
-    private boolean recompileTesselators = false;
+    private EventRenderer(final Builder builder)
+    {
+        renderPipeline = builder.renderPipeline;
+    }
+
+    @Override
+    public void rebuild()
+    {
+        for (final Object action : renderPipeline)
+        {
+            if (action instanceof IRenderer)
+            {
+                ((IRenderer) action).rebuild();
+            }
+        }
+    }
+
+    @Override
+    public void render(final WorldRenderer context, final MatrixStack matrixStack, final float partialTicks)
+    {
+        for (final Object action : renderPipeline)
+        {
+            if (action instanceof IRenderer)
+            {
+                ((IRenderer) action).render(context, matrixStack, partialTicks);
+            }
+            else if (action instanceof IRenderStateModifier)
+            {
+                ((IRenderStateModifier) action).run(context, matrixStack, partialTicks);
+            }
+        }
+    }
 
     /**
-     * Creates new instance.
+     * @return new EventRenderer builder
      */
-    public EventRenderer()
+    public static Builder builder()
     {
+        return new Builder();
+    }
+
+    public static class Builder
+    {
+        private final List<Object> renderPipeline = new ArrayList<>();
+
+        private Builder()
+        {
+        }
+
         /**
-         * Intentionally left empty
+         * Adds structure renderer.
+         *
+         * @param structure   rendered structure
+         * @param structureBB its bounding box
+         * @return updated builder instance
          */
-    }
-
-    /**
-     * Adds active event for rendering. Use
-     *
-     * @param event new event
-     * @return whether addition succeeded or not
-     */
-    public boolean addActiveEvent(final EventInfoHolder<?> event)
-    {
-        if (!event.isCanceled())
+        public Builder structure(final Structure structure, final StructureBB structureBB)
         {
-            if (activeEvents.size() < Structurize.getConfig().getClient().maxAmountOfRenderedEvents.get())
-            {
-                activeEvents.add(event);
-                return true;
-            }
+            renderPipeline.add(new StructureRenderer(structure, structureBB));
+            return this;
         }
-        return false;
-    }
 
-    /**
-     * Marks all active events as canceled.
-     */
-    public void cancelAllActiveEvents()
-    {
-        for (final EventInfoHolder<?> e : activeEvents)
+        /**
+         * Adds box renderer.
+         *
+         * @param structureBB rendered box
+         * @return updated builder instance
+         */
+        public Builder box(final StructureBB structureBB)
         {
-            e.cancel();
+            renderPipeline.add(new BoxRenderer(structureBB));
+            return this;
         }
-    }
 
-    /**
-     * Forces every renderer tessellator to recompile.
-     */
-    public void recompileTessellators()
-    {
-        recompileTesselators = true;
-    }
-
-    /**
-     * Renders all active events onto player's screen.
-     *
-     * @param worldRenderer event data
-     * @param partialTicks  event data
-     */
-    public void renderActiveEvents(final WorldRenderer worldRenderer, final float partialTicks)
-    {
-        // TODO: should we not render remaining events if we cause tick lag?
-        final float modifiedPartialTicks = Structurize.getConfig().getClient().structurePartialTicks.get() ? partialTicks : FALLBACK_PARTIAL_TICKS;
-        final Iterator<EventInfoHolder<?>> iterator = activeEvents.iterator();
-        while (iterator.hasNext())
+        /**
+         * Translate rendering from player relative to world absolute using pos from supplier.
+         *
+         * @param absolutePosSupplier supplier of world absolute position
+         * @return updated builder instance
+         */
+        public Builder absolutePos(final Supplier<BlockPos> absolutePosSupplier)
         {
-            // TODO: proper rendering order would be great, need to determine fronts and backs
-            final EventInfoHolder<?> event = iterator.next();
-            if (event.isCanceled())
-            {
-                iterator.remove();
-                continue;
-            }
-
-            renderEvent(event, modifiedPartialTicks);
+            renderPipeline.add(new PositionTranslator.Apply(absolutePosSupplier));
+            return this;
         }
-        recompileTesselators = false;
-    }
 
-    /**
-     * Renders event onto player's screen.
-     *
-     * @param event        event to render
-     * @param partialTicks render time between two logic ticks
-     */
-    private void renderEvent(final EventInfoHolder<?> event, final float partialTicks)
-    {
-        final Vec3d projectedView = Minecraft.getInstance().gameRenderer.getActiveRenderInfo().getProjectedView();
+        /**
+         * Restores world absolute rendering to player relative.
+         *
+         * @return updated builder instance
+         */
+        public Builder absolutePosRestore()
+        {
+            renderPipeline.add(new PositionTranslator.Reset());
+            return this;
+        }
 
-        event.getRenderer().draw(projectedView, recompileTesselators, partialTicks);
-
-        renderStructureBB(event, projectedView);
-    }
-
-    /**
-     * Renders white structure BB.
-     * TODO: create special renderer and add ground level entrance face etc.
-     *
-     * @param event event to render
-     * @param view  screen view
-     */
-    private void renderStructureBB(final EventInfoHolder<?> event, final Vec3d view)
-    {
-        GlStateManager.lineWidth(2.0F);
-        GlStateManager.disableTexture();
-        GlStateManager.depthMask(false);
-        WorldRenderer.drawSelectionBoundingBox(event.getPosition().toAABB().expand(1, 1, 1).offset(view.scale(-1)), 1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.depthMask(true);
-        GlStateManager.enableTexture();
+        /**
+         * Builds new EventRenderer based on this builder.
+         *
+         * @return new EventRenderer
+         */
+        public EventRenderer build()
+        {
+            final EventRenderer built = new EventRenderer(this);
+            built.rebuild();
+            return built;
+        }
     }
 }

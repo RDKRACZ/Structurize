@@ -3,8 +3,7 @@ package com.ldtteam.structurize.config;
 import java.util.List;
 import java.util.function.Predicate;
 import com.ldtteam.structurize.util.LanguageHandler;
-import com.ldtteam.structurize.util.constant.GeneralConstants;
-
+import com.ldtteam.structurize.util.constant.Constants;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.Builder;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
@@ -36,7 +35,7 @@ public abstract class AbstractConfiguration
 
     private static String nameTKey(final String key)
     {
-        return GeneralConstants.MOD_ID + ".config." + key;
+        return Constants.MOD_ID + ".config." + key;
     }
 
     private static String commentTKey(final String key)
@@ -79,7 +78,11 @@ public abstract class AbstractConfiguration
         return defineDouble(builder, key, defaultValue, Double.MIN_VALUE, Double.MAX_VALUE);
     }
 
-    protected static DoubleValue defineDouble(final Builder builder, final String key, final double defaultValue, final double min, final double max)
+    protected static DoubleValue defineDouble(final Builder builder,
+        final String key,
+        final double defaultValue,
+        final double min,
+        final double max)
     {
         return buildBase(builder, key).defineInRange(key, defaultValue, min, max);
     }

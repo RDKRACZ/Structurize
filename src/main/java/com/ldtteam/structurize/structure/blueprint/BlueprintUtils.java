@@ -132,9 +132,9 @@ public class BlueprintUtils
             final Vec3d oldPos = entity.getPositionVector();
             final CompoundNBT entityTag = entity.serializeNBT();
             final ListNBT posList = new ListNBT();
-            posList.add(new DoubleNBT(oldPos.x - structBB.getAnchor().getX()));
-            posList.add(new DoubleNBT(oldPos.y - structBB.getAnchor().getY()));
-            posList.add(new DoubleNBT(oldPos.z - structBB.getAnchor().getZ()));
+            posList.add(DoubleNBT.valueOf(oldPos.x - structBB.getAnchor().getX()));
+            posList.add(DoubleNBT.valueOf(oldPos.y - structBB.getAnchor().getY()));
+            posList.add(DoubleNBT.valueOf(oldPos.z - structBB.getAnchor().getZ()));
 
             BlockPos entityPos = entity.getPosition();
             if (entity instanceof HangingEntity)
@@ -142,9 +142,9 @@ public class BlueprintUtils
                 entityPos = ((HangingEntity) entity).getHangingPosition();
             }
             entityTag.put("Pos", posList);
-            entityTag.put("TileX", new IntNBT(entityPos.getX() - structBB.getAnchor().getX()));
-            entityTag.put("TileY", new IntNBT(entityPos.getY() - structBB.getAnchor().getY()));
-            entityTag.put("TileZ", new IntNBT(entityPos.getZ() - structBB.getAnchor().getZ()));
+            entityTag.put("TileX", IntNBT.valueOf(entityPos.getX() - structBB.getAnchor().getX()));
+            entityTag.put("TileY", IntNBT.valueOf(entityPos.getY() - structBB.getAnchor().getY()));
+            entityTag.put("TileZ", IntNBT.valueOf(entityPos.getZ() - structBB.getAnchor().getZ()));
             entitiesTag.add(entityTag);
         }
 
@@ -210,7 +210,7 @@ public class BlueprintUtils
         for (final String requiredMod : schem.getRequiredMods())
         {
             // modsList.set(i,);
-            modsList.add(new StringNBT(requiredMod));
+            modsList.add(StringNBT.valueOf(requiredMod));
         }
         tag.put("required_mods", modsList);
 
@@ -226,7 +226,7 @@ public class BlueprintUtils
             final ListNBT architectsTag = new ListNBT();
             for (final String architect : architects)
             {
-                architectsTag.add(new StringNBT(architect));
+                architectsTag.add(StringNBT.valueOf(architect));
             }
             tag.put("architects", architectsTag);
         }

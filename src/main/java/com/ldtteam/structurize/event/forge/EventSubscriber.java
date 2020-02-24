@@ -1,4 +1,4 @@
-package com.ldtteam.structurize.event;
+package com.ldtteam.structurize.event.forge;
 
 import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.command.EntryPoint;

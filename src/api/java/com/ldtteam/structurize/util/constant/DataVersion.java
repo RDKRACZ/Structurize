@@ -2,6 +2,9 @@ package com.ldtteam.structurize.util.constant;
 
 import net.minecraft.util.SharedConstants;
 
+/**
+ * Enum for data
+ */
 public enum DataVersion
 {
     /*

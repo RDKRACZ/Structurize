@@ -85,7 +85,7 @@ public class AnyblockSubstitution extends Block
                     SHOULD_RENDER_BLOCK_TEXTURE.set(!SHOULD_RENDER_BLOCK_TEXTURE.get());
                     final SectionPos center = SectionPos.from(playerIn.getPosition());
                     ((ClientWorld) worldIn).markSurroundingsForRerender(center.getX(), center.getY(), center.getZ());
-                    Structurize.getEventRenderer().recompileTessellators();
+                    // Structurize.getEventRenderer().recompileTessellators();
                 }
 
                 return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getHeldItem(handIn));

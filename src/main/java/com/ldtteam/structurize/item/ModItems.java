@@ -7,7 +7,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.registries.IForgeRegistry;
 import static com.ldtteam.structurize.block.ModBlocks.*;
-import com.ldtteam.structurize.util.constant.GeneralConstants;
+import com.ldtteam.structurize.util.constant.Constants;
 
 /**
  * Utils for mod items init
@@ -83,7 +83,7 @@ public class ModItems
          */
         private ModItemGroup()
         {
-            super(GeneralConstants.MOD_NAME);
+            super(Constants.MOD_NAME);
         }
 
         /**

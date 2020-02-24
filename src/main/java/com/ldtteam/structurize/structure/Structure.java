@@ -26,9 +26,9 @@ public class Structure implements IStructure
     }
 
     @Override
-    public IStructureBB getBoundingBox()
+    public StructureBB createBoundingBox(final BlockPos where)
     {
-        return null;
+        return new StructureBB(null, null);
     }
 
     @Override

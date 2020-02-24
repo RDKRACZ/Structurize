@@ -4,7 +4,6 @@ buildscript {
         maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
-        flatDir { dirs 'libs' }
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: forge_gradle_ver, changing: true
@@ -14,6 +13,14 @@ apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+
+repositories {
+    flatDir { dirs 'libs' }
+    maven {
+        name 'LDTTeam - Modding'
+        url 'https://ldtteam.jfrog.io/ldtteam/modding/'
+    }
+}
 
 version = mod_ver
 group = mod_class_group // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -73,6 +80,7 @@ minecraft {
             mods {
                 structurize {
                     source sourceSets.main
+                    source sourceSets.api
                 }
             }
         }
@@ -89,6 +97,7 @@ minecraft {
             mods {
                 structurize {
                     source sourceSets.main
+                    source sourceSets.api
                 }
             }
         }
@@ -120,6 +129,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
     implementation com_intel_annotations
+    implementation com_ldtte_blockout
 
     testImplementation junit_junit
     testImplementation org_mocki_mockitocore
@@ -149,15 +159,7 @@ task apiJar(type: Jar) {
 }
 
 // Example configuration to allow publishing using the maven-publish task
-// we define a custom artifact that is sourced from the reobfJar output task
-// and then declare that to be published
-// Note you'll need to add a repository here
-def reobfFile = file("$buildDir/reobfJar/output.jar")
-def reobfArtifact = artifacts.add('default', reobfFile) {
-    type 'jar'
-    builtBy 'reobfJar'
-}
-
-task setupCIWorkspace {
-    //dummy task
-}
+// This is the preferred method to reobfuscate your jar file
+jar.finalizedBy('reobfJar') 
+// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
+//publish.dependsOn('reobfJar')

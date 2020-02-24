@@ -27,7 +27,8 @@ public class BlueprintStructureDataProvider implements IStructureDataProvider
     private Map<BlockPos, CompoundNBT> transformedTEs = null;
 
     private BlueprintStructureDataProvider()
-    {}
+    {
+    }
 
     /**
      * Creates new structure provider.
@@ -59,7 +60,7 @@ public class BlueprintStructureDataProvider implements IStructureDataProvider
         blueprint = BlueprintUtils.readFromStream(path);
         blueprintPath = path;
         mirrorRotationAnchor = null;
-        event.getPosition().resize(getXsize(), getYsize(), getZsize());
+        // event.getPosition().resize(getXsize(), getYsize(), getZsize());
     }
 
     /**
@@ -107,33 +108,33 @@ public class BlueprintStructureDataProvider implements IStructureDataProvider
     @Override
     public void rotateClockwise()
     {
-        event.getPosition().rotateCW(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
+        // event.getPosition().rotateCW(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
         applyMirrorRotationOnStructure(Rotation.CLOCKWISE_90, Mirror.NONE);
-        event.getRenderer().recompile();
+        // event.getRenderer().recompile();
     }
 
     @Override
     public void rotateCounterClockwise()
     {
-        event.getPosition().rotateCCW(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
+        // event.getPosition().rotateCCW(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
         applyMirrorRotationOnStructure(Rotation.COUNTERCLOCKWISE_90, Mirror.NONE);
-        event.getRenderer().recompile();
+        // event.getRenderer().recompile();
     }
 
     @Override
     public void mirrorX()
     {
-        event.getPosition().mirrorX(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
+        // event.getPosition().mirrorX(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
         applyMirrorRotationOnStructure(Rotation.NONE, Mirror.FRONT_BACK);
-        event.getRenderer().recompile();
+        // event.getRenderer().recompile();
     }
 
     @Override
     public void mirrorZ()
     {
-        event.getPosition().mirrorZ(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
+        // event.getPosition().mirrorZ(getZeroBasedMirrorRotationAnchor().add(event.getPosition().getAnchor()));
         applyMirrorRotationOnStructure(Rotation.NONE, Mirror.LEFT_RIGHT);
-        event.getRenderer().recompile();
+        // event.getRenderer().recompile();
     }
 
     @Override

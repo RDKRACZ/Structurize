@@ -3,7 +3,7 @@ package com.ldtteam.structurize.util.constant;
 /**
  * Class for storing general constants
  */
-public class GeneralConstants
+public class Constants
 {
     public static final String MOD_ID = "structurize";
     public static final String MOD_NAME = "Structurize";
@@ -11,7 +11,7 @@ public class GeneralConstants
     /**
      * Private constructor to hide implicit public one.
      */
-    private GeneralConstants()
+    private Constants()
     {
         /*
          * Intentionally left empty

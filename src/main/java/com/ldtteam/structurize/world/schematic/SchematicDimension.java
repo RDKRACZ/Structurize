@@ -51,9 +51,9 @@ public class SchematicDimension extends OverworldDimension
         {
             Structurize.getLogger().warn("Creating schematic dimension in non schematic world type! Things may break.");
         }
-        final FlatGenerationSettings flatgenerationsettings =
-            FlatGenerationSettings.createFlatGenerator(new Dynamic<>(NBTDynamicOps.INSTANCE, world.getWorldInfo().getGeneratorOptions()));
-        final SingleBiomeProviderSettings singlebiomeprovidersettings1 = BiomeProviderType.FIXED.createSettings().setBiome(flatgenerationsettings.getBiome());
+        final FlatGenerationSettings flatgenerationsettings = FlatGenerationSettings
+            .createFlatGenerator(new Dynamic<>(NBTDynamicOps.INSTANCE, world.getWorldInfo().getGeneratorOptions()));
+        final SingleBiomeProviderSettings singlebiomeprovidersettings1 = BiomeProviderType.FIXED.func_226840_a_(world.getWorldInfo());
         return ChunkGeneratorType.FLAT.create(world, BiomeProviderType.FIXED.create(singlebiomeprovidersettings1), flatgenerationsettings);
     }
 

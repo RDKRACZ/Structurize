@@ -8,7 +8,7 @@ import com.ldtteam.structurize.pipeline.defaults.build.InstantBuildProvider;
 import com.ldtteam.structurize.pipeline.defaults.scan.DefaultScanners;
 import com.ldtteam.structurize.pipeline.scan.BlockInfoScanner;
 import com.ldtteam.structurize.pipeline.scan.EntityScanner;
-import com.ldtteam.structurize.util.constant.GeneralConstants;
+import com.ldtteam.structurize.util.constant.Constants;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -16,7 +16,7 @@ import net.minecraftforge.registries.RegistryBuilder;
 
 public class ComponentRegistries
 {
-    private static final ResourceLocation DEFAULT_KEY = new ResourceLocation(GeneralConstants.MOD_ID, "default");
+    private static final ResourceLocation DEFAULT_KEY = new ResourceLocation(Constants.MOD_ID, "default");
     private static final String DEFAULT_KEY_STRING = DEFAULT_KEY.toString();
 
     private final IForgeRegistry<BlockInfoScanner> blockInfoScannerRegistry;
@@ -36,7 +36,7 @@ public class ComponentRegistries
 
     protected static <T extends IForgeRegistryEntry<T>> RegistryBuilder<T> buildRegistry(final Class<T> clazz, final String name)
     {
-        return new RegistryBuilder<T>().setName(new ResourceLocation(GeneralConstants.MOD_ID, name))
+        return new RegistryBuilder<T>().setName(new ResourceLocation(Constants.MOD_ID, name))
             .setDefaultKey(DEFAULT_KEY)
             .disableSaving()
             .setType(clazz)

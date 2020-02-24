@@ -81,7 +81,7 @@ interface IStructureBB
      */
     default AxisAlignedBB toZeroBasedAABB()
     {
-        return new AxisAlignedBB(0, 0, 0, getXSize(), getYSize(), getZSize());
+        return new AxisAlignedBB(0, 0, 0, getXSize() - 1, getYSize() - 1, getZSize() - 1);
     }
 
     /**

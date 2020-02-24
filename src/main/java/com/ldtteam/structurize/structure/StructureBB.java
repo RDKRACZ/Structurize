@@ -1,7 +1,6 @@
 package com.ldtteam.structurize.structure;
 
-import com.ldtteam.structurize.util.CubePosIterator;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -33,6 +32,21 @@ public class StructureBB implements IStructureBB
         maxX = Math.max(start.getX(), end.getX());
         maxY = Math.max(start.getY(), end.getY());
         maxZ = Math.max(start.getZ(), end.getZ());
+    }
+
+    /**
+     * Creates a copy from given instance.
+     *
+     * @param original instance to be copied
+     */
+    public StructureBB(final StructureBB original)
+    {
+        minX = original.minX;
+        minY = original.minY;
+        minZ = original.minZ;
+        maxX = original.maxX;
+        maxY = original.maxY;
+        maxZ = original.maxZ;
     }
 
     @Override
@@ -76,7 +90,7 @@ public class StructureBB implements IStructureBB
      *
      * @param vector move vector
      */
-    public void moveBy(@NotNull final BlockPos vector)
+    public void moveBy(final BlockPos vector)
     {
         minX += vector.getX();
         minY += vector.getY();
@@ -87,46 +101,12 @@ public class StructureBB implements IStructureBB
     }
 
     /**
-     * Recalculates peek to match given size.
-     *
-     * @param newXSize new X axis size
-     * @param newYSize new Y axis size
-     * @param newZSize new Z axis size
-     */
-    public void resize(final int newXSize, final int newYSize, final int newZSize)
-    {
-        maxX = minX + newXSize - 1;
-        maxY = minY + newYSize - 1;
-        maxZ = minZ + newZSize - 1;
-    }
-
-    /**
-     * Rotates clockwise around given center.
-     *
-     * @param center real world pos to rotate around
-     */
-    public void rotateCW(@NotNull final BlockPos center)
-    {
-        rotate(center, Rotation.CLOCKWISE_90);
-    }
-
-    /**
-     * Rotates counterclockwise around given center.
-     *
-     * @param center real world pos to rotate around
-     */
-    public void rotateCCW(@NotNull final BlockPos center)
-    {
-        rotate(center, Rotation.COUNTERCLOCKWISE_90);
-    }
-
-    /**
      * Rotates using given rotation around given center.
      *
      * @param center   real world pos to rotate around
      * @param rotation rotation type
      */
-    public void rotate(@NotNull final BlockPos center, final Rotation rotation)
+    public void rotate(final BlockPos center, final Rotation rotation)
     {
         BlockPos min = getAnchor();
         BlockPos max = getPeek();
@@ -150,26 +130,39 @@ public class StructureBB implements IStructureBB
     }
 
     /**
-     * Mirrors through YZ plane using given center.
+     * Mirrors using given mirror through given center.
      *
-     * @param center real world pos to mirror over
+     * @param center real world pos to mirror through
+     * @param mirror mirror type
      */
-    public void mirrorX(@NotNull final BlockPos center)
+    public void mirror(final BlockPos center, final Mirror mirror)
     {
-        final int oldMin = minX;
-        minX = -maxX + 2 * center.getX();
-        maxX = -oldMin + 2 * center.getX();
-    }
+        BlockPos min = getAnchor();
+        BlockPos max = getPeek();
 
-    /**
-     * Mirrors through XY plane using given center.
-     *
-     * @param center real world pos to mirror over
-     */
-    public void mirrorZ(@NotNull final BlockPos center)
-    {
-        final int oldMin = minZ;
-        minZ = -maxZ + 2 * center.getZ();
-        maxZ = -oldMin + 2 * center.getZ();
+        // translate
+        min = min.subtract(center);
+        max = max.subtract(center);
+
+        // mirror
+        if (mirror == Mirror.FRONT_BACK)
+        {
+            min = new BlockPos(min.getX(), min.getY(), -1 * min.getZ());
+            max = new BlockPos(max.getX(), max.getY(), -1 * max.getZ());
+        }
+        else if (mirror == Mirror.LEFT_RIGHT)
+        {
+            min = new BlockPos(-1 * min.getX(), min.getY(), min.getZ());
+            max = new BlockPos(-1 * max.getX(), max.getY(), max.getZ());
+        }
+
+        // translate
+        min = min.add(center);
+        max = max.add(center);
+
+        minX = Math.min(min.getX(), max.getX());
+        minZ = Math.min(min.getZ(), max.getZ());
+        maxX = Math.max(min.getX(), max.getX());
+        maxZ = Math.max(min.getZ(), max.getZ());
     }
 }

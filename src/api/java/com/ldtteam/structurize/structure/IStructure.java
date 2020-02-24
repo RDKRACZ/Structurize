@@ -38,11 +38,12 @@ public interface IStructure
     List<Entity> getEntities();
 
     /**
-     * Getter for structure bounding box. Contains things like anchor and peek poses, sizes, volume...
+     * Creates new structure bounding box. Contains things like anchor and peek poses, sizes, volume...
      *
+     * @param where anchor for new bounding box
      * @return {@link StructureBB}
      */
-    IStructureBB getBoundingBox();
+    IStructureBB createBoundingBox(BlockPos where);
 
     /**
      * @return {@link IAttributeMap}
