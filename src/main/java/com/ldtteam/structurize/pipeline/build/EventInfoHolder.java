@@ -45,17 +45,19 @@ public class EventInfoHolder<T extends IStructureDataProvider>
     /**
      * Creates blueprint event.
      *
-     * @param  anchorPos position where should structure begin
-     * @param  world     world of player
-     * @return           new blueprint event
+     * @param anchorPos position where should structure begin
+     * @param world     world of player
+     * @return new blueprint event
      */
     public static EventInfoHolder<BlueprintStructureDataProvider> createBlueprintEvent(final BlockPos anchorPos, final World world)
     {
-        final EventInfoHolder<BlueprintStructureDataProvider> result =
-            new EventInfoHolder<>(BlueprintStructureDataProvider.create(), anchorPos, world);
+        final EventInfoHolder<BlueprintStructureDataProvider> result = new EventInfoHolder<>(BlueprintStructureDataProvider.create(),
+            anchorPos,
+            world);
         result.getStructure().setEvent(result);
         result.getStructure()
-            .setStructurePath(Minecraft.getInstance().gameDir.toPath().resolve("structurize").resolve("tempschem.blueprint").toAbsolutePath());
+            .setStructurePath(
+                Minecraft.getInstance().gameDir.toPath().resolve("structurize").resolve("tempschem.blueprint").toAbsolutePath());
         return result;
     }
 
@@ -102,11 +104,7 @@ public class EventInfoHolder<T extends IStructureDataProvider>
      */
     public StructureRenderer getRenderer()
     {
-        if (renderer == null)
-        {
-            renderer = new StructureRenderer(this, true);
-        }
-        return renderer;
+        return null;
     }
 
     /**

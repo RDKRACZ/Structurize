@@ -51,7 +51,7 @@ public class BuildTool extends Item
         final ItemStack itemstack = playerIn.getHeldItem(handIn);
         if (worldIn.isRemote())
         {
-            WindowBuildTool.open(playerIn.getPosition(), playerIn);
+            // WindowBuildTool.open(playerIn.getPosition(), playerIn);
         }
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
@@ -67,7 +67,7 @@ public class BuildTool extends Item
     {
         if (!context.getWorld().isRemote())
         {
-            WindowBuildTool.open(context.getPos(), context.getPlayer());
+            // WindowBuildTool.open(context.getPos(), context.getPlayer());
         }
         return ActionResultType.SUCCESS;
     }

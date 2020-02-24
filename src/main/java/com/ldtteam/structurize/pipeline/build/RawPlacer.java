@@ -4,16 +4,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import com.ldtteam.structurize.Structurize;
-import com.ldtteam.structurize.pipeline.build.ComponentPlacer.BlockStateComponentPlacer;
-import com.ldtteam.structurize.pipeline.build.ComponentPlacer.EntityComponentPlacer;
-import com.ldtteam.structurize.pipeline.build.ComponentPlacer.FluidStateComponentPlacer;
-import com.ldtteam.structurize.pipeline.build.ComponentPlacer.TileEntityComponentPlacer;
 import com.ldtteam.structurize.structure.StructureBB;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.fluid.IFluidState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Tuple;
@@ -70,8 +64,7 @@ public class RawPlacer
         final BlockPos worldPos = structurePosition.getAnchor().add(tePos);
         final TileEntity te = TileEntity.create(teCompound);
 
-        te.setPos(worldPos);
-        te.setWorld(structureWorld);
+        te.setWorldAndPos(structureWorld, worldPos);
 
         return new Tuple<TileEntity, BlockPos>(te, worldPos);
     }
@@ -97,22 +90,12 @@ public class RawPlacer
         return new Tuple<Entity, Vec3d>(entity, newPos);
     }
 
-    public static BlockStateComponentPlacer getBlockStatePlacer(final BlockState blockState)
+    public static BlockInfoPlacer getBlockStatePlacer(final BlockState blockState)
     {
-        return Structurize.getComponentRegistries().getBlockStatePlacerRegistry().getValue(blockState.getBlock().getRegistryName());
+        return Structurize.getComponentRegistries().getBlockInfoPlacerRegistry().getValue(blockState.getBlock().getRegistryName());
     }
 
-    public static FluidStateComponentPlacer getFluidStatePlacer(final IFluidState fluidState)
-    {
-        return Structurize.getComponentRegistries().getFluidStatePlacerRegistry().getValue(fluidState.getFluid().getRegistryName());
-    }
-
-    public static TileEntityComponentPlacer getTileEntityPlacer(final TileEntity tileEntity)
-    {
-        return Structurize.getComponentRegistries().getTileEntityPlacerRegistry().getValue(tileEntity.getType().getRegistryName());
-    }
-
-    public static EntityComponentPlacer getEntityPlacer(final Entity entity)
+    public static EntityPlacer getEntityPlacer(final Entity entity)
     {
         return Structurize.getComponentRegistries().getEntityPlacerRegistry().getValue(entity.getType().getRegistryName());
     }

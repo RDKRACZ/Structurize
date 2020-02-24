@@ -4,7 +4,6 @@ import com.ldtteam.structurize.pipeline.build.BlockInfoPlacer;
 import com.ldtteam.structurize.pipeline.build.BuildProvider;
 import com.ldtteam.structurize.pipeline.build.EntityPlacer;
 import com.ldtteam.structurize.pipeline.defaults.build.DefaultPlacers;
-import com.ldtteam.structurize.pipeline.defaults.build.InstantBuildProvider;
 import com.ldtteam.structurize.pipeline.defaults.scan.DefaultScanners;
 import com.ldtteam.structurize.pipeline.scan.BlockInfoScanner;
 import com.ldtteam.structurize.pipeline.scan.EntityScanner;
@@ -65,10 +64,10 @@ public class ComponentRegistries
 
     public void registerDefaultBP(final IForgeRegistry<BuildProvider> registry)
     {
-        registry.registerAll(new InstantBuildProvider().setRegistryName(DEFAULT_KEY_STRING));
+        // registry.registerAll(new InstantBuildProvider().setRegistryName(DEFAULT_KEY_STRING));
     }
 
-    public IForgeRegistry<BlockInfoScanner> getBlockStateScannerRegistry()
+    public IForgeRegistry<BlockInfoScanner> getBlockInfoScannerRegistry()
     {
         return blockInfoScannerRegistry;
     }
@@ -78,7 +77,7 @@ public class ComponentRegistries
         return entityScannerRegistry;
     }
 
-    public IForgeRegistry<BlockInfoPlacer> getBlockStatePlacerRegistry()
+    public IForgeRegistry<BlockInfoPlacer> getBlockInfoPlacerRegistry()
     {
         return blockInfoPlacerRegistry;
     }

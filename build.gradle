@@ -22,7 +22,7 @@ repositories {
     }
 }
 
-version = mod_ver
+version = mod_ver // + build counter 
 group = mod_class_group // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = mod_id
 
@@ -144,7 +144,7 @@ jar {
         attributes([
             "Specification-Title": mod_id,
             "Specification-Vendor": mod_author,
-            "Specification-Version": "1", // We are version 1 of ourselves
+            "Specification-Version": mod_ver_major,
             "Implementation-Title": name,
             "Implementation-Version": "${project.version}",
             "Implementation-Vendor" : mod_author,
