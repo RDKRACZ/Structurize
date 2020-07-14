@@ -54,6 +54,11 @@ public final class Structures
     public static final String SCHEMATICS_SCAN = "scans";
 
     /**
+     * Storage location for files downloaded from schemaserver.
+     */
+    public static final String SCHEMATICS_DYNAMIC_ONLINE_CACHE = "dyncache";
+
+    /**
      * Schematic's path in the jar file.
      */
     public static final String SCHEMATICS_ASSET_PATH = "/assets/";
@@ -166,7 +171,7 @@ public final class Structures
 
         if (md5Map.size() == 0)
         {
-            Log.getLogger().error("Error loading StructureProxy directory. Things will break!");
+            Log.getLogger().error("Error loading StructureProxy directory or no schematics found. Things may break!");
         }
     }
 
@@ -300,7 +305,7 @@ public final class Structures
      * @param basePath the base path.
      * @param prefix   either schematics, scans, cache
      */
-    private static void loadSchematicsForPrefix(@NotNull final Path basePath, @NotNull final String prefix)
+    public static void loadSchematicsForPrefix(@NotNull final Path basePath, @NotNull final String prefix)
     {
         if (!Files.exists(basePath.resolve(prefix)))
         {

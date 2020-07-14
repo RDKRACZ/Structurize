@@ -13,6 +13,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
@@ -87,5 +88,13 @@ public class ClientProxy implements IProxy
     public BlockState getBlockStateFromWorld(final BlockPos pos)
     {
         return Minecraft.getInstance().world.getBlockState(pos);
+    }
+
+    @Override
+    public void notifyClientOrServerOps(final ITextComponent message)
+    {
+        Minecraft.getInstance().execute(() -> {
+            Minecraft.getInstance().player.sendMessage(message, Minecraft.getInstance().player.getUniqueID());
+        });
     }
 }

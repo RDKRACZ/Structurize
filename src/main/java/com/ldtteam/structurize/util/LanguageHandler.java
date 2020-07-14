@@ -164,7 +164,12 @@ public final class LanguageHandler
 
     public static void sendMessageToPlayer(final PlayerEntity player, final String key, final Object... format)
     {
-        player.sendMessage(new StringTextComponent(translateKeyWithFormat(key, format)), player.getUniqueID());
+        player.sendMessage(prepareMessage(key, format), player.getUniqueID());
+    }
+
+    public static StringTextComponent prepareMessage(final String key, final Object... format)
+    {
+        return new StringTextComponent(translateKeyWithFormat(key, format));
     }
 
     /**
@@ -176,7 +181,7 @@ public final class LanguageHandler
      */
     public static String translateKeyWithFormat(final String key, final Object... format)
     {
-        return String.format(translateKey(key.toLowerCase(Locale.US)), format);
+        return String.format(translateKey(key), format);
     }
 
     /**

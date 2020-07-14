@@ -1,5 +1,6 @@
 package com.ldtteam.blockout.controls;
 
+import com.google.common.base.Strings;
 import com.ldtteam.blockout.Pane;
 import com.ldtteam.blockout.PaneParams;
 import com.ldtteam.blockout.views.View;
@@ -32,6 +33,7 @@ public class TextField extends Pane
     protected int textColor = 0xE0E0E0;
     protected int textColorDisabled = 0x707070;
     protected boolean shadow = true;
+    protected char replacementCharacter = '\0';
     @Nullable
     protected String tabNextPaneID = null;
     // Runtime
@@ -41,6 +43,7 @@ public class TextField extends Pane
     protected int scrollOffset = 0;
     protected int selectionEnd = 0;
     protected int cursorBlinkCounter = 0;
+    protected boolean isEnterTab = false;
 
     /**
      * Simple public constructor to instantiate.
@@ -65,6 +68,9 @@ public class TextField extends Pane
         shadow = params.getBooleanAttribute("shadow", shadow);
         text = params.getLocalizedStringAttribute("textContent", text);
         tabNextPaneID = params.getStringAttribute("tab", null);
+        final String cover = params.getStringAttribute("cover");
+        replacementCharacter = cover.isEmpty() ? '\0' : cover.charAt(0);
+        isEnterTab = params.getBooleanAttribute("enterToTab", isEnterTab);
     }
 
     public Filter getFilter()
@@ -230,6 +236,12 @@ public class TextField extends Pane
             case GLFW.GLFW_KEY_LEFT:
                 return handleArrowKeys(key);
 
+            case GLFW.GLFW_KEY_ENTER:
+            case GLFW.GLFW_KEY_KP_ENTER:
+                if (!isEnterTab)
+                {
+                    return handleChar(c);
+                }
             case GLFW.GLFW_KEY_TAB:
                 return handleTab();
 
@@ -255,7 +267,14 @@ public class TextField extends Pane
             final Pane next = getWindow().findPaneByID(tabNextPaneID);
             if (next != null)
             {
-                next.setFocus();
+                if (next instanceof Button)
+                {
+                    ((Button) next).handleClick(0, 0);
+                }
+                else
+                {
+                    next.setFocus();
+                }
             }
         }
         return true;
@@ -338,12 +357,14 @@ public class TextField extends Pane
         final int drawY = y;
 
         // Determine the portion of the string that is visible on screen
-        final String visibleString = mc.fontRenderer.func_238412_a_(text.substring(scrollOffset), drawWidth);
+        final String displayText = replacementCharacter == '\0' ? text
+            : Strings.repeat(Character.toString(replacementCharacter), text.length());
+        final String visibleString = mc.fontRenderer.func_238412_a_(displayText.substring(scrollOffset), drawWidth);
 
         final int relativeCursorPosition = cursorPosition - scrollOffset;
         int relativeSelectionEnd = selectionEnd - scrollOffset;
         final boolean cursorVisible = relativeCursorPosition >= 0 && relativeCursorPosition <= visibleString.length();
-        final boolean cursorBeforeEnd = cursorPosition < text.length() || text.length() >= maxTextLength;
+        final boolean cursorBeforeEnd = cursorPosition < displayText.length() || displayText.length() >= maxTextLength;
 
         // Enforce selection to the length limit of the visible string
         if (relativeSelectionEnd > visibleString.length())
