@@ -40,7 +40,7 @@ public final class LanguageHandler
         final ITextComponent message = buildChatComponent(key, format);
         for (final PlayerEntity player : players)
         {
-            player.sendMessage(message);
+            player.sendMessage(message, player.getUniqueID());
         }
     }
 
@@ -53,7 +53,7 @@ public final class LanguageHandler
      */
     public static void sendMessageToPlayer(final PlayerEntity player, final String key, final Object... format)
     {
-        player.sendMessage(buildChatComponent(key, format));
+        player.sendMessage(buildChatComponent(key, format), player.getUniqueID());
     }
 
     /**
@@ -65,7 +65,7 @@ public final class LanguageHandler
      */
     public static ITextComponent buildChatComponent(final String key, final Object... format)
     {
-        final String buildedMessage = String.format(LanguageMap.getInstance().translateKey(key), format);
+        final String buildedMessage = String.format(LanguageMap.getInstance().func_230503_a_(key), format);
 
         return new StringTextComponent(buildedMessage);
     }
@@ -136,7 +136,7 @@ public final class LanguageHandler
         {
             if (isMCloaded)
             {
-                return LanguageMap.getInstance().translateKey(key);
+                return LanguageMap.getInstance().func_230503_a_(key);
             }
             else
             {

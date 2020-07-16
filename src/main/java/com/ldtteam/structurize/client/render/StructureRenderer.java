@@ -6,19 +6,19 @@ import com.ldtteam.structurize.structure.StructureBB;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import org.lwjgl.opengl.GL11C;
+import net.minecraft.client.AbstractOption;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.culling.ClippingHelperImpl;
+import net.minecraft.client.renderer.culling.ClippingHelper;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.client.settings.AbstractOption;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 
 public class StructureRenderer implements IWorldRenderer
@@ -27,13 +27,13 @@ public class StructureRenderer implements IWorldRenderer
 
     private final Structure structure;
     private final StructureBB structureBB;
-    private final StructureWorld world;
+    // private final StructureWorld world;
 
     public StructureRenderer(final Structure structure, final StructureBB structureBB)
     {
         this.structure = structure;
         this.structureBB = structureBB;
-        this.world = null;
+        // this.world = null;
     }
 
     @Override
@@ -45,14 +45,14 @@ public class StructureRenderer implements IWorldRenderer
         final IProfiler profiler = mc.getProfiler();
         final Matrix4f curMatrix = matrixStack.getLast().getMatrix();
         final ActiveRenderInfo activeRenderInfo = mc.gameRenderer.getActiveRenderInfo();
-        final Vec3d projectedView = activeRenderInfo.getProjectedView();
+        final Vector3d projectedView = activeRenderInfo.getProjectedView();
         final double camX = projectedView.getX();
         final double camY = projectedView.getY();
         final double camZ = projectedView.getZ();
         final float renderDistance = mc.gameRenderer.getFarPlaneDistance();
 
         profiler.startSection("culling");
-        final ClippingHelperImpl clippinghelperimpl = new ClippingHelperImpl(curMatrix, context.getProjectionMatrix());
+        final ClippingHelper clippinghelperimpl = new ClippingHelper(curMatrix, context.getProjectionMatrix());
         clippinghelperimpl.setCameraPosition(camX, camY, camZ);
 
         profiler.endStartSection("terrain_setup");

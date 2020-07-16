@@ -10,11 +10,9 @@ import com.ldtteam.structurize.pipeline.build.EntityPlacer;
 import com.ldtteam.structurize.pipeline.scan.BlockInfoScanner;
 import com.ldtteam.structurize.pipeline.scan.EntityScanner;
 import com.ldtteam.structurize.util.LanguageHandler;
-import com.ldtteam.structurize.world.ModDimensions;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
-import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -70,12 +68,14 @@ public class LifecycleSubscriber
      *
      * @param event event
      */
-    @SubscribeEvent
-    public static void onModDimensionRegistry(final RegistryEvent.Register<ModDimension> event)
-    {
-        Structurize.getLogger().warn("RegistryEvent.Register<ModDimension>");
-        ModDimensions.registerModDimensions(event.getRegistry());
-    }
+    /*
+     * @SubscribeEvent
+     * public static void onModDimensionRegistry(final RegistryEvent.Register<ModDimension> event)
+     * {
+     * Structurize.getLogger().warn("RegistryEvent.Register<ModDimension>");
+     * ModDimensions.registerModDimensions(event.getRegistry());
+     * }
+     */
 
     /**
      * Called when BP are supposed to be registered.

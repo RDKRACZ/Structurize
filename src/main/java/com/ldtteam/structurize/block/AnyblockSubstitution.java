@@ -37,7 +37,7 @@ public class AnyblockSubstitution extends Block
      */
     public AnyblockSubstitution()
     {
-        this(Properties.create(new Material(MaterialColor.WOOD, false, true, true, true, true, false, false, PushReaction.BLOCK))
+        this(Properties.create(new Material(MaterialColor.WOOD, false, true, true, true, false, false, PushReaction.BLOCK))
             .doesNotBlockMovement()
             .hardnessAndResistance(1.0F));
     }
@@ -83,12 +83,12 @@ public class AnyblockSubstitution extends Block
                 if (worldIn.isRemote() && Structurize.getConfig().getClient().toggleableLightTexture.get())
                 {
                     SHOULD_RENDER_BLOCK_TEXTURE.set(!SHOULD_RENDER_BLOCK_TEXTURE.get());
-                    final SectionPos center = SectionPos.from(playerIn.getPosition());
+                    final SectionPos center = SectionPos.from(playerIn.func_233580_cy_());
                     ((ClientWorld) worldIn).markSurroundingsForRerender(center.getX(), center.getY(), center.getZ());
                     // Structurize.getEventRenderer().recompileTessellators();
                 }
 
-                return new ActionResult<>(ActionResultType.SUCCESS, playerIn.getHeldItem(handIn));
+                return super.onItemRightClick(worldIn, playerIn, handIn);
             }
         }.setRegistryName(this.getRegistryName());
     }

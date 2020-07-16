@@ -21,7 +21,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
@@ -37,6 +37,7 @@ import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.Heightmap.Type;
+import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -65,9 +66,11 @@ public class Chunk implements IChunk
             chunkSections[chunkSection.getYPos()] = chunkSection;
         }
 
-        for (final INBT tileEntityNbt : nbt.getList(NBTConstants.CHUNK_TILE_ENTITIES, NBT.TAG_COMPOUND))
+        for (final INBT tileEntityNbt0 : nbt.getList(NBTConstants.CHUNK_TILE_ENTITIES, NBT.TAG_COMPOUND))
         {
-            final TileEntity tileEntity = TileEntity.create((CompoundNBT) tileEntityNbt);
+            final CompoundNBT tileEntityNbt = (CompoundNBT) tileEntityNbt0;
+            final BlockPos pos = new BlockPos(tileEntityNbt.getInt("x"), tileEntityNbt.getInt("y"), tileEntityNbt.getInt("z"));
+            final TileEntity tileEntity = TileEntity.readTileEntity(this.getBlockState(pos), tileEntityNbt);
             tileEntities.put(packBlockPos(tileEntity.getPos()), tileEntity);
         }
 
@@ -103,7 +106,7 @@ public class Chunk implements IChunk
         for (final Entity entity : entities)
         {
             final CompoundNBT entNbt = entity.serializeNBT();
-            entNbt.removeUniqueId("UUID");
+            entNbt.remove("UUID");
             entitiesNbt.add(entNbt);
         }
 
@@ -172,7 +175,7 @@ public class Chunk implements IChunk
     }
 
     @Override
-    public IFluidState getFluidState(final BlockPos pos)
+    public FluidState getFluidState(final BlockPos pos)
     {
         return getBlockState(pos).getFluidState();
     }
@@ -244,40 +247,40 @@ public class Chunk implements IChunk
     }
 
     @Override
-    public void addStructureReference(final String arg0, final long arg1)
+    public void func_230343_a_(final Structure<?> p_230343_1_, final long p_230343_2_)
     {
         // Noop
     }
 
     @Override
-    public Map<String, LongSet> getStructureReferences()
-    {
-        // Noop
-        return null;
-    }
-
-    @Override
-    public LongSet getStructureReferences(final String arg0)
+    public Map<Structure<?>, LongSet> getStructureReferences()
     {
         // Noop
         return null;
     }
 
     @Override
-    public StructureStart getStructureStart(final String arg0)
+    public LongSet func_230346_b_(final Structure<?> p_230346_1_)
     {
         // Noop
         return null;
     }
 
     @Override
-    public void putStructureStart(final String arg0, final StructureStart arg1)
+    public StructureStart<?> func_230342_a_(final Structure<?> p_230342_1_)
+    {
+        // Noop
+        return null;
+    }
+
+    @Override
+    public void func_230344_a_(final Structure<?> p_230344_1_, final StructureStart<?> p_230344_2_)
     {
         // Noop
     }
 
     @Override
-    public void setStructureReferences(final Map<String, LongSet> arg0)
+    public void setStructureReferences(final Map<Structure<?>, LongSet> p_201606_1_)
     {
         // Noop
     }
@@ -323,14 +326,14 @@ public class Chunk implements IChunk
     }
 
     @Override
-    public Map<String, StructureStart> getStructureStarts()
+    public Map<Structure<?>, StructureStart<?>> getStructureStarts()
     {
         // Noop
         return null;
     }
 
     @Override
-    public void setStructureStarts(final Map<String, StructureStart> structureStartsIn)
+    public void setStructureStarts(final Map<Structure<?>, StructureStart<?>> structureStartsIn)
     {
         // Noop
     }

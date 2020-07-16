@@ -10,10 +10,10 @@ import com.ldtteam.structurize.client.render.util.RenderUtils.BuiltBuffer;
 import joptsimple.internal.Strings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Vector3f;
-import net.minecraft.client.renderer.Vector4f;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.vector.Vector2f;
+import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.util.math.vector.Vector4f;
 import net.minecraftforge.client.model.obj.LineReader;
 
 /**
@@ -177,7 +177,7 @@ public class OBJLoader
     public class OBJModel
     {
         private final List<Vector3f> positions = new ArrayList<>();
-        private final List<Vec2f> texCoords = new ArrayList<>();
+        private final List<Vector2f> texCoords = new ArrayList<>();
         private final List<Vector3f> normals = new ArrayList<>();
         private final List<Vector4f> colors = new ArrayList<>();
         private final List<OBJObject> objects = new ArrayList<>();

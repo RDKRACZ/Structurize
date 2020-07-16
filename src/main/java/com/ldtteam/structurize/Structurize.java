@@ -9,7 +9,6 @@ import com.ldtteam.structurize.network.NetworkChannel;
 import com.ldtteam.structurize.pipeline.ComponentRegistries;
 import com.ldtteam.structurize.util.constant.DataVersion;
 import com.ldtteam.structurize.util.constant.Constants;
-import com.ldtteam.structurize.world.schematic.SchematicWorldType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import net.minecraftforge.api.distmarker.Dist;
@@ -29,7 +28,6 @@ public class Structurize
     private final NetworkChannel networkChannel;
     private final Configuration configuration;
     private final ComponentRegistries componentRegistries;
-    private final SchematicWorldType schematicWorldType;
     private final IStructurizeApi api;
 
     /**
@@ -43,10 +41,10 @@ public class Structurize
         networkChannel = new NetworkChannel("net-channel");
         configuration = new Configuration(ModLoadingContext.get().getActiveContainer());
         componentRegistries = new ComponentRegistries();
-        schematicWorldType = new SchematicWorldType();
         Mod.EventBusSubscriber.Bus.MOD.bus().get().register(LifecycleSubscriber.class);
         Mod.EventBusSubscriber.Bus.FORGE.bus().get().register(EventSubscriber.class);
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> Mod.EventBusSubscriber.Bus.FORGE.bus().get().register(ClientEventSubscriber.class));
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+            () -> () -> Mod.EventBusSubscriber.Bus.FORGE.bus().get().register(ClientEventSubscriber.class));
         api = new ApiImpl();
 
         if (DataVersion.CURRENT == DataVersion.UPCOMING)
@@ -85,14 +83,6 @@ public class Structurize
     public static ComponentRegistries getComponentRegistries()
     {
         return instance.componentRegistries;
-    }
-
-    /**
-     * @return registered world type instance
-     */
-    public static SchematicWorldType getSchematicWorldType()
-    {
-        return instance.schematicWorldType;
     }
 
     /**

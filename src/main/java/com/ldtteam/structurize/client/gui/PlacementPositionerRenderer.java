@@ -6,7 +6,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import org.lwjgl.opengl.GL11;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Matrix4f;
 
 public class PlacementPositionerRenderer
 {

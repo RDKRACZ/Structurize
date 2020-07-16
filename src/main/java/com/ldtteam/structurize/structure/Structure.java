@@ -11,8 +11,8 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.IFluidState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
@@ -64,7 +64,7 @@ public class Structure implements IStructure
         return chunk != null ? chunk.getBlockState(pos) : Blocks.AIR.getDefaultState();
     }
 
-    public IFluidState getFluidState(final BlockPos pos)
+    public FluidState getFluidState(final BlockPos pos)
     {
         final Chunk chunk = getChunk(pos.getX(), pos.getZ());
         return chunk != null ? chunk.getFluidState(pos) : Fluids.EMPTY.getDefaultState();

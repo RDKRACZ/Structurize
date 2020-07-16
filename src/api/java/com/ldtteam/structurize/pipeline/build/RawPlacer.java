@@ -11,7 +11,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
 /**
@@ -63,7 +63,7 @@ public class RawPlacer
     public Tuple<TileEntity, BlockPos> transformDataToTileEntity(final CompoundNBT teCompound, final BlockPos tePos)
     {
         final BlockPos worldPos = structurePosition.getAnchor().add(tePos);
-        final TileEntity te = TileEntity.create(teCompound);
+        final TileEntity te = null; // TileEntity.create(teCompound);
 
         te.setWorldAndPos(structureWorld, worldPos);
 
@@ -76,7 +76,7 @@ public class RawPlacer
      * @param entityCompound entity data
      * @return constructed Entity and REAL world pos
      */
-    public Tuple<Entity, Vec3d> transformDataToEntity(final CompoundNBT entityCompound)
+    public Tuple<Entity, Vector3d> transformDataToEntity(final CompoundNBT entityCompound)
     {
         final Optional<EntityType<?>> type = EntityType.readEntityType(entityCompound);
         if (!type.isPresent())
@@ -86,9 +86,9 @@ public class RawPlacer
         }
         final Entity entity = type.get().create(structureWorld);
         entity.deserializeNBT(entityCompound);
-        final Vec3d newPos = entity.getPositionVector().add(new Vec3d(structurePosition.getAnchor()));
+        final Vector3d newPos = entity.getPositionVec().add(Vector3d.func_237491_b_(structurePosition.getAnchor()));
         entity.setPosition(newPos.getX(), newPos.getY(), newPos.getZ());
-        return new Tuple<Entity, Vec3d>(entity, newPos);
+        return new Tuple<Entity, Vector3d>(entity, newPos);
     }
 
     public static BlockInfoPlacer getBlockStatePlacer(final BlockState blockState)

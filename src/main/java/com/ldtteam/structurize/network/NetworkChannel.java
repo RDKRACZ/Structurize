@@ -7,7 +7,6 @@ import com.ldtteam.structurize.util.Utils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -35,8 +34,10 @@ public class NetworkChannel
      */
     public NetworkChannel(final String channelName)
     {
-        rawChannel = NetworkRegistry
-            .newSimpleChannel(Utils.createLocationFor(channelName), () -> LATEST_PROTO_VER, ACCEPTED_PROTO_VERS::equals, ACCEPTED_PROTO_VERS::equals);
+        rawChannel = NetworkRegistry.newSimpleChannel(Utils.createLocationFor(channelName),
+            () -> LATEST_PROTO_VER,
+            ACCEPTED_PROTO_VERS::equals,
+            ACCEPTED_PROTO_VERS::equals);
     }
 
     /**
@@ -122,10 +123,12 @@ public class NetworkChannel
      * @param msg message to send
      * @param dim target dimension
      */
-    public void sendToDimension(final IMessage msg, final DimensionType dim)
-    {
-        rawChannel.send(PacketDistributor.DIMENSION.with(() -> dim), msg);
-    }
+    /*
+     * public void sendToDimension(final IMessage msg, final DimensionType dim)
+     * {
+     * rawChannel.send(PacketDistributor.DIMENSION.with(() -> dim), msg);
+     * }
+     */
 
     /**
      * Sends to everyone in circle made using given target point.

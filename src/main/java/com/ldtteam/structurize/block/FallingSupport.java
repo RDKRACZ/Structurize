@@ -19,7 +19,7 @@ public class FallingSupport extends Block
      */
     public FallingSupport()
     {
-        this(Properties.create(new Material(MaterialColor.WOOD, false, true, true, true, true, false, false, PushReaction.BLOCK))
+        this(Properties.create(new Material(MaterialColor.WOOD, false, true, true, true, false, false, PushReaction.BLOCK))
             .doesNotBlockMovement()
             .noDrops()
             .hardnessAndResistance(Float.MAX_VALUE));

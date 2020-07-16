@@ -2,8 +2,6 @@ package com.ldtteam.structurize.event.forge;
 
 import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.command.EntryPoint;
-import com.ldtteam.structurize.world.ModDimensions;
-import com.ldtteam.structurize.world.schematic.PlayerEvents;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -37,7 +35,7 @@ public class EventSubscriber
     public static void onServerAboutToStart(final FMLServerAboutToStartEvent event)
     {
         Structurize.getLogger().warn("FMLServerAboutToStartEvent");
-        ModDimensions.registerDimensionTypes();
+        // ModDimensions.registerDimensionTypes();
     }
 
     /**
@@ -93,7 +91,7 @@ public class EventSubscriber
     @SubscribeEvent
     public static void onPlayerLoggedIn(final PlayerLoggedInEvent event)
     {
-        PlayerEvents.onPlayerJoinedSchematicWorldType(event.getPlayer());
+        // PlayerEvents.onPlayerJoinedSchematicWorldType(event.getPlayer());
     }
 
     /**
@@ -104,7 +102,7 @@ public class EventSubscriber
     @SubscribeEvent
     public static void onEntityTravelToDimension(final EntityTravelToDimensionEvent event)
     {
-        if (!PlayerEvents.canEntityTravelToDimension(event.getEntity(), event.getDimension()))
+        if (false)// !PlayerEvents.canEntityTravelToDimension(event.getEntity(), event.getDimension()))
         {
             event.setCanceled(true);
         }
