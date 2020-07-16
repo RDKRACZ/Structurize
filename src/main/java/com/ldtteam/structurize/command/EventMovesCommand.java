@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands.EnvironmentType;
 import net.minecraft.command.arguments.BlockPosArgument;
 import net.minecraft.util.math.BlockPos;
 
@@ -13,6 +14,11 @@ import net.minecraft.util.math.BlockPos;
 public class EventMovesCommand extends AbstractCommand
 {
     private static final String POS_ARG = "movepos";
+
+    protected static EnvironmentType getEnvironmentType()
+    {
+        return EnvironmentType.INTEGRATED;
+    }
 
     protected static LiteralArgumentBuilder<CommandSource> build()
     {

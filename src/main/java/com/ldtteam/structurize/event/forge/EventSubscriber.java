@@ -2,11 +2,11 @@ package com.ldtteam.structurize.event.forge;
 
 import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.command.EntryPoint;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
@@ -44,10 +44,10 @@ public class EventSubscriber
      * @param event event
      */
     @SubscribeEvent
-    public static void onServerStarting(final FMLServerStartingEvent event)
+    public static void onRegisterCommands(final RegisterCommandsEvent event)
     {
-        Structurize.getLogger().warn("FMLServerStartingEvent");
-        EntryPoint.register(event.getCommandDispatcher());
+        Structurize.getLogger().warn("RegisterCommandsEvent");
+        EntryPoint.register(event.getDispatcher(), event.getEnvironment());
     }
 
     /**

@@ -3,6 +3,7 @@ package com.ldtteam.structurize.command;
 import com.ldtteam.structurize.util.constant.Constants;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands.EnvironmentType;
 
 /**
  * Mod entry command
@@ -37,10 +38,11 @@ public class EntryPoint extends AbstractCommand
      *
      * @param dispatcher main server command dispatcher
      */
-    public static void register(final CommandDispatcher<CommandSource> dispatcher)
+    public static void register(final CommandDispatcher<CommandSource> dispatcher, final EnvironmentType environment)
     {
-        final CommandTree structurizeRoot = new CommandTree(Constants.MOD_ID).addNode(EventMovesCommand.build());
+        final CommandTree structurizeRoot = CommandTree.newRootNode()
+            .addNode(EventMovesCommand::build, EventMovesCommand::getEnvironmentType);
 
-        dispatcher.register(structurizeRoot.build());
+        structurizeRoot.register(dispatcher, environment);
     }
 }
