@@ -1,40 +1,30 @@
 package com.ldtteam.structurize.client.render;
 
 import java.util.function.Supplier;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.WorldRenderer;
+import com.ldtteam.structurize.client.render.util.RenderUtils;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 
-public abstract class PositionTranslator implements IRenderStateModifier
+public class PositionTranslator extends EventRenderer
 {
-    public static class Apply extends PositionTranslator
+    private final Supplier<BlockPos> absolutePosSupplier;
+
+    public PositionTranslator(final Supplier<BlockPos> absolutePosSupplier, final Builder builder)
     {
-        private final Supplier<BlockPos> absolutePosSupplier;
-
-        public Apply(final Supplier<BlockPos> absolutePosSupplierIn)
-        {
-            absolutePosSupplier = absolutePosSupplierIn;
-        }
-
-        @Override
-        public void run(final WorldRenderer context, final MatrixStack matrixStack, final float partialTicks)
-        {
-            final Vec3d camera = Minecraft.getInstance().gameRenderer.getActiveRenderInfo().getProjectedView();
-            final BlockPos anchor = absolutePosSupplier.get();
-
-            matrixStack.push();
-            matrixStack.translate(anchor.getX() - camera.getX(), anchor.getY() - camera.getY(), anchor.getZ() - camera.getZ());
-        }
+        super(builder);
+        this.absolutePosSupplier = absolutePosSupplier;
     }
 
-    public static class Reset extends PositionTranslator
+    @Override
+    public void render(final RenderWorldLastEvent context)
     {
-        @Override
-        public void run(final WorldRenderer context, final MatrixStack matrixStack, final float partialTicks)
-        {
-            matrixStack.pop();
-        }
+        final Vec3d camera = RenderUtils.getVanillaRenderInfo().getProjectedView();
+        final BlockPos anchor = absolutePosSupplier.get();
+
+        context.getMatrixStack().push();
+        context.getMatrixStack().translate(anchor.getX() - camera.getX(), anchor.getY() - camera.getY(), anchor.getZ() - camera.getZ());
+        super.render(context);
+        context.getMatrixStack().pop();
     }
 }

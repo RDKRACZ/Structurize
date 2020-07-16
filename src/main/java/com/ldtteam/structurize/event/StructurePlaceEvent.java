@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 
 public class StructurePlaceEvent implements IStructurePlaceEvent
 {
@@ -63,17 +64,14 @@ public class StructurePlaceEvent implements IStructurePlaceEvent
     }
 
     @Override
-    public void render(final WorldRenderer context, final MatrixStack matrixStack, final float partialTicks)
+    public void render(final RenderWorldLastEvent context)
     {
         if (eventRenderer == null)
         {
             eventRenderer = EventRenderer.builder()
-                .absolutePos(structureBB::getAnchor)
-                .structure(structure, structureBB)
-                .box(structureBB)
-                .absolutePosRestore()
+                .absolutePos(structureBB::getAnchor, EventRenderer.builder().structure(structure, structureBB).box(structureBB))
                 .build();
         }
-        eventRenderer.render(context, matrixStack, partialTicks);
+        eventRenderer.render(context);
     }
 }

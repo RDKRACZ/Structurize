@@ -1,7 +1,6 @@
 package com.ldtteam.structurize;
 
 import com.ldtteam.structurize.apiimpl.ApiImpl;
-import com.ldtteam.structurize.client.gui.GuiKeybindManager;
 import com.ldtteam.structurize.config.Configuration;
 import com.ldtteam.structurize.event.forge.ClientEventSubscriber;
 import com.ldtteam.structurize.event.forge.EventSubscriber;
@@ -49,11 +48,10 @@ public class Structurize
         Mod.EventBusSubscriber.Bus.FORGE.bus().get().register(EventSubscriber.class);
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> Mod.EventBusSubscriber.Bus.FORGE.bus().get().register(ClientEventSubscriber.class));
         api = new ApiImpl();
-        GuiKeybindManager.KEY_BINDING.setToDefault();
 
         if (DataVersion.CURRENT == DataVersion.UPCOMING)
         {
-            throw new RuntimeException("Missing newest data versions. Please update api/util/constant/DataVersion");
+            throw new RuntimeException("Missing some newest data versions. Please update api/util/constant/DataVersion");
         }
     }
 

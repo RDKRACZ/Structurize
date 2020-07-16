@@ -1,6 +1,6 @@
 package com.ldtteam.structurize.network.messages;
 
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.network.NetworkEvent;

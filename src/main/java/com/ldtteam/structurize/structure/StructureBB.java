@@ -147,13 +147,13 @@ public class StructureBB implements IStructureBB
         // mirror
         if (mirror == Mirror.FRONT_BACK)
         {
-            min = new BlockPos(min.getX(), min.getY(), -1 * min.getZ());
-            max = new BlockPos(max.getX(), max.getY(), -1 * max.getZ());
+            min = new BlockPos(-1 * min.getX(), min.getY(), min.getZ());
+            max = new BlockPos(-1 * max.getX(), max.getY(), max.getZ());
         }
         else if (mirror == Mirror.LEFT_RIGHT)
         {
-            min = new BlockPos(-1 * min.getX(), min.getY(), min.getZ());
-            max = new BlockPos(-1 * max.getX(), max.getY(), max.getZ());
+            min = new BlockPos(min.getX(), min.getY(), -1 * min.getZ());
+            max = new BlockPos(max.getX(), max.getY(), -1 * max.getZ());
         }
 
         // translate

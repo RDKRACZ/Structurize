@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.Map;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.ITextComponent;
@@ -37,7 +35,7 @@ public final class LanguageHandler
      * @param key     translation key
      * @param format  String.format() attributes
      */
-    public static void sendMessageToPlayers(@Nullable final Collection<PlayerEntity> players, final String key, final Object... format)
+    public static void sendMessageToPlayers(final Collection<PlayerEntity> players, final String key, final Object... format)
     {
         final ITextComponent message = buildChatComponent(key, format);
         for (final PlayerEntity player : players)
@@ -53,7 +51,7 @@ public final class LanguageHandler
      * @param key    translation key
      * @param format String.format() attributes
      */
-    public static void sendMessageToPlayer(@NotNull final PlayerEntity player, final String key, final Object... format)
+    public static void sendMessageToPlayer(final PlayerEntity player, final String key, final Object... format)
     {
         player.sendMessage(buildChatComponent(key, format));
     }

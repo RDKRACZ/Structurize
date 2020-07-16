@@ -136,10 +136,8 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    apiImplementation com_intel_annotations
-
-    implementation com_intel_annotations
-    implementation com_ldtte_blockout
+    implementation com_ldtte_blockout_api
+    // runtime com_ldtte_blockout
 
     testImplementation junit_junit
     testImplementation org_mocki_mockitocore

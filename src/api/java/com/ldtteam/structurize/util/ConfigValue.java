@@ -2,8 +2,6 @@ package com.ldtteam.structurize.util;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class ConfigValue<T, U extends ConfigValue<T, U>>
 {
@@ -46,19 +44,16 @@ public class ConfigValue<T, U extends ConfigValue<T, U>>
         return context.descriptionKey;
     }
 
-    @Nullable
     public Predicate<GenericConfiguration> getEnabledPredicate()
     {
         return context.enabledPredicate;
     }
 
-    @Nullable
     public Predicate<ConfigValue<T, U>> getValueValidator()
     {
         return context.valueValidator;
     }
 
-    @Nullable
     public String getInvalidValueKey()
     {
         return context.invalidValueKey;
@@ -82,37 +77,37 @@ public class ConfigValue<T, U extends ConfigValue<T, U>>
         {
         }
 
-        public ConfigContext<T, U> setNameKey(@NotNull final String nameKey)
+        public ConfigContext<T, U> setNameKey(final String nameKey)
         {
             this.nameKey = nameKey;
             return this;
         }
 
-        public ConfigContext<T, U> setDescriptionKey(@NotNull final String descriptionKey)
+        public ConfigContext<T, U> setDescriptionKey(final String descriptionKey)
         {
             this.descriptionKey = descriptionKey;
             return this;
         }
 
-        public ConfigContext<T, U> setEnabledPredicate(@Nullable final Predicate<GenericConfiguration> enabledPredicate)
+        public ConfigContext<T, U> setEnabledPredicate(final Predicate<GenericConfiguration> enabledPredicate)
         {
             this.enabledPredicate = enabledPredicate;
             return this;
         }
 
-        public ConfigContext<T, U> setValueValidator(@Nullable Predicate<ConfigValue<T, U>> valueValidator)
+        public ConfigContext<T, U> setValueValidator(Predicate<ConfigValue<T, U>> valueValidator)
         {
             this.valueValidator = valueValidator;
             return this;
         }
 
-        public ConfigContext<T, U> setInvalidValueKey(@Nullable String invalidValueKey)
+        public ConfigContext<T, U> setInvalidValueKey(String invalidValueKey)
         {
             this.invalidValueKey = invalidValueKey;
             return this;
         }
 
-        public ConfigContext<T, U> setDefaultValue(@NotNull final T defaultValue)
+        public ConfigContext<T, U> setDefaultValue(final T defaultValue)
         {
             this.defaultValue = defaultValue;
             return this;

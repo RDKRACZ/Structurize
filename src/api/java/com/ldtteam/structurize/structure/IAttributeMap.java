@@ -12,5 +12,5 @@ public interface IAttributeMap
      * @param attribute attribute enum
      * @return value of attribute in this map, if not found then it's default value
      */
-    <T> T getAttributeValue(Attribute<T> attribute);
+    <T> T getAttributeValue(Attribute<T, ?> attribute);
 }

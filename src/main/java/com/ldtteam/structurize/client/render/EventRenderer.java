@@ -5,18 +5,17 @@ import java.util.List;
 import java.util.function.Supplier;
 import com.ldtteam.structurize.structure.Structure;
 import com.ldtteam.structurize.structure.StructureBB;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 
 /**
  * Renderer holder for attaching few renderers into one.
  */
-public class EventRenderer implements IRenderer
+public class EventRenderer implements IWorldRenderer
 {
-    private final List<Object> renderPipeline;
+    private final List<IWorldRenderer> renderPipeline;
 
-    private EventRenderer(final Builder builder)
+    protected EventRenderer(final Builder builder)
     {
         renderPipeline = builder.renderPipeline;
     }
@@ -24,28 +23,18 @@ public class EventRenderer implements IRenderer
     @Override
     public void rebuild()
     {
-        for (final Object action : renderPipeline)
+        for (final IWorldRenderer renderer : renderPipeline)
         {
-            if (action instanceof IRenderer)
-            {
-                ((IRenderer) action).rebuild();
-            }
+            renderer.rebuild();
         }
     }
 
     @Override
-    public void render(final WorldRenderer context, final MatrixStack matrixStack, final float partialTicks)
+    public void render(final RenderWorldLastEvent context)
     {
-        for (final Object action : renderPipeline)
+        for (final IWorldRenderer renderer : renderPipeline)
         {
-            if (action instanceof IRenderer)
-            {
-                ((IRenderer) action).render(context, matrixStack, partialTicks);
-            }
-            else if (action instanceof IRenderStateModifier)
-            {
-                ((IRenderStateModifier) action).run(context, matrixStack, partialTicks);
-            }
+            renderer.render(context);
         }
     }
 
@@ -59,7 +48,7 @@ public class EventRenderer implements IRenderer
 
     public static class Builder
     {
-        private final List<Object> renderPipeline = new ArrayList<>();
+        private final List<IWorldRenderer> renderPipeline = new ArrayList<>();
 
         private Builder()
         {
@@ -94,22 +83,12 @@ public class EventRenderer implements IRenderer
          * Translate rendering from player relative to world absolute using pos from supplier.
          *
          * @param absolutePosSupplier supplier of world absolute position
+         * @param translatedRenderer  builder of renderer which should be translated to absolutePos
          * @return updated builder instance
          */
-        public Builder absolutePos(final Supplier<BlockPos> absolutePosSupplier)
+        public Builder absolutePos(final Supplier<BlockPos> absolutePosSupplier, final Builder translatedRenderer)
         {
-            renderPipeline.add(new PositionTranslator.Apply(absolutePosSupplier));
-            return this;
-        }
-
-        /**
-         * Restores world absolute rendering to player relative.
-         *
-         * @return updated builder instance
-         */
-        public Builder absolutePosRestore()
-        {
-            renderPipeline.add(new PositionTranslator.Reset());
+            renderPipeline.add(new PositionTranslator(absolutePosSupplier, translatedRenderer));
             return this;
         }
 

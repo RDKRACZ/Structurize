@@ -46,12 +46,16 @@ public class ScanTool extends AbstractItemWithPosSelector
         if (!worldIn.isRemote())
         {
             final long time = System.nanoTime();
-            final Path loc = Minecraft.getInstance().gameDir.toPath().resolve("structurize").resolve("tempschem.blueprint").toAbsolutePath();
+            final Path loc = Minecraft.getInstance().gameDir.toPath()
+                .resolve("structurize")
+                .resolve("tempschem.blueprint")
+                .toAbsolutePath();
             Structurize.getLogger().info("Saving bp to: " + loc.toString());
             try
             {
                 Files.createDirectories(loc.getParent());
-                BlueprintUtils.writeToStream(loc, BlueprintUtils.createBlueprint(worldIn, start, end, Long.toString(System.currentTimeMillis()), null));
+                // BlueprintUtils.writeToStream(loc, BlueprintUtils.createBlueprint(worldIn, start, end,
+                // Long.toString(System.currentTimeMillis()), null));
             }
             catch (final IOException e)
             {

@@ -2,6 +2,7 @@ package com.ldtteam.structurize.event.forge;
 
 import com.ldtteam.structurize.Structurize;
 import com.ldtteam.structurize.block.ModBlocks;
+import com.ldtteam.structurize.client.gui.OverlayGuiManager;
 import com.ldtteam.structurize.item.ModItems;
 import com.ldtteam.structurize.pipeline.build.BlockInfoPlacer;
 import com.ldtteam.structurize.pipeline.build.BuildProvider;
@@ -16,6 +17,7 @@ import net.minecraft.item.Item;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
@@ -161,6 +163,8 @@ public class LifecycleSubscriber
     public static void onClientInit(final FMLClientSetupEvent event)
     {
         Structurize.getLogger().warn("FMLClientSetupEvent");
+        ClientRegistry.registerKeyBinding(OverlayGuiManager.KEY_BINDING);
+        OverlayGuiManager.setup();
         // Structurize.getOptifineCompat().intialize();
     }
 

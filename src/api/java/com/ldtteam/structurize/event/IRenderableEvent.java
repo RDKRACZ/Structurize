@@ -1,9 +1,8 @@
 package com.ldtteam.structurize.event;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 
 public interface IRenderableEvent
 {
-    void render(WorldRenderer context, MatrixStack matrixStack, float partialTicks);
+    void render(RenderWorldLastEvent context);
 }

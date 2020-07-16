@@ -2,8 +2,7 @@ package com.ldtteam.structurize.event;
 
 import com.ldtteam.structurize.client.render.EventRenderer;
 import com.ldtteam.structurize.structure.StructureBB;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 
 public class CaliperEvent implements ICaliperEvent
 {
@@ -16,12 +15,12 @@ public class CaliperEvent implements ICaliperEvent
     }
 
     @Override
-    public void render(final WorldRenderer context, final MatrixStack matrixStack, final float partialTicks)
+    public void render(final RenderWorldLastEvent context)
     {
         if (eventRenderer == null)
         {
-            eventRenderer = EventRenderer.builder().absolutePos(structureBB::getAnchor).box(structureBB).absolutePosRestore().build();
+            eventRenderer = EventRenderer.builder().absolutePos(structureBB::getAnchor, EventRenderer.builder().box(structureBB)).build();
         }
-        eventRenderer.render(context, matrixStack, partialTicks);
+        eventRenderer.render(context);
     }
 }

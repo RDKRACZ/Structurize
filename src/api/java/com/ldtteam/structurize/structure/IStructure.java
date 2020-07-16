@@ -15,27 +15,15 @@ public interface IStructure
      * @param pos relative structure blockPos
      * @return {@link BlockInfo}
      */
-    default BlockInfo getBlockInfo(final BlockPos pos)
-    {
-        return getBlockInfo(pos.getX(), pos.getY(), pos.getZ());
-    }
+    BlockInfo getBlockInfo(BlockPos pos);
 
     /**
-     * Getter for blockinfo for blockPos relative to structure anchor.
+     * Getter for all entities in chunk given by pos.
      *
-     * @param x relative structure X pos
-     * @param y relative structure Y pos
-     * @param z relative structure Z pos
-     * @return {@link BlockInfo}
-     */
-    BlockInfo getBlockInfo(int x, int y, int z);
-
-    /**
-     * Getter for all structure entities.
-     *
+     * @param pos pos in targeted chunk
      * @return list of structure entities
      */
-    List<Entity> getEntities();
+    List<Entity> getEntitiesInChunk(BlockPos pos);
 
     /**
      * Creates new structure bounding box. Contains things like anchor and peek poses, sizes, volume...

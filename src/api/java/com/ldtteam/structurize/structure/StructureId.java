@@ -2,6 +2,7 @@ package com.ldtteam.structurize.structure;
 
 public class StructureId
 {
+    public static final StructureId EMPTY = new StructureId();
     private static final int PARTS_COUNT = 8;
     private static final String VERSION_REGEX = "^\\d+(\\.\\d+)*$";
     private String origin;
@@ -12,13 +13,19 @@ public class StructureId
     private String type;
     private String name;
     private String version;
+    private String joined;
 
     private StructureId()
     {
     }
 
-    public static StructureId from(final String structurePath) throws InvalidStructureIdException
+    public static StructureId of(final String structurePath) throws InvalidStructureIdException
     {
+        if (structurePath.isEmpty())
+        {
+            return EMPTY;
+        }
+
         final StructureId result = new StructureId();
         final String[] parts = structurePath.split(":");
 
@@ -36,6 +43,7 @@ public class StructureId
         result.type = parts[part++];
         result.name = parts[part++];
         result.version = parts[part++];
+        result.joined = structurePath;
 
         if (!(result.origin.equals("local") || result.origin.equals("online") || result.origin.equals("mod")))
         {
@@ -96,6 +104,12 @@ public class StructureId
     public String getVersion()
     {
         return version;
+    }
+
+    @Override
+    public String toString()
+    {
+        return joined;
     }
 
     public static final class InvalidStructureIdException extends RuntimeException
