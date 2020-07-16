@@ -28,7 +28,7 @@ public abstract class AbstractCommand
      * <li>{@link EnvironmentType#DEDICATED} register only when on dedicated server</li>
      * <li>{@link EnvironmentType#ALL} register always</li>
      *
-     * @return enviro
+     * @return in which command environment should be command registered
      */
     protected static EnvironmentType getEnvironmentType()
     {
